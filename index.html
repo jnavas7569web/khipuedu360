@@ -26,7 +26,7 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen p-4">
+<body class="flex items-center justify-center h-screen p-4 font-sans">
 
     <div class="glass-card w-full max-w-sm p-10">
         <div class="text-center mb-10">
@@ -38,11 +38,11 @@
         
         <form id="login-form" class="space-y-6">
             <div>
-                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest ml-1">Correo (email)</label>
+                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest ml-1">Correo</label>
                 <div class="relative">
                     <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
                     <input type="email" id="email" placeholder="nombre@ejemplo.com" required
-                        class="w-full pl-11 pr-4 py-3.5 input-style rounded-2xl outline-none font-semibold text-slate-700">
+                        class="w-full pl-11 pr-4 py-3.5 input-style rounded-2xl outline-none font-semibold text-slate-700 italic">
                 </div>
             </div>
 
@@ -55,16 +55,18 @@
                 </div>
             </div>
             
-            <button type="submit" id="loginBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-200 transform transition-all active:scale-95 uppercase text-xs tracking-widest">
+            <button type="submit" id="loginBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-200 transform transition-all active:scale-95 uppercase text-sm tracking-widest">
                 Ingresar al Sistema
             </button>
         </form>
         
         <div class="text-center mt-8">
             <button id="btn-olvido" class="text-indigo-500 hover:text-indigo-700 text-[11px] font-bold transition-all flex items-center justify-center mx-auto gap-2">
-                <i class="fa-solid fa-circle-question text-sm"></i> ¿Olvidaste tu contraseña?
+                <i class="fa-solid fa-lock-open"></i> ¿Olvidaste tu contraseña?
             </button>
         </div>
+
+        <p id="message" class="mt-6 text-center text-red-500 text-xs font-bold h-4 italic"></p>
     </div>
 
 <script type="module">
@@ -87,6 +89,7 @@
     auth.languageCode = 'es';
 
     const loginForm = document.getElementById('login-form');
+    const msg = document.getElementById('message');
 
     // --- LÓGICA DE INICIO DE SESIÓN ---
     loginForm.addEventListener('submit', async (e) => {
@@ -97,43 +100,47 @@
 
         btn.disabled = true;
         btn.innerText = "VALIDANDO ACCESO...";
+        msg.innerText = "";
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+            
+            // Validar en la colección 'usuario' (en singular como tu imagen)
             const userDoc = await getDoc(doc(db, "usuario", userCredential.user.uid));
 
             if (userDoc.exists() && userDoc.data().estado === 'activo') {
                 Swal.fire({
-                    icon: 'success',
                     title: '¡Acceso Correcto!',
                     text: 'Bienvenido a Khipu Edu 360',
-                    showConfirmButton: false,
+                    icon: 'success',
                     timer: 1500,
+                    showConfirmButton: false,
                     willClose: () => { window.location.href = "ee.html"; }
                 });
             } else {
-                throw { message: "Cuenta inactiva o sin perfil asignado." };
+                throw { code: 'custom/inactive', message: "Cuenta inactiva o sin perfil." };
             }
         } catch (error) {
             btn.disabled = false;
             btn.innerText = "INGRESAR AL SISTEMA";
-            let msgError = "Credenciales incorrectas.";
-            if (error.code === 'auth/invalid-credential') msgError = "Correo o contraseña no válidos.";
-            
+            let errorMsg = "Credenciales incorrectas.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') errorMsg = "El usuario no existe o los datos son incorrectos.";
+            if (error.code === 'custom/inactive') errorMsg = error.message;
+
             Swal.fire({
-                icon: 'error',
                 title: 'Error de Acceso',
-                text: msgError,
+                text: errorMsg,
+                icon: 'error',
                 confirmButtonColor: '#6366f1'
             });
         }
     });
 
-    // --- LÓGICA DE RECUPERAR CONTRASEÑA (SweetAlert2 Pro) ---
+    // --- LÓGICA DE RECUPERAR CONTRASEÑA (Copiada de tu código funcional) ---
     document.getElementById('btn-olvido').addEventListener('click', async (e) => {
         e.preventDefault();
 
-        const { value: emailReset } = await Swal.fire({
+        const { value: email } = await Swal.fire({
             title: 'Recuperar Contraseña',
             html: '<p class="text-sm text-gray-600">Enviaremos un enlace a tu correo para que puedas cambiar tu clave de forma segura.</p>',
             input: 'email',
@@ -146,15 +153,15 @@
             inputAttributes: { autocapitalize: 'off', autocorrect: 'off' }
         });
 
-        if (emailReset) {
+        if (email) {
             try {
-                await sendPasswordResetEmail(auth, emailReset);
+                await sendPasswordResetEmail(auth, email);
                 
                 Swal.fire({
                     title: '¡Enlace Enviado!',
                     html: `<div class="text-left p-2">
                             <p><b>Khipu Edu 360 Informa:</b></p>
-                            <p class="mt-2">Se ha enviado un correo a: <b>${emailReset}</b></p>
+                            <p class="mt-2">Se ha enviado un correo a: <b>${email}</b></p>
                             <p class="mt-2 text-xs text-gray-500 italic">Si no lo ves, revisa la carpeta de Correo No Deseado o Spam.</p>
                            </div>`,
                     icon: 'success',
@@ -163,7 +170,9 @@
             } catch (error) {
                 console.error(error);
                 let msgError = "No se pudo enviar el correo.";
-                if (error.code === 'auth/user-not-found') msgError = "Este correo no está registrado en el sistema.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
+                    msgError = "Este correo no está registrado o es inválido.";
+                }
                 
                 Swal.fire('Error', msgError, 'error');
             }
