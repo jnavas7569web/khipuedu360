@@ -38,7 +38,7 @@
         
         <form id="login-form" class="space-y-6">
             <div>
-                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest ml-1">Correo Institucional</label>
+                <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest ml-1">Correo (email)</label>
                 <div class="relative">
                     <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
                     <input type="email" id="email" placeholder="nombre@ejemplo.com" required
@@ -88,58 +88,84 @@
 
     const loginForm = document.getElementById('login-form');
 
-    // --- LÓGICA DE LOGIN ---
+    // --- LÓGICA DE INICIO DE SESIÓN ---
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
         const btn = document.getElementById('loginBtn');
+
         btn.disabled = true;
         btn.innerText = "VALIDANDO ACCESO...";
 
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+            const userCredential = await signInWithEmailAndPassword(auth, email, pass);
             const userDoc = await getDoc(doc(db, "usuario", userCredential.user.uid));
 
             if (userDoc.exists() && userDoc.data().estado === 'activo') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Acceso Autorizado',
+                    title: '¡Acceso Correcto!',
+                    text: 'Bienvenido a Khipu Edu 360',
                     showConfirmButton: false,
                     timer: 1500,
                     willClose: () => { window.location.href = "ee.html"; }
                 });
             } else {
-                throw { message: "Cuenta inactiva o sin perfil." };
+                throw { message: "Cuenta inactiva o sin perfil asignado." };
             }
         } catch (error) {
             btn.disabled = false;
             btn.innerText = "INGRESAR AL SISTEMA";
+            let msgError = "Credenciales incorrectas.";
+            if (error.code === 'auth/invalid-credential') msgError = "Correo o contraseña no válidos.";
+            
             Swal.fire({
                 icon: 'error',
                 title: 'Error de Acceso',
-                text: "Correo o contraseña no válidos",
+                text: msgError,
                 confirmButtonColor: '#6366f1'
             });
         }
     });
 
-    // --- LÓGICA DE RECUPERACIÓN ---
-    document.getElementById('btn-olvido').addEventListener('click', async () => {
-        const { value: userEmail } = await Swal.fire({
+    // --- LÓGICA DE RECUPERAR CONTRASEÑA (SweetAlert2 Pro) ---
+    document.getElementById('btn-olvido').addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const { value: emailReset } = await Swal.fire({
             title: 'Recuperar Contraseña',
+            html: '<p class="text-sm text-gray-600">Enviaremos un enlace a tu correo para que puedas cambiar tu clave de forma segura.</p>',
             input: 'email',
-            inputPlaceholder: 'Ingresa tu correo institucional',
-            confirmButtonText: 'Enviar enlace',
+            inputPlaceholder: 'tu-correo@ejemplo.com',
             confirmButtonColor: '#6366f1',
+            confirmButtonText: 'Enviar Enlace',
             showCancelButton: true,
-            cancelButtonText: 'Cancelar'
+            cancelButtonText: 'Cancelar',
+            cancelButtonColor: '#d33',
+            inputAttributes: { autocapitalize: 'off', autocorrect: 'off' }
         });
 
-        if (userEmail) {
+        if (emailReset) {
             try {
-                await sendPasswordResetEmail(auth, userEmail);
-                Swal.fire('¡Enviado!', 'Revisa tu bandeja de entrada o spam.', 'success');
+                await sendPasswordResetEmail(auth, emailReset);
+                
+                Swal.fire({
+                    title: '¡Enlace Enviado!',
+                    html: `<div class="text-left p-2">
+                            <p><b>Khipu Edu 360 Informa:</b></p>
+                            <p class="mt-2">Se ha enviado un correo a: <b>${emailReset}</b></p>
+                            <p class="mt-2 text-xs text-gray-500 italic">Si no lo ves, revisa la carpeta de Correo No Deseado o Spam.</p>
+                           </div>`,
+                    icon: 'success',
+                    confirmButtonColor: '#6366f1'
+                });
             } catch (error) {
-                Swal.fire('Error', 'No se pudo enviar el correo.', 'error');
+                console.error(error);
+                let msgError = "No se pudo enviar el correo.";
+                if (error.code === 'auth/user-not-found') msgError = "Este correo no está registrado en el sistema.";
+                
+                Swal.fire('Error', msgError, 'error');
             }
         }
     });
