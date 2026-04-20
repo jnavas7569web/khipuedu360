@@ -242,10 +242,10 @@
                         <i class="fa-solid fa-user-plus text-xl text-indigo-400"></i>
                         <span>AÑADIR USUARIO</span>
                     </a>
-                              <a href="masmaterias.html" class="btn-admin" style="background: #4f46e5;">
-    <i class="fa-solid fa-book-open text-xl text-indigo-300"></i>
-    <span>GESTIONAR MATERIAS</span>
-</a>
+                              <div onclick="abrirMenuGestion()" class="btn-admin cursor-pointer" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1);">
+    <i class="fa-solid fa-layer-group text-xl text-indigo-400"></i>
+    <span>GESTIÓN MATERIAS Y GRADOS</span>
+</div>
                     <a href="asignaciones.html" class="btn-admin" style="background: #1e293b;">
                         <i class="fa-solid fa-users-gear text-xl"></i>
                         <span>GESTIONAR PERSONAL</span>
@@ -330,6 +330,32 @@
                 }
             });
         });
+        window.abrirMenuGestion = () => {
+    Swal.fire({
+        title: 'Gestión Académica',
+        text: '¿Qué sección deseas configurar hoy?',
+        icon: 'question',
+        showCancelButton: true,
+        showDenyButton: true,
+        confirmButtonText: '<i class="fa-solid fa-book-open mr-2"></i> Materias',
+        denyButtonText: '<i class="fa-solid fa-graduation-cap mr-2"></i> Grados / Años',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#4f46e5', // Color Indigo
+        denyButtonColor: '#1e293b',    // Color Slate
+        customClass: {
+            popup: 'rounded-3xl',
+            confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
+            denyButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
+            cancelButton: 'rounded-xl font-bold uppercase text-xs'
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = 'materias.html';
+        } else if (result.isDenied) {
+            window.location.href = 'grados.html';
+        }
+    });
+};
     </script>
 </body>
 </html>
