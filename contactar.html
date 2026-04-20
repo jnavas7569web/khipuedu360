@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Contacto Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .badge-curso { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Contactos</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Localizador de Representantes</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </header>
+
+        <section class="glass-card p-8 mb-8">
+            <div class="relative max-w-xl mx-auto">
+                <input type="text" id="input-busqueda" 
+                    class="w-full p-5 pl-14 input-style rounded-3xl font-black text-slate-700 outline-none text-lg uppercase" 
+                    placeholder="NOMBRE O APELLIDO DEL ALUMNO..."
+                    onkeyup="if(event.key === 'Enter') buscarEstudiante()">
+                <div class="absolute left-5 top-5 text-slate-300 text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
+                <button onclick="buscarEstudiante()" class="absolute right-3 top-3 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase hover:bg-black transition-all">Buscar</button>
+            </div>
+        </section>
+
+        <div id="contenedor-resultados" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2 text-center py-20 opacity-20">
+                <i class="fa-solid fa-search text-7xl mb-4"></i>
+                <p class="font-black uppercase text-xs">Ingrese un nombre para identificar al curso y representante</p>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.buscarEstudiante = async () => {
+        const busqueda = document.getElementById('input-busqueda').value.trim().toUpperCase();
+        if(busqueda.length < 3) return alert("Escriba al menos 3 letras.");
+
+        const contenedor = document.getElementById('contenedor-resultados');
+        contenedor.innerHTML = '<div class="md:col-span-2 text-center py-20 font-black text-indigo-900 animate-pulse uppercase">Escaneando nóminas...</div>';
+
+        try {
+            // 1. Obtener todos los alumnos (para búsqueda flexible)
+            const snapEstu = await getDocs(collection(db, "estudiantes"));
+            let alumnosEncontrados = [];
+
+            snapEstu.forEach(docE => {
+                const d = docE.data();
+                if (`${d.nombres} ${d.apellidos}`.toUpperCase().includes(busqueda)) {
+                    alumnosEncontrados.push(d);
+                }
+            });
+
+            if (alumnosEncontrados.length === 0) {
+                contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-slate-400 font-bold uppercase text-xs">No hay coincidencias.</div>`;
+                return;
+            }
+
+            contenedor.innerHTML = "";
+
+            // 2. Procesar cada alumno para traer su curso y su representante
+            for (const alumno of alumnosEncontrados) {
+                // Buscamos su grado y paralelo en la colección 'matriculas'
+                const qMat = query(collection(db, "matriculas"), where("cedula_estudiante", "==", alumno.cedula));
+                const snapMat = await getDocs(qMat);
+                
+                let infoCurso = "SIN MATRÍCULA";
+                if(!snapMat.empty) {
+                    const m = snapMat.docs[0].data();
+                    // Usamos los IDs de grado y paralelo que tengas guardados
+                    infoCurso = `${m.id_grado || ''} "${m.id_paralelo || ''}"`.toUpperCase();
+                }
+
+                // Buscamos al representante
+                const docR = await getDoc(doc(db, "representantes", alumno.representante_id));
+                
+                if(docR.exists()) {
+                    const r = docR.data();
+                    const card = `
+                        <div class="glass-card p-6 border-2 border-slate-50 hover:border-indigo-500 transition-all flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">ESTUDIANTE:</span>
+                                        <span class="font-black text-slate-800 text-sm">${alumno.nombres} ${alumno.apellidos}</span>
+                                        <span class="badge-curso w-fit">${infoCurso}</span>
+                                    </div>
+                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-black text-[8px] uppercase tracking-tighter">${r.parentesco}</span>
+                                </div>
+                                
+                                <div class="mt-4 pt-4 border-t border-slate-50">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">REPRESENTANTE:</p>
+                                    <h3 class="font-bold text-slate-700 uppercase text-md">${r.nombre_completo}</h3>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mt-6">
+                                <a href="tel:${r.telefono}" class="bg-slate-800 text-white p-3 rounded-2xl text-center hover:bg-black transition-all text-xs font-bold">
+                                    <i class="fa-solid fa-phone mr-2"></i> LLAMAR
+                                </a>
+                                <a href="https://wa.me/593${r.telefono.replace(/^0/, '')}?text=Estimado(a)%20${r.nombres},%20le%20saludo%20de%20la%20Escuela%20Gran%20Colombia.%20Me%20comunico%20por%20su%20hijo(a)%20${alumno.nombres}%20de%20${infoCurso}." 
+                                   target="_blank" class="bg-emerald-500 text-white p-3 rounded-2xl text-center hover:bg-emerald-600 transition-all text-xs font-bold">
+                                    <i class="fa-brands fa-whatsapp mr-2"></i> WHATSAPP
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    contenedor.innerHTML += card;
+                }
+            }
+
+        } catch (err) {
+            console.error(err);
+            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error de red.</div>`;
+        }
+    };
+</script>
+</body>
+</html>
