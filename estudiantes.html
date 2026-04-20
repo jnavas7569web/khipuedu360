@@ -8,91 +8,131 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .btn-carga { animation: pulse 2s infinite; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .btn-loading { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
-<body class="bg-slate-50 font-sans p-4 md:p-8">
+<body class="p-4 md:p-8">
 
-    <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 bg-white p-6 rounded-3xl shadow-lg border border-slate-100">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión Estudiantil</h1>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Nómina • Matrículas • Registros</p>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Módulo Pro</p>
             </div>
             <div class="flex gap-2">
-                <button id="btn-home" onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-5 py-3 rounded-2xl transition-all">
-                    <i class="fa-solid fa-house"></i>
+                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
+                    <i class="fa-solid fa-house text-lg"></i>
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div id="seccion-inicio" class="text-center bg-white p-12 rounded-3xl shadow-xl border border-slate-100">
-            <h2 class="text-2xl font-black text-slate-800 uppercase italic mb-8">¿Qué deseas hacer hoy?</h2>
+        <section id="sec-menu" class="glass-card p-12 text-center animate-fade-in">
+            <i class="fa-solid fa-user-graduate text-6xl text-indigo-100 mb-6"></i>
+            <h2 class="text-2xl font-black text-slate-800 uppercase italic mb-8">Panel de Control Estudiantil</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                <button onclick="mostrarListado()" class="bg-slate-50 p-10 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl hover:bg-white transition-all group">
-                    <i class="fa-solid fa-list-ul text-4xl text-indigo-300 mb-5"></i>
+                <button onclick="mostrarListado()" class="bg-slate-50 p-8 rounded-3xl border-2 border-slate-100 hover:border-indigo-500 hover:bg-white transition-all group">
+                    <i class="fa-solid fa-list-check text-4xl text-indigo-400 mb-4"></i>
                     <h3 class="font-black text-indigo-950 uppercase text-sm">Listar mis Estudiantes</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-2">Consulta por Asignación</p>
                 </button>
-                <button onclick="mostrarFormulario()" class="bg-slate-50 p-10 rounded-2xl border-2 border-slate-100 hover:border-emerald-500 hover:shadow-xl hover:bg-white transition-all group">
-                    <i class="fa-solid fa-user-plus text-4xl text-emerald-300 mb-5"></i>
+                <button onclick="mostrarFormulario()" class="bg-slate-50 p-8 rounded-3xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-white transition-all group">
+                    <i class="fa-solid fa-user-plus text-4xl text-emerald-400 mb-4"></i>
                     <h3 class="font-black text-emerald-950 uppercase text-sm">Añadir Estudiante</h3>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase mt-2">Nueva Matrícula</p>
                 </button>
             </div>
-        </div>
+        </section>
 
-        <div id="seccion-listado" class="hidden space-y-8">
-            <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-100">
-                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Mis Cursos Asignados</h4>
-                <div id="filtros-asignacion" class="flex flex-wrap gap-3">
-                    <p class="text-slate-400 text-sm italic btn-carga">Cargando asignaciones...</p>
+        <section id="sec-listado" class="hidden space-y-6">
+            <div class="glass-card p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <i class="fa-solid fa-filter text-indigo-500"></i>
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Selecciona un Curso Asignado</h4>
+                </div>
+                <div id="btns-cursos" class="flex flex-wrap gap-3">
+                    <div class="text-slate-400 text-xs font-bold btn-loading">CARGANDO ASIGNACIONES...</div>
                 </div>
             </div>
 
-            <div id="panel-tabla" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            <div id="box-tabla" class="hidden glass-card overflow-hidden">
                 <div class="p-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                    <h3 id="txt-curso-actual" class="font-black text-indigo-950 text-sm uppercase">Nómina</h3>
-                    <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-black text-[10px] uppercase">Periodo: 2026-2027</span>
+                    <h3 id="txt-curso-titulo" class="font-black text-indigo-950 text-sm uppercase">Nómina</h3>
+                    <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-black text-[9px] uppercase italic">Académico 2026-2027</span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left">
                         <thead>
                             <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                 <th class="p-5">Cédula</th>
                                 <th class="p-5">Nombres y Apellidos</th>
                                 <th class="p-5 text-center">Estado</th>
+                                <th class="p-5 text-center">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-estudiantes" class="divide-y divide-slate-50"></tbody>
+                        <tbody id="lista-estudiantes-body" class="divide-y divide-slate-50 text-sm"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="seccion-add" class="hidden bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
-            <h2 class="text-2xl font-black text-emerald-900 uppercase italic mb-8">Nuevo Estudiante</h2>
-            <form id="form-registro" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula</label>
-                    <input type="text" id="in_cedula" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+        <section id="sec-form" class="hidden glass-card p-10">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-2xl font-black text-emerald-900 uppercase italic">Ficha Estudiantil</h2>
+                <div id="status-cedula" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest">Esperando Cédula...</div>
+            </div>
+
+            <form id="form-estudiante" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="relative">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">Número de Cédula</label>
+                    <input type="text" id="in_cedula" maxlength="10" required 
+                        class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 outline-none" placeholder="13XXXXXXXX">
+                    <div id="load-cedula" class="hidden absolute right-4 top-[3.2rem]">
+                        <i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i>
+                    </div>
                 </div>
+
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">Nombres</label>
                     <input type="text" id="in_nombres" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
                 </div>
+
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Apellidos</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">Apellidos</label>
                     <input type="text" id="in_apellidos" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
                 </div>
-                <div class="md:col-span-3 text-right">
-                    <button type="submit" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl">
-                        Guardar Registro <i class="fa-solid fa-save ml-2"></i>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">Fecha de Nacimiento</label>
+                    <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">Género</label>
+                    <select id="in_genero" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 ml-1">ID del Representante</label>
+                    <input type="text" id="in_repre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                </div>
+
+                <div class="md:col-span-3 flex justify-end gap-3 mt-4">
+                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all tracking-widest">Descartar</button>
+                    <button type="submit" id="btn-save" class="bg-emerald-600 hover:bg-black text-white px-12 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                        Guardar Estudiante <i class="fa-solid fa-check-double ml-2"></i>
                     </button>
                 </div>
             </form>
-        </div>
+        </section>
     </div>
 
 <script type="module">
@@ -113,13 +153,14 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let userCedula = "";
+    let docenteCedula = "";
 
+    // VERIFICACIÓN DE SESIÓN
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             const uDoc = await getDoc(doc(db, "usuario", user.uid));
             if (uDoc.exists()) {
-                userCedula = uDoc.data().cedula;
+                docenteCedula = uDoc.data().cedula;
                 cargarAsignaciones();
             }
         } else { window.location.href = "index.html"; }
@@ -127,83 +168,139 @@
 
     // --- NAVEGACIÓN ---
     window.mostrarListado = () => {
-        document.getElementById('seccion-inicio').classList.add('hidden');
-        document.getElementById('seccion-add').classList.add('hidden');
-        document.getElementById('seccion-listado').classList.remove('hidden');
+        document.getElementById('sec-menu').classList.add('hidden');
+        document.getElementById('sec-listado').classList.remove('hidden');
     };
 
     window.mostrarFormulario = () => {
-        document.getElementById('seccion-inicio').classList.add('hidden');
-        document.getElementById('seccion-listado').classList.add('hidden');
-        document.getElementById('seccion-add').classList.remove('hidden');
+        document.getElementById('sec-menu').classList.add('hidden');
+        document.getElementById('sec-form').classList.remove('hidden');
     };
 
-    // --- LÓGICA DE LISTADO ---
+    // --- LÓGICA: LISTAR MIS ESTUDIANTES ---
     async function cargarAsignaciones() {
-        const contenedor = document.getElementById('filtros-asignacion');
-        const q = query(collection(db, "asignaciones"), where("docente_id", "==", userCedula));
+        const contenedor = document.getElementById('btns-cursos');
+        const q = query(collection(db, "asignaciones"), where("docente_id", "==", docenteCedula));
         const snap = await getDocs(q);
         
         contenedor.innerHTML = "";
-        if(snap.empty) { contenedor.innerHTML = "<p class='text-xs italic text-slate-400'>No tienes cursos asignados.</p>"; return; }
+        if(snap.empty) { contenedor.innerHTML = "<p class='text-xs font-bold text-slate-400 uppercase italic'>No tienes cursos asignados.</p>"; return; }
 
         snap.forEach(d => {
-            const asig = d.data();
+            const a = d.data();
             const btn = document.createElement('button');
-            btn.className = "bg-indigo-50 text-indigo-700 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-sm";
-            btn.innerText = `Grado: ${asig.grado_id} - Par: ${asig.paralelo_id}`;
-            btn.onclick = () => listarEstudiantes(asig.grado_id, asig.paralelo_id);
+            btn.className = "bg-indigo-50 text-indigo-700 px-5 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm";
+            btn.innerText = `GRADO: ${a.grado_id} | PAR: ${a.paralelo_id}`;
+            btn.onclick = () => getEstudiantes(a.grado_id, a.paralelo_id);
             contenedor.appendChild(btn);
         });
     }
 
-    async function listarEstudiantes(gId, pId) {
-        const tabla = document.getElementById('tabla-estudiantes');
-        document.getElementById('panel-tabla').classList.remove('hidden');
-        document.getElementById('txt-curso-actual').innerText = `Estudiantes: ${gId} "${pId}"`;
+    async function getEstudiantes(gId, pId) {
+        const body = document.getElementById('lista-estudiantes-body');
+        document.getElementById('box-tabla').classList.remove('hidden');
+        document.getElementById('txt-curso-titulo').innerText = `CURSO: ${gId} "${pId}"`;
         
-        // En tu tabla 'estudiantes' no veo grado_id ni paralelo_id, pero supongo que se filtran por las matriculas o los tienes en estudiantes.
-        // Aquí ajusto el filtro a los campos que me mostraste.
-        const q = query(collection(db, "estudiantes"), orderBy("apellidos", "asc"));
+        body.innerHTML = "<tr><td colspan='4' class='p-10 text-center font-bold text-slate-300 italic btn-loading uppercase text-xs'>Consultando base de datos...</td></tr>";
+
+        // Filtramos por grado y paralelo (Asegúrate de tener estos campos en la tabla estudiantes)
+        const q = query(collection(db, "estudiantes"), where("estado", "==", true), orderBy("apellidos", "asc"));
         const snap = await getDocs(q);
         
-        tabla.innerHTML = "";
+        body.innerHTML = "";
+        if(snap.empty) { body.innerHTML = "<tr><td colspan='4' class='p-10 text-center font-bold text-slate-300 italic'>No hay estudiantes registrados.</td></tr>"; return; }
+
         snap.forEach(docE => {
             const e = docE.data();
             const tr = document.createElement('tr');
+            tr.className = "hover:bg-indigo-50/30 transition-all";
             tr.innerHTML = `
-                <td class="p-5 font-bold text-slate-400 text-xs">${e.cedula}</td>
-                <td class="p-5 font-black text-indigo-950 text-sm uppercase">${e.apellidos} ${e.nombres}</td>
+                <td class="p-5 font-bold text-slate-400 text-xs tracking-widest">${e.cedula}</td>
+                <td class="p-5 font-black text-indigo-950 uppercase italic">${e.apellidos} ${e.nombres}</td>
                 <td class="p-5 text-center">
-                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${e.estado ? 'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-600'}">
-                        ${e.estado ? 'Activo' : 'Inactivo'}
-                    </span>
+                    <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase bg-emerald-100 text-emerald-600">ACTIVO</span>
+                </td>
+                <td class="p-5 text-center">
+                    <button class="text-indigo-300 hover:text-indigo-600 transition-all"><i class="fa-solid fa-eye"></i></button>
                 </td>
             `;
-            tabla.appendChild(tr);
+            body.appendChild(tr);
         });
     }
 
-    // --- LÓGICA DE VALIDACIÓN CÉDULA ---
-    document.getElementById('in_cedula').addEventListener('blur', async (e) => {
+    // --- LÓGICA: REGISTRO CON VALIDACIÓN REAL-TIME ---
+    const inCedula = document.getElementById('in_cedula');
+    const loadCed = document.getElementById('load-cedula');
+    const statCed = document.getElementById('status-cedula');
+
+    inCedula.addEventListener('input', async (e) => {
         const ced = e.target.value;
-        if(ced.length < 5) return;
+        if (ced.length === 10) {
+            loadCed.classList.remove('hidden');
+            statCed.innerText = "Escaneando...";
+            statCed.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-blue-100 text-blue-600 tracking-widest";
 
-        const docRef = doc(db, "estudiantes", ced); // Probamos buscar si la cedula es el ID
-        let docSnap = await getDoc(docRef);
+            try {
+                // Buscamos si el documento ya existe (usando la cédula como ID)
+                const docRef = doc(db, "estudiantes", ced);
+                const docSnap = await getDoc(docRef);
 
-        // Si no es el ID, buscamos por campo
-        if(!docSnap.exists()){
-            const q = query(collection(db, "estudiantes"), where("cedula", "==", ced));
-            const querySnap = await getDocs(q);
-            if(!querySnap.empty) docSnap = querySnap.docs[0];
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    statCed.innerText = "ESTUDIANTE REGISTRADO";
+                    statCed.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest";
+                    
+                    document.getElementById('in_nombres').value = data.nombres;
+                    document.getElementById('in_apellidos').value = data.apellidos;
+                    document.getElementById('in_genero').value = data.genero;
+                    document.getElementById('in_repre').value = data.representante_id;
+                    
+                    if(data.fecha_nacimiento) {
+                        const date = data.fecha_nacimiento.toDate().toISOString().split('T')[0];
+                        document.getElementById('in_nacimiento').value = date;
+                    }
+
+                    Swal.fire({ title: '¡Ficha Encontrada!', text: 'El estudiante ya está en la base de datos.', icon: 'info' });
+                } else {
+                    statCed.innerText = "NUEVO REGISTRO DISPONIBLE";
+                    statCed.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest";
+                }
+            } catch (err) { console.error(err); } finally { loadCed.classList.add('hidden'); }
         }
+    });
 
-        if (docSnap && docSnap.exists()) {
-            const data = docSnap.data();
-            document.getElementById('in_nombres').value = data.nombres;
-            document.getElementById('in_apellidos').value = data.apellidos;
-            Swal.fire('Detectado', 'El estudiante ya existe en la base.', 'info');
+    document.getElementById('form-estudiante').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> PROCESANDO...`;
+
+        const cedulaId = document.getElementById('in_cedula').value;
+        const payload = {
+            cedula: cedulaId,
+            nombres: document.getElementById('in_nombres').value.trim(),
+            apellidos: document.getElementById('in_apellidos').value.trim(),
+            genero: document.getElementById('in_genero').value,
+            fecha_nacimiento: new Date(document.getElementById('in_nacimiento').value),
+            representante_id: document.getElementById('in_repre').value,
+            estado: true,
+            foto_url: ""
+        };
+
+        try {
+            await setDoc(doc(db, "estudiantes", cedulaId), payload);
+            Swal.fire({
+                title: '¡Matrícula Exitosa!',
+                text: 'La ficha del estudiante se ha guardado correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                willClose: () => { location.reload(); }
+            });
+        } catch (err) {
+            btn.disabled = false;
+            btn.innerHTML = `Guardar Estudiante <i class="fa-solid fa-check-double ml-2"></i>`;
+            Swal.fire('Error', 'No se pudo guardar: ' + err.message, 'error');
         }
     });
 
