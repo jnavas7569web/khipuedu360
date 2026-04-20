@@ -21,7 +21,7 @@
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión Estudiantil</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Ficha de Inscripción</p>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Ficha Pro</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
@@ -30,17 +30,18 @@
 
         <section class="glass-card p-10">
             <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-black text-emerald-900 uppercase italic">Nueva Matrícula</h2>
-                <div id="status-cedula" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest border border-slate-200">Esperando Cédula...</div>
+                <h2 class="text-2xl font-black text-emerald-900 uppercase italic">Ficha de Registro</h2>
+                <div id="status-main" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest border border-slate-200">Escáner Inactivo</div>
             </div>
 
             <form id="form-estudiante" class="space-y-8">
                 <div class="bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
-                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-[0.2em] border-b border-indigo-50 pb-2">1. Información de Identidad</h4>
+                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-[0.2em] border-b border-indigo-50 pb-2">1. Datos Personales y Académicos</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="relative">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula Alumno</label>
                             <input type="text" id="in_cedula" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="13XXXXXXXX">
+                            <div id="load-cedula" class="hidden absolute right-4 top-[3.2rem] text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres</label>
@@ -49,45 +50,6 @@
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Apellidos</label>
                             <input type="text" id="in_apellidos" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Fecha de Nacimiento</label>
-                            <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Género</label>
-                            <select id="in_genero" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                                <option value="M">MASCULINO</option>
-                                <option value="F">FEMENINO</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nacionalidad</label>
-                            <input type="text" id="in_nacionalidad" value="ECUATORIANA" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Tipo de Sangre</label>
-                            <select id="in_sangre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                                <option value="A+">A+</option><option value="O+">O+</option><option value="B+">B+</option><option value="AB+">AB+</option>
-                                <option value="A-">A-</option><option value="O-">O-</option><option value="B-">B-</option><option value="AB-">AB-</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">NEE (Discapacidad)</label>
-                            <select id="in_nee" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                                <option value="no">NO</option>
-                                <option value="si">SI</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-50">
-                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-[0.2em] border-b border-indigo-100 pb-2">2. Asignación y Familia</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula del Representante</label>
-                            <input type="text" id="in_repre_id" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Buscar cédula...">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Grado / Año</label>
@@ -102,8 +64,46 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Periodo Lectivo Actual</label>
-                            <input type="text" id="in_periodo" value="2026-2027" readonly class="w-full p-4 bg-white/50 border-2 border-slate-100 rounded-2xl font-black text-slate-400 cursor-not-allowed text-center">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Periodo Actual</label>
+                            <input type="text" id="in_periodo" value="2026-2027" readonly class="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-black text-slate-400 text-center">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nacimiento</label>
+                            <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Género</label>
+                            <select id="in_genero" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                                <option value="M">MASCULINO</option>
+                                <option value="F">FEMENINO</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Sangre</label>
+                            <select id="in_sangre" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                                <option value="A+">A+</option><option value="O+">O+</option><option value="B+">B+</option><option value="AB+">AB+</option>
+                                <option value="A-">A-</option><option value="O-">O-</option><option value="B-">B-</option><option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-50">
+                    <div class="flex justify-between items-center mb-6 border-b border-indigo-100 pb-2">
+                        <h4 class="text-indigo-600 font-black text-[10px] uppercase tracking-[0.2em]">2. Información del Representante</h4>
+                        <button type="button" id="btn-crear-repre" class="hidden text-[9px] font-black uppercase bg-amber-500 text-white px-3 py-1.5 rounded-lg hover:bg-black transition-all">
+                            <i class="fa-solid fa-plus mr-1"></i> Añadir Nuevo Representante
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="relative">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula Representante</label>
+                            <input type="text" id="in_repre_id" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Buscar cédula...">
+                            <div id="load-repre" class="hidden absolute right-4 top-[3.2rem] text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombre Confirmado</label>
+                            <input type="text" id="in_repre_nombre" readonly class="w-full p-4 bg-white/50 border-2 border-slate-100 rounded-2xl font-black text-slate-400 uppercase italic">
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all tracking-widest">Descartar</button>
                     <button type="submit" id="btn-save" class="bg-emerald-600 hover:bg-black text-white px-12 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
-                        Guardar Estudiante <i class="fa-solid fa-check-double ml-2"></i>
+                        Guardar Ficha Estudiantil <i class="fa-solid fa-check-double ml-2"></i>
                     </button>
                 </div>
             </form>
@@ -140,51 +140,106 @@
             getDocs(collection(db, "grados")),
             getDocs(collection(db, "paralelos"))
         ]);
-
         const selG = document.getElementById('in_grado');
-        selG.innerHTML = '<option value="">Seleccione Grado</option>';
-        snapGrados.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
-
         const selP = document.getElementById('in_paralelo');
-        selP.innerHTML = '<option value="">Seleccione Paralelo</option>';
+        
+        selG.innerHTML = '<option value="">Elegir Grado...</option>';
+        snapGrados.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
+        
+        selP.innerHTML = '<option value="">-</option>';
         snapParalelos.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.id}</option>`);
     }
 
-    // --- GUARDADO BASADO EN TABLA FOTO ---
+    // --- ESCÁNER DE CÉDULA ESTUDIANTE ---
+    document.getElementById('in_cedula').addEventListener('input', async (e) => {
+        const ced = e.target.value;
+        const status = document.getElementById('status-main');
+        if (ced.length === 10) {
+            document.getElementById('load-cedula').classList.remove('hidden');
+            const dSnap = await getDoc(doc(db, "estudiantes", ced));
+            if (dSnap.exists()) {
+                const data = dSnap.data();
+                status.innerText = "ESTUDIANTE REGISTRADO - MODO EDICIÓN";
+                status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest border border-amber-200";
+                
+                document.getElementById('in_nombres').value = data.nombres;
+                document.getElementById('in_apellidos').value = data.apellidos;
+                document.getElementById('in_grado').value = data.grado;
+                document.getElementById('in_paralelo').value = data.paralelo;
+                document.getElementById('in_genero').value = data.genero;
+                document.getElementById('in_sangre').value = data.tipo_sangre;
+                document.getElementById('in_repre_id').value = data.representante_id;
+                
+                if(data.fecha_nacimiento) {
+                    const date = data.fecha_nacimiento.toDate().toISOString().split('T')[0];
+                    document.getElementById('in_nacimiento').value = date;
+                }
+                validarRepresentante(data.representante_id);
+            } else {
+                status.innerText = "NUEVO ESTUDIANTE";
+                status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
+            }
+            document.getElementById('load-cedula').classList.add('hidden');
+        }
+    });
+
+    // --- ESCÁNER DE REPRESENTANTE ---
+    document.getElementById('in_repre_id').addEventListener('input', (e) => {
+        if(e.target.value.length === 10) validarRepresentante(e.target.value);
+    });
+
+    async function validarRepresentante(cedula) {
+        const load = document.getElementById('load-repre');
+        const display = document.getElementById('in_repre_nombre');
+        const btnAdd = document.getElementById('btn-crear-repre');
+        
+        load.classList.remove('hidden');
+        const rSnap = await getDoc(doc(db, "representantes", cedula));
+        
+        if (rSnap.exists()) {
+            display.value = rSnap.data().nombre_completo;
+            display.classList.remove('text-red-500');
+            display.classList.add('text-indigo-600');
+            btnAdd.classList.add('hidden');
+        } else {
+            display.value = "REPRESENTANTE NO ENCONTRADO";
+            display.classList.remove('text-indigo-600');
+            display.classList.add('text-red-500');
+            btnAdd.classList.remove('hidden');
+        }
+        load.classList.add('hidden');
+    }
+
+    document.getElementById('btn-crear-repre').onclick = () => window.location.href = 'representantes.html';
+
+    // --- GUARDAR ---
     document.getElementById('form-estudiante').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const ced = document.getElementById('in_cedula').value;
         const btn = document.getElementById('btn-save');
-        const ced = document.getElementById('in_cedula').value.trim();
-        
         btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...`;
 
         const payload = {
             cedula: ced,
-            nombres: document.getElementById('in_nombres').value.trim().toUpperCase(),
-            apellidos: document.getElementById('in_apellidos').value.trim().toUpperCase(),
+            nombres: document.getElementById('in_nombres').value.toUpperCase(),
+            apellidos: document.getElementById('in_apellidos').value.toUpperCase(),
+            grado: document.getElementById('in_grado').value,
+            paralelo: document.getElementById('in_paralelo').value,
             fecha_nacimiento: new Date(document.getElementById('in_nacimiento').value),
             genero: document.getElementById('in_genero').value,
-            nacionalidad: document.getElementById('in_nacionalidad').value.toUpperCase(),
             tipo_sangre: document.getElementById('in_sangre').value,
-            nee: document.getElementById('in_nee').value,
-            representante_id: document.getElementById('in_repre_id').value.trim(),
-            grado: document.getElementById('in_grado').value, // El ID como grado_01
-            paralelo: document.getElementById('in_paralelo').value, // El ID como A
+            representante_id: document.getElementById('in_repre_id').value,
             periodo_actual: "2026-2027",
             estado: true,
-            foto_url: "",
             updated_at: serverTimestamp()
         };
 
         try {
             await setDoc(doc(db, "estudiantes", ced), payload);
-            Swal.fire({ title: '¡Guardado!', text: 'Estudiante registrado en el sistema.', icon: 'success' })
-                .then(() => location.reload());
-        } catch (error) {
+            Swal.fire({ title: '¡Guardado!', text: 'La ficha ha sido sincronizada.', icon: 'success' }).then(() => location.reload());
+        } catch (err) {
             btn.disabled = false;
-            btn.innerText = "Guardar Estudiante";
-            Swal.fire('Error', 'No se pudo sincronizar con la base de datos.', 'error');
+            Swal.fire('Error', 'No se pudo guardar.', 'error');
         }
     });
 
