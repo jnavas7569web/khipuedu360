@@ -126,7 +126,11 @@
         .stat-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; opacity: 0.9; }
         .stat-icon-bg { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.2; transform: rotate(-15deg); }
 
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; }
+        .cards-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+    gap: 20px; 
+}
 
         .action-card {
             cursor: pointer; transition: 0.3s; color: white; min-height: 140px;
@@ -222,6 +226,10 @@
                 <div class="card action-card" style="background: #8b5cf6;" onclick="window.location.href='reportes.html'">
                     <i class="fa-solid fa-file-export"></i>
                     <span>Generar Reportes</span>
+                </div>
+                <div class="card action-card" style="background: #64748b;" onclick="window.location.href='configuracion.html'">
+                <i class="fa-solid fa-gears"></i>
+                <span>Configuración</span>
                 </div>
             </div>
 
