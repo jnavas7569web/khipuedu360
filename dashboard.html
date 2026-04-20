@@ -139,16 +139,20 @@
 
         /* ADMIN PANEL */
         .admin-section { margin-top: 30px; padding-top: 20px; border-top: 2px dashed var(--gris-suave); }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .btn-admin { 
-            padding: 15px; border-radius: 15px; color: white; font-weight: 800; 
-            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; font-size: 0.8rem;
+            padding: 20px; border-radius: 20px; color: white; font-weight: 800; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-decoration: none; font-size: 0.8rem;
+            transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
         }
+        .btn-admin:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
 
         @media (min-width: 992px) {
             .sidebar { transform: translateX(0); position: relative; }
             .hamburger { display: none; }
         }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -160,8 +164,7 @@
         </div>
         <div class="sidebar-menu">
             <a href="matriculas.html" class="sidebar-link"><i class="fa-solid fa-id-card-clip"></i> Matrículas</a>
-           <div class="sidebar-menu">  <a href="estudiantes.html" class="sidebar-link">
-        <i class="fa-solid fa-user-graduate"></i> Estudiantes </a>  </div>
+            <a href="estudiantes.html" class="sidebar-link"><i class="fa-solid fa-user-graduate"></i> Estudiantes</a>
             <a href="representantes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Representantes</a>
             <a href="asistencias.html" class="sidebar-link"><i class="fa-solid fa-clipboard-check"></i> Asistencias</a>
             <a href="contacto.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
@@ -196,7 +199,7 @@
                     </div>
                 </div>
 
-                <div class="card stat-card card-naranja">
+                <div class="card stat-card card-naranja" onclick="window.location.href='estudiantes.html'" style="cursor: pointer;">
                     <div class="stat-label">Estudiantes Registrados</div>
                     <div class="stat-value" id="count-estudiantes">0</div>
                     <i class="fa-solid fa-graduation-cap stat-icon-bg"></i>
@@ -222,14 +225,20 @@
                 </div>
             </div>
 
-            <div id="admin-panel" class="admin-section" style="display: none;">
-                <h3 style="font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 15px; letter-spacing: 1px; font-weight: 800;">Gestión de Administrador</h3>
+            <div id="admin-panel" class="admin-section hidden">
+                <h3 style="font-size: 0.8rem; text-transform: uppercase; color: #94a3b8; margin-bottom: 20px; letter-spacing: 1px; font-weight: 800;">Gestión de Administrador</h3>
                 <div class="admin-grid">
+                    <a href="usuarios.html" class="btn-admin" style="background: #1e293b;">
+                        <i class="fa-solid fa-user-plus text-xl text-indigo-400"></i>
+                        <span>AÑADIR USUARIO</span>
+                    </a>
                     <a href="registro_usuarios.html" class="btn-admin" style="background: #1e293b;">
-                        <i class="fa-solid fa-users-gear"></i> GESTIONAR PERSONAL
+                        <i class="fa-solid fa-users-gear text-xl"></i>
+                        <span>GESTIONAR PERSONAL</span>
                     </a>
                     <a href="periodos.html" class="btn-admin" style="background: #334155;">
-                        <i class="fa-solid fa-calendar-day"></i> CONFIGURAR PERIODOS
+                        <i class="fa-solid fa-calendar-day text-xl"></i>
+                        <span>CONFIGURAR PERIODOS</span>
                     </a>
                 </div>
             </div>
@@ -260,15 +269,22 @@
                     const userDoc = await getDoc(doc(db, "usuario", user.uid));
                     if (userDoc.exists()) {
                         const data = userDoc.data();
+                        
+                        // Llenar datos de usuario
                         document.getElementById('nav-user-name').innerText = `${data.nombre} ${data.apellido}`;
                         document.getElementById('nav-user-role').innerText = data.rol;
                         document.getElementById('welcome-text').innerText = `¡Hola, ${data.nombre}!`;
                         document.getElementById('nav-avatar').src = data.foto_url || `https://ui-avatars.com/api/?name=${data.nombre}+${data.apellido}&background=random`;
 
+                        // LÓGICA DE SEGURIDAD POR ROL
+                        const adminPanel = document.getElementById('admin-panel');
                         if (data.rol === 'admin' || data.rol === 'superadmin') {
-                            document.getElementById('admin-panel').style.display = 'block';
+                            adminPanel.classList.remove('hidden');
+                        } else {
+                            adminPanel.remove(); // Borra el panel si no es admin
                         }
 
+                        // Contador de estudiantes
                         const snapshot = await getCountFromServer(collection(db, "estudiantes"));
                         document.getElementById('count-estudiantes').innerText = snapshot.data().count;
                     } else {
@@ -282,6 +298,7 @@
             }
         });
 
+        // Sidebar logic
         const sidebar = document.getElementById('sidebar');
         document.getElementById('btn-menu').addEventListener('click', () => sidebar.classList.add('active'));
         document.getElementById('closeMenu').addEventListener('click', () => sidebar.classList.remove('active'));
