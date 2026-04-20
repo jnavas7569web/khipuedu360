@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Zona en Construcción</title>
+    <style>
+        /* Estilo Retro de 8-bits */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        :root {
+            --fondo: #0a0a20;
+            --neon-azul: #00f2ff;
+            --neon-rosa: #ff00ff;
+            --blanco: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--fondo);
+            color: var(--blanco);
+            font-family: 'Press Start 2P', cursive;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Estrellas de fondo animadas */
+        .space {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            box-shadow: 10vw 20vh white, 50vw 40vh white, 80vw 10vh white, 30vw 70vh white, 70vw 80vh white, 15vw 90vh white;
+            animation: move-stars 10s linear infinite;
+        }
+
+        @keyframes move-stars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-100vh); }
+        }
+
+        /* La Nave Espacial Pixelada (Hecha con CSS puro) */
+        .spaceship {
+            position: relative;
+            width: 10px;
+            height: 10px;
+            /* Dibujo de nave píxel por píxel usando box-shadow */
+            box-shadow: 
+                0 0 var(--blanco), 0 10px var(--blanco), 0 20px var(--blanco),
+                10px 10px var(--neon-azul), 10px 20px var(--neon-azul),
+                -10px 10px var(--neon-azul), -10px 20px var(--neon-azul),
+                20px 20px var(--blanco), -20px 20px var(--blanco),
+                0 -10px var(--neon-rosa); 
+            animation: float 3s ease-in-out infinite;
+            margin-bottom: 50px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Fuego de la nave */
+        .thruster {
+            position: absolute;
+            top: 30px;
+            left: 0;
+            width: 10px;
+            height: 10px;
+            background: var(--neon-rosa);
+            box-shadow: 0 10px orange, 0 20px yellow;
+            animation: flicker 0.1s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.8; transform: scaleY(1); }
+            100% { opacity: 1; transform: scaleY(1.5); }
+        }
+
+        h1 {
+            font-size: 20px;
+            line-height: 1.5;
+            text-shadow: 4px 4px var(--neon-rosa);
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+
+        p {
+            font-size: 10px;
+            color: var(--neon-azul);
+            letter-spacing: 2px;
+            z-index: 10;
+        }
+
+        .btn-volver {
+            margin-top: 40px;
+            padding: 15px 25px;
+            background: transparent;
+            border: 4px solid var(--neon-azul);
+            color: var(--neon-azul);
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            z-index: 10;
+        }
+
+        .btn-volver:hover {
+            background: var(--neon-azul);
+            color: var(--fondo);
+            box-shadow: 0 0 20px var(--neon-azul);
+        }
+
+        /* Texto parpadeante */
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="space"></div>
+    <div class="space" style="animation-delay: -5s; left: 20px;"></div>
+
+    <div class="spaceship">
+        <div class="thruster"></div>
+    </div>
+
+    <h1>ERROR 404<br>ZONA EN<br>CONSTRUCCIÓN</h1>
+    
+    <p class="blink">CARGANDO NUEVAS FUNCIONES...</p>
+
+    <a href="dashboard.html" class="btn-volver">VOLVER AL INICIO</a>
+
+    <script>
+        // Efecto de sonido retro opcional (muy ligero)
+        document.body.addEventListener('click', () => {
+            console.log("Khipu Edu 360: Explorando el espacio docente...");
+        });
+    </script>
+</body>
+</html>
