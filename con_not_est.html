@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Consulta de Calificaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; }
+        .glass-card { background: white; border-radius: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
+        .input-huge { background: #f8fafc; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .input-huge:focus { border-color: #6366f1; background: white; box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.1); }
+        .row-materia { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+        .row-materia:hover { background: #f8fafc; }
+    </style>
+</head>
+<body class="p-4 md:p-10 min-h-screen flex flex-col items-center">
+
+    <div class="text-center mb-10">
+        <h1 class="text-2xl font-black text-indigo-900 tracking-tighter italic italic uppercase">Khipu Edu 360</h1>
+        <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.4em]">Plataforma de Consulta Académica</p>
+    </div>
+
+    <main class="max-w-3xl w-full">
+        <section class="glass-card p-8 md:p-12 mb-8 text-center">
+            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase italic">Consultar Notas de Estudiante</h2>
+            
+            <div class="relative max-w-md mx-auto">
+                <input type="text" id="cedula_input" maxlength="10" 
+                    class="w-full p-5 rounded-3xl input-huge text-center font-black text-xl tracking-widest text-slate-700 outline-none" 
+                    placeholder="INGRESE CÉDULA">
+                <button onclick="consultarNotas()" class="mt-6 w-full bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-2xl uppercase text-[11px] tracking-widest transition-all shadow-xl active:scale-95">
+                    Ver Calificaciones <i class="fa-solid fa-magnifying-glass ml-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <div id="panel-resultados" class="hidden animate-fade-in">
+            <div class="glass-card p-8 mb-6 border-l-8 border-indigo-500">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estudiante Encontrado:</p>
+                        <h3 id="res_nombre" class="text-2xl font-black text-slate-800 uppercase italic">---</h3>
+                        <div class="flex gap-2 mt-2">
+                            <span id="res_curso" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-black text-[10px] uppercase">---</span>
+                        </div>
+                    </div>
+                    <button onclick="limpiar()" class="text-slate-300 hover:text-red-500 transition-all">
+                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-card overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <th class="p-5">Asignatura</th>
+                                <th class="p-5 text-center">Nota 1</th>
+                                <th class="p-5 text-center">Nota 2</th>
+                                <th class="p-5 text-center">Nota 3</th>
+                                <th class="p-5 text-center bg-indigo-50 text-indigo-600">Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-notas" class="text-sm font-bold text-slate-600">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="placeholder-vacio" class="text-center py-20 opacity-20">
+            <i class="fa-solid fa-file-invoice text-7xl"></i>
+        </div>
+    </main>
+
+    <footer class="mt-auto py-10">
+        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">© 2026 Escuela Gran Colombia • Portoviejo</p>
+    </footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.consultarNotas = async () => {
+        const ced = document.getElementById('cedula_input').value.trim();
+        
+        if(ced.length !== 10) {
+            return Swal.fire('Error', 'La cédula debe tener 10 dígitos.', 'error');
+        }
+
+        // Mostrar cargando
+        Swal.fire({ title: 'Buscando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+        try {
+            // 1. Buscar Estudiante
+            const estuRef = doc(db, "estudiantes", ced);
+            const estuSnap = await getDoc(estuRef);
+
+            if (!estuSnap.exists()) {
+                Swal.close();
+                return Swal.fire('No encontrado', 'No existe un estudiante registrado con esa cédula.', 'warning');
+            }
+
+            const alumno = estuSnap.data();
+            document.getElementById('res_nombre').innerText = `${alumno.nombres} ${alumno.apellidos}`;
+            document.getElementById('res_curso').innerText = `${alumno.grado} "${alumno.paralelo}"`;
+
+            // 2. Buscar Notas
+            const qNotas = query(collection(db, "notas"), where("cedula_estudiante", "==", ced));
+            const snapNotas = await getDocs(qNotas);
+            
+            const tbody = document.getElementById('tabla-notas');
+            tbody.innerHTML = "";
+
+            if(snapNotas.empty) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">No hay notas registradas para este periodo.</td></tr>`;
+            } else {
+                snapNotas.forEach(docN => {
+                    const n = docN.data();
+                    const promedio = ((parseFloat(n.nota1 || 0) + parseFloat(n.nota2 || 0) + parseFloat(n.nota3 || 0)) / 3).toFixed(2);
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "row-materia";
+                    tr.innerHTML = `
+                        <td class="p-5 uppercase font-black text-indigo-950">${n.nombre_materia || n.id_materia}</td>
+                        <td class="p-5 text-center">${n.nota1 || '0.00'}</td>
+                        <td class="p-5 text-center">${n.nota2 || '0.00'}</td>
+                        <td class="p-5 text-center">${n.nota3 || '0.00'}</td>
+                        <td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${promedio}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            Swal.close();
+            document.getElementById('panel-resultados').classList.remove('hidden');
+            document.getElementById('placeholder-vacio').classList.add('hidden');
+
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'Hubo un problema al conectar con el servidor.', 'error');
+        }
+    };
+
+    window.limpiar = () => {
+        document.getElementById('cedula_input').value = "";
+        document.getElementById('panel-resultados').classList.add('hidden');
+        document.getElementById('placeholder-vacio').classList.remove('hidden');
+    };
+
+</script>
+</body>
+</html>
