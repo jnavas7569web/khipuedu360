@@ -49,12 +49,8 @@
 
         <section id="sec-listado" class="hidden space-y-6">
             <div class="glass-card p-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <i class="fa-solid fa-filter text-indigo-500"></i>
-                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Selecciona un Curso Asignado</h4>
-                </div>
                 <div id="btns-cursos" class="flex flex-wrap gap-3">
-                    <div class="text-slate-400 text-xs font-bold btn-loading">CARGANDO ASIGNACIONES...</div>
+                    <div class="text-slate-400 text-xs font-bold btn-loading uppercase">Cargando asignaciones...</div>
                 </div>
             </div>
             <div id="box-tabla" class="hidden glass-card overflow-hidden">
@@ -87,8 +83,8 @@
                     <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-widest border-b pb-2">Información del Estudiante</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="relative">
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Cédula del Estudiante</label>
-                            <input type="text" id="in_cedula" maxlength="10" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700" placeholder="13XXXXXXXX">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Cédula</label>
+                            <input type="text" id="in_cedula" maxlength="10" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
                             <div id="load-cedula" class="hidden absolute right-3 top-9 text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
                         </div>
                         <div>
@@ -101,7 +97,7 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Nacionalidad</label>
-                            <input type="text" id="in_nacionalidad" value="ecuatoriana" class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase">
+                            <input type="text" id="in_nacionalidad" value="ECUATORIANA" class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase">
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Fecha de Nacimiento</label>
@@ -110,8 +106,8 @@
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Género</label>
                             <select id="in_genero" class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
-                                <option value="M">Masculino</option>
-                                <option value="F">Femenino</option>
+                                <option value="M">MASCULINO</option>
+                                <option value="F">FEMENINO</option>
                             </select>
                         </div>
                         <div>
@@ -124,29 +120,34 @@
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">NEE (Discapacidad)</label>
                             <select id="in_nee" class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
-                                <option value="no">No</option><option value="si">Si</option>
+                                <option value="no">NO</option><option value="si">SI</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-widest border-b border-indigo-200 pb-2">Información del Representante</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-6 tracking-widest border-b border-indigo-200 pb-2">Vínculo Familiar</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                         <div class="relative">
                             <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Cédula del Representante</label>
-                            <input type="text" id="in_repre_id" maxlength="10" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700" placeholder="Buscar cédula...">
+                            <input type="text" id="in_repre_id" maxlength="10" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700" placeholder="Ingrese 10 dígitos">
                             <div id="load-repre" class="hidden absolute right-3 top-9 text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Nombre del Representante</label>
-                            <input type="text" id="in_repre_nombre" readonly class="w-full p-3 bg-white border-2 border-slate-100 rounded-xl font-bold text-slate-400 uppercase" placeholder="Se cargará automáticamente">
+                        <div id="repre-result-container">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Nombre Confirmado</label>
+                            <input type="text" id="in_repre_nombre" readonly class="w-full p-3 bg-white border-2 border-slate-100 rounded-xl font-bold text-slate-400 uppercase" placeholder="Esperando validación...">
                         </div>
+                    </div>
+                    <div id="btn-add-repre-container" class="hidden mt-4">
+                        <button type="button" onclick="window.location.href='representantes.html'" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all">
+                            <i class="fa-solid fa-user-plus mr-2"></i> Crear Nuevo Representante
+                        </button>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-4">
-                    <button type="button" onclick="location.reload()" class="px-8 py-3 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 tracking-widest">Descartar</button>
+                <div class="flex justify-end gap-3 pt-4 border-t">
+                    <button type="button" onclick="location.reload()" class="px-8 py-3 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all">Descartar</button>
                     <button type="submit" id="btn-save" class="bg-emerald-600 hover:bg-black text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all">
                         Finalizar Registro <i class="fa-solid fa-check-double ml-2"></i>
                     </button>
@@ -228,47 +229,56 @@
                 const data = dSnap.data();
                 document.getElementById('in_nombres').value = data.nombres;
                 document.getElementById('in_apellidos').value = data.apellidos;
-                document.getElementById('in_nacionalidad').value = data.nacionalidad || "ecuatoriana";
+                document.getElementById('in_nacionalidad').value = data.nacionalidad;
                 document.getElementById('in_genero').value = data.genero;
-                document.getElementById('in_sangre').value = data.tipo_sangre || "A+";
-                document.getElementById('in_nee').value = data.nee || "no";
+                document.getElementById('in_sangre').value = data.tipo_sangre;
+                document.getElementById('in_nee').value = data.nee;
                 document.getElementById('in_repre_id').value = data.representante_id;
-                buscarRepresentante(data.representante_id);
-                Swal.fire('Ficha Detectada', 'Se han cargado los datos del estudiante.', 'info');
+                validarRepresentante(data.representante_id);
+                Swal.fire('Detectado', 'Ficha de estudiante cargada.', 'info');
             }
             document.getElementById('load-cedula').classList.add('hidden');
         }
     });
 
-    // --- VALIDACIÓN REPRESENTANTE ---
+    // --- VALIDACIÓN REPRESENTANTE CORREGIDA (BUSQUEDA POR CAMPO CEDULA) ---
     document.getElementById('in_repre_id').addEventListener('input', (e) => {
-        if(e.target.value.length === 10) buscarRepresentante(e.target.value);
+        if(e.target.value.length === 10) validarRepresentante(e.target.value);
     });
 
-    async function buscarRepresentante(cedula) {
+    async function validarRepresentante(cedula) {
         document.getElementById('load-repre').classList.remove('hidden');
-        const rSnap = await getDoc(doc(db, "representantes", cedula));
-        if (rSnap.exists()) {
-            document.getElementById('in_repre_nombre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
-        } else {
-            document.getElementById('in_repre_nombre').value = "";
-            Swal.fire('No encontrado', 'El representante no existe. Por favor regístrelo primero.', 'warning');
-        }
+        document.getElementById('btn-add-repre-container').classList.add('hidden');
+        
+        try {
+            const qRepre = query(collection(db, "representantes"), where("cedula", "==", cedula));
+            const snapRepre = await getDocs(qRepre);
+
+            if (!snapRepre.empty) {
+                const dataR = snapRepre.docs[0].data();
+                document.getElementById('in_repre_nombre').value = `${dataR.nombres} ${dataR.apellidos}`;
+                document.getElementById('in_repre_nombre').classList.replace('text-slate-400', 'text-indigo-600');
+            } else {
+                document.getElementById('in_repre_nombre').value = "NO ENCONTRADO EN EL SISTEMA";
+                document.getElementById('in_repre_nombre').classList.replace('text-indigo-600', 'text-red-500');
+                document.getElementById('btn-add-repre-container').classList.remove('hidden');
+                Swal.fire('No registrado', 'La cédula del representante no existe.', 'warning');
+            }
+        } catch (error) { console.error(error); }
         document.getElementById('load-repre').classList.add('hidden');
     }
 
     // --- GUARDADO ---
     document.getElementById('form-estudiante').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const ced = document.getElementById('in_cedula').value;
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
 
         const payload = {
-            cedula: ced,
-            nombres: document.getElementById('in_nombres').value,
-            apellidos: document.getElementById('in_apellidos').value,
-            nacionalidad: document.getElementById('in_nacionalidad').value,
+            cedula: document.getElementById('in_cedula').value,
+            nombres: document.getElementById('in_nombres').value.toUpperCase(),
+            apellidos: document.getElementById('in_apellidos').value.toUpperCase(),
+            nacionalidad: document.getElementById('in_nacionalidad').value.toUpperCase(),
             fecha_nacimiento: new Date(document.getElementById('in_nacimiento').value),
             genero: document.getElementById('in_genero').value,
             tipo_sangre: document.getElementById('in_sangre').value,
@@ -279,7 +289,7 @@
         };
 
         try {
-            await setDoc(doc(db, "estudiantes", ced), payload);
+            await setDoc(doc(db, "estudiantes", payload.cedula), payload);
             Swal.fire('Éxito', 'Estudiante registrado correctamente.', 'success').then(() => location.reload());
         } catch (err) {
             btn.disabled = false;
