@@ -95,7 +95,32 @@
         messagingSenderId: "505046535196",
         appId: "1:505046535196:web:5e260f2839bacdc35263d9"
     };
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const auth = getAuth(app);
+
+// BLOQUE DE SEGURIDAD: Verificar sesión activa
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // Si no hay usuario, expulsar al login de inmediato
+        window.location.href = "index.html";
+    } else {
+        // OPCIONAL: Control de nivel Admin (Solo para páginas de gestión)
+        // Si la página es 'usuarios.html' o 'configuracion.html'
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('usuarios.html') || currentPath.includes('asignaciones.html')) {
+            const userDoc = await getDoc(doc(db, "usuario", user.uid));
+            if (userDoc.exists() && userDoc.data().rol !== 'admin') {
+                Swal.fire('Acceso Denegado', 'No tienes permisos de administrador.', 'error')
+                .then(() => window.location.href = "dashboard.html");
+            }
+        }
+    }
+});
+    
+    //////////////////////////////////////////hackinggggggggggggggggggggg///////////////////////////////////////////////////////////////////////////////
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
