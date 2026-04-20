@@ -144,7 +144,39 @@
         messagingSenderId: "505046535196",
         appId: "1:505046535196:web:5e260f2839bacdc35263d9"
     };
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// --- IMPORTACIÓN DE AUTH ---
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app); // Inicializar Auth
+
+// --- ESCUDO DE SEGURIDAD ---
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // Si no hay sesión, expulsión inmediata al login
+        window.location.href = "index.html";
+    } else {
+        // Si hay sesión, mostramos la página
+        document.body.style.opacity = "1";
+        
+        // OPCIONAL: Control de Admin para esta página (chi chiiii)
+        // Solo el administrador Jury debería poder gestionar personal
+        const userDoc = await getDoc(doc(db, "usuario", user.uid));
+        if (userDoc.exists() && userDoc.data().rol !== 'admin') {
+            Swal.fire({
+                title: 'Acceso Denegado',
+                text: 'Esta zona es exclusiva para administradores.',
+                icon: 'error',
+                confirmButtonColor: '#4f46e5'
+            }).then(() => {
+                window.location.href = "dashboard.html";
+            });
+        }
+    }
+});
+    //////////////////////////////////////////hackinggggggggggggggggggggg///////////////////////////////////////////////////////////////////////////////
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
