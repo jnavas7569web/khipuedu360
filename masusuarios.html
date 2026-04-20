@@ -36,7 +36,7 @@
 
             <form id="form-usuario" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="md:col-span-2 relative">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Número de Cédula (ID de Acceso)</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Número de Cédula</label>
                     <input type="text" id="in_cedula" maxlength="10" required 
                         class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 outline-none text-xl tracking-widest" placeholder="13XXXXXXXX">
                     <div id="load-icon" class="hidden absolute right-4 top-[3.2rem] text-indigo-500">
@@ -45,21 +45,26 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres y Apellidos</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombre Completo</label>
                     <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Correo Electrónico</label>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Correo Electrónico (Login)</label>
                     <input type="email" id="in_correo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                </div>
+
+                <div id="container-pass">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Contraseña de Acceso</label>
+                    <input type="password" id="in_pass" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Mínimo 6 caracteres">
                 </div>
 
                 <div>
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Título / Especialidad</label>
-                    <input type="text" id="in_titulo" placeholder="Ej. Lcdo. en Ciencias de la Educación" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                    <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
                 </div>
 
-                <div>
+                <div class="md:col-span-2">
                     <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Rol en el Sistema</label>
                     <select id="in_rol" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
                         <option value="docente">DOCENTE</option>
@@ -70,7 +75,7 @@
                 <div class="md:col-span-2 flex justify-end gap-3 mt-6">
                     <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all">Descartar</button>
                     <button type="submit" id="btn-save" class="bg-indigo-600 hover:bg-black text-white px-12 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
-                        Guardar Usuario <i class="fa-solid fa-user-check ml-2"></i>
+                        Registrar Acceso <i class="fa-solid fa-user-shield ml-2"></i>
                     </button>
                 </div>
             </form>
@@ -79,7 +84,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -91,13 +97,15 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
     const inCedula = document.getElementById('in_cedula');
     const loadIcon = document.getElementById('load-icon');
     const statUser = document.getElementById('status-user');
+    const inputPass = document.getElementById('in_pass');
 
-    // BUSCADOR EN TIEMPO REAL
+    // BUSCADOR DE USUARIO EXISTENTE
     inCedula.addEventListener('input', async (e) => {
         const ced = e.target.value;
         if (ced.length === 10) {
@@ -105,24 +113,25 @@
             statUser.innerText = "Buscando...";
             
             try {
-                // Buscamos en la colección usuarios donde la cedula coincida
                 const q = query(collection(db, "usuario"), where("cedula", "==", ced));
                 const snap = await getDocs(q);
 
                 if (!snap.empty) {
-                    const userDoc = snap.docs[0];
-                    const data = userDoc.data();
-                    
-                    // Llenar campos
+                    const data = snap.docs[0].data();
                     document.getElementById('in_nombre').value = data.nombre;
                     document.getElementById('in_correo').value = data.correo;
                     document.getElementById('in_titulo').value = data.titulo || "";
                     document.getElementById('in_rol').value = data.rol;
-
-                    statUser.innerText = "USUARIO ENCONTRADO - MODO EDICIÓN";
+                    
+                    // Si ya existe, la clave no es obligatoria (se asume que ya tiene una)
+                    inputPass.required = false;
+                    inputPass.placeholder = "Dejar en blanco para mantener clave actual";
+                    
+                    statUser.innerText = "USUARIO REGISTRADO - MODO EDICIÓN";
                     statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest";
-                    Swal.fire({ title: 'Usuario existente', text: 'Puedes actualizar la información del docente.', icon: 'info', timer: 1500, showConfirmButton: false });
                 } else {
+                    inputPass.required = true;
+                    inputPass.placeholder = "Mínimo 6 caracteres";
                     statUser.innerText = "NUEVO REGISTRO";
                     statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest";
                 }
@@ -130,41 +139,62 @@
         }
     });
 
-    // GUARDAR O ACTUALIZAR
+    // GUARDAR USUARIO Y CREAR AUTH
     document.getElementById('form-usuario').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> PROCESANDO...`;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...`;
 
+        const email = document.getElementById('in_correo').value.trim();
+        const password = document.getElementById('in_pass').value;
         const cedula = document.getElementById('in_cedula').value;
-        const payload = {
-            cedula: cedula,
-            nombre: document.getElementById('in_nombre').value.trim(),
-            correo: document.getElementById('in_correo').value.trim(),
-            titulo: document.getElementById('in_titulo').value.trim(),
-            rol: document.getElementById('in_rol').value,
-            estado: true
-        };
 
         try {
-            // Usamos la cédula como ID del documento para que sea único
-            await setDoc(doc(db, "usuario", cedula), payload, { merge: true });
-            
+            // 1. Verificar si es nuevo para crear cuenta de Auth
+            const q = query(collection(db, "usuario"), where("cedula", "==", cedula));
+            const snap = await getDocs(q);
+            let uid_final = "";
+
+            if (snap.empty) {
+                // Crear usuario en Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                uid_final = userCredential.user.uid;
+            } else {
+                uid_final = snap.docs[0].id; // Usar el ID actual si solo estamos actualizando datos
+            }
+
+            // 2. Guardar perfil en Firestore
+            const payload = {
+                uid: uid_final,
+                cedula: cedula,
+                nombre: document.getElementById('in_nombre').value.trim().toUpperCase(),
+                correo: email,
+                titulo: document.getElementById('in_titulo').value.trim().toUpperCase(),
+                rol: document.getElementById('in_rol').value,
+                estado: "activo",
+                creacion: serverTimestamp()
+            };
+
+            await setDoc(doc(db, "usuario", uid_final), payload, { merge: true });
+
             Swal.fire({
-                title: '¡Operación Exitosa!',
-                text: 'El usuario ha sido guardado/actualizado correctamente.',
+                title: '¡Acceso Creado!',
+                text: `El usuario ${payload.nombre} ahora puede entrar al sistema.`,
                 icon: 'success',
-                confirmButtonColor: '#6366f1'
+                confirmButtonColor: '#4f46e5'
             }).then(() => location.reload());
 
-        } catch (err) {
+        } catch (error) {
             btn.disabled = false;
-            btn.innerHTML = `Guardar Usuario <i class="fa-solid fa-user-check ml-2"></i>`;
-            Swal.fire('Error', 'No se pudo procesar la solicitud: ' + err.message, 'error');
+            btn.innerHTML = `Registrar Acceso <i class="fa-solid fa-user-shield ml-2"></i>`;
+            let msg = "No se pudo crear el acceso.";
+            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado en el sistema.";
+            if(error.code === 'auth/weak-password') msg = "La contraseña debe tener al menos 6 caracteres.";
+            
+            Swal.fire('Error de Registro', msg, 'error');
         }
     });
-
 </script>
 </body>
 </html>
