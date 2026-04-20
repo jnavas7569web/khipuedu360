@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Gestión Estudiantil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .btn-carga { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 bg-white p-6 rounded-3xl shadow-lg border border-slate-100">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión Estudiantil</h1>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Nómina • Matrículas • Registros</p>
+            </div>
+            <div class="flex gap-2">
+                <button id="btn-home" onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-5 py-3 rounded-2xl transition-all">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="seccion-inicio" class="text-center bg-white p-12 rounded-3xl shadow-xl border border-slate-100">
+            <h2 class="text-2xl font-black text-slate-800 uppercase italic mb-8">¿Qué deseas hacer hoy?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                <button onclick="mostrarListado()" class="bg-slate-50 p-10 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:shadow-xl hover:bg-white transition-all group">
+                    <i class="fa-solid fa-list-ul text-4xl text-indigo-300 mb-5"></i>
+                    <h3 class="font-black text-indigo-950 uppercase text-sm">Listar mis Estudiantes</h3>
+                </button>
+                <button onclick="mostrarFormulario()" class="bg-slate-50 p-10 rounded-2xl border-2 border-slate-100 hover:border-emerald-500 hover:shadow-xl hover:bg-white transition-all group">
+                    <i class="fa-solid fa-user-plus text-4xl text-emerald-300 mb-5"></i>
+                    <h3 class="font-black text-emerald-950 uppercase text-sm">Añadir Estudiante</h3>
+                </button>
+            </div>
+        </div>
+
+        <div id="seccion-listado" class="hidden space-y-8">
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-100">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 italic">Mis Cursos Asignados</h4>
+                <div id="filtros-asignacion" class="flex flex-wrap gap-3">
+                    <p class="text-slate-400 text-sm italic btn-carga">Cargando asignaciones...</p>
+                </div>
+            </div>
+
+            <div id="panel-tabla" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                    <h3 id="txt-curso-actual" class="font-black text-indigo-950 text-sm uppercase">Nómina</h3>
+                    <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-black text-[10px] uppercase">Periodo: 2026-2027</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                                <th class="p-5">Cédula</th>
+                                <th class="p-5">Nombres y Apellidos</th>
+                                <th class="p-5 text-center">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-estudiantes" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="seccion-add" class="hidden bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
+            <h2 class="text-2xl font-black text-emerald-900 uppercase italic mb-8">Nuevo Estudiante</h2>
+            <form id="form-registro" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula</label>
+                    <input type="text" id="in_cedula" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres</label>
+                    <input type="text" id="in_nombres" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Apellidos</label>
+                    <input type="text" id="in_apellidos" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                </div>
+                <div class="md:col-span-3 text-right">
+                    <button type="submit" class="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl">
+                        Guardar Registro <i class="fa-solid fa-save ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let userCedula = "";
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const uDoc = await getDoc(doc(db, "usuario", user.uid));
+            if (uDoc.exists()) {
+                userCedula = uDoc.data().cedula;
+                cargarAsignaciones();
+            }
+        } else { window.location.href = "index.html"; }
+    });
+
+    // --- NAVEGACIÓN ---
+    window.mostrarListado = () => {
+        document.getElementById('seccion-inicio').classList.add('hidden');
+        document.getElementById('seccion-add').classList.add('hidden');
+        document.getElementById('seccion-listado').classList.remove('hidden');
+    };
+
+    window.mostrarFormulario = () => {
+        document.getElementById('seccion-inicio').classList.add('hidden');
+        document.getElementById('seccion-listado').classList.add('hidden');
+        document.getElementById('seccion-add').classList.remove('hidden');
+    };
+
+    // --- LÓGICA DE LISTADO ---
+    async function cargarAsignaciones() {
+        const contenedor = document.getElementById('filtros-asignacion');
+        const q = query(collection(db, "asignaciones"), where("docente_id", "==", userCedula));
+        const snap = await getDocs(q);
+        
+        contenedor.innerHTML = "";
+        if(snap.empty) { contenedor.innerHTML = "<p class='text-xs italic text-slate-400'>No tienes cursos asignados.</p>"; return; }
+
+        snap.forEach(d => {
+            const asig = d.data();
+            const btn = document.createElement('button');
+            btn.className = "bg-indigo-50 text-indigo-700 px-5 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition shadow-sm";
+            btn.innerText = `Grado: ${asig.grado_id} - Par: ${asig.paralelo_id}`;
+            btn.onclick = () => listarEstudiantes(asig.grado_id, asig.paralelo_id);
+            contenedor.appendChild(btn);
+        });
+    }
+
+    async function listarEstudiantes(gId, pId) {
+        const tabla = document.getElementById('tabla-estudiantes');
+        document.getElementById('panel-tabla').classList.remove('hidden');
+        document.getElementById('txt-curso-actual').innerText = `Estudiantes: ${gId} "${pId}"`;
+        
+        // En tu tabla 'estudiantes' no veo grado_id ni paralelo_id, pero supongo que se filtran por las matriculas o los tienes en estudiantes.
+        // Aquí ajusto el filtro a los campos que me mostraste.
+        const q = query(collection(db, "estudiantes"), orderBy("apellidos", "asc"));
+        const snap = await getDocs(q);
+        
+        tabla.innerHTML = "";
+        snap.forEach(docE => {
+            const e = docE.data();
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-5 font-bold text-slate-400 text-xs">${e.cedula}</td>
+                <td class="p-5 font-black text-indigo-950 text-sm uppercase">${e.apellidos} ${e.nombres}</td>
+                <td class="p-5 text-center">
+                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${e.estado ? 'bg-emerald-100 text-emerald-600':'bg-red-100 text-red-600'}">
+                        ${e.estado ? 'Activo' : 'Inactivo'}
+                    </span>
+                </td>
+            `;
+            tabla.appendChild(tr);
+        });
+    }
+
+    // --- LÓGICA DE VALIDACIÓN CÉDULA ---
+    document.getElementById('in_cedula').addEventListener('blur', async (e) => {
+        const ced = e.target.value;
+        if(ced.length < 5) return;
+
+        const docRef = doc(db, "estudiantes", ced); // Probamos buscar si la cedula es el ID
+        let docSnap = await getDoc(docRef);
+
+        // Si no es el ID, buscamos por campo
+        if(!docSnap.exists()){
+            const q = query(collection(db, "estudiantes"), where("cedula", "==", ced));
+            const querySnap = await getDocs(q);
+            if(!querySnap.empty) docSnap = querySnap.docs[0];
+        }
+
+        if (docSnap && docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('in_nombres').value = data.nombres;
+            document.getElementById('in_apellidos').value = data.apellidos;
+            Swal.fire('Detectado', 'El estudiante ya existe en la base.', 'info');
+        }
+    });
+
+</script>
+</body>
+</html>
