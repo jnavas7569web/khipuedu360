@@ -1,1 +1,170 @@
-dd
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Registro de Usuarios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión de Usuarios</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Control de Acceso</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </header>
+
+        <section class="glass-card p-10">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black text-indigo-900 uppercase italic">Ficha de Usuario</h2>
+                <div id="status-user" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest">Listo para escanear</div>
+            </div>
+
+            <form id="form-usuario" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2 relative">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Número de Cédula (ID de Acceso)</label>
+                    <input type="text" id="in_cedula" maxlength="10" required 
+                        class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 outline-none text-xl tracking-widest" placeholder="13XXXXXXXX">
+                    <div id="load-icon" class="hidden absolute right-4 top-[3.2rem] text-indigo-500">
+                        <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres y Apellidos</label>
+                    <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Correo Electrónico</label>
+                    <input type="email" id="in_correo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Título / Especialidad</label>
+                    <input type="text" id="in_titulo" placeholder="Ej. Lcdo. en Ciencias de la Educación" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Rol en el Sistema</label>
+                    <select id="in_rol" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        <option value="docente">DOCENTE</option>
+                        <option value="admin">ADMINISTRADOR</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-2 flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all">Descartar</button>
+                    <button type="submit" id="btn-save" class="bg-indigo-600 hover:bg-black text-white px-12 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                        Guardar Usuario <i class="fa-solid fa-user-check ml-2"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const inCedula = document.getElementById('in_cedula');
+    const loadIcon = document.getElementById('load-icon');
+    const statUser = document.getElementById('status-user');
+
+    // BUSCADOR EN TIEMPO REAL
+    inCedula.addEventListener('input', async (e) => {
+        const ced = e.target.value;
+        if (ced.length === 10) {
+            loadIcon.classList.remove('hidden');
+            statUser.innerText = "Buscando...";
+            
+            try {
+                // Buscamos en la colección usuarios donde la cedula coincida
+                const q = query(collection(db, "usuario"), where("cedula", "==", ced));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    const userDoc = snap.docs[0];
+                    const data = userDoc.data();
+                    
+                    // Llenar campos
+                    document.getElementById('in_nombre').value = data.nombre;
+                    document.getElementById('in_correo').value = data.correo;
+                    document.getElementById('in_titulo').value = data.titulo || "";
+                    document.getElementById('in_rol').value = data.rol;
+
+                    statUser.innerText = "USUARIO ENCONTRADO - MODO EDICIÓN";
+                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest";
+                    Swal.fire({ title: 'Usuario existente', text: 'Puedes actualizar la información del docente.', icon: 'info', timer: 1500, showConfirmButton: false });
+                } else {
+                    statUser.innerText = "NUEVO REGISTRO";
+                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest";
+                }
+            } catch (err) { console.error(err); } finally { loadIcon.classList.add('hidden'); }
+        }
+    });
+
+    // GUARDAR O ACTUALIZAR
+    document.getElementById('form-usuario').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> PROCESANDO...`;
+
+        const cedula = document.getElementById('in_cedula').value;
+        const payload = {
+            cedula: cedula,
+            nombre: document.getElementById('in_nombre').value.trim(),
+            correo: document.getElementById('in_correo').value.trim(),
+            titulo: document.getElementById('in_titulo').value.trim(),
+            rol: document.getElementById('in_rol').value,
+            estado: true
+        };
+
+        try {
+            // Usamos la cédula como ID del documento para que sea único
+            await setDoc(doc(db, "usuario", cedula), payload, { merge: true });
+            
+            Swal.fire({
+                title: '¡Operación Exitosa!',
+                text: 'El usuario ha sido guardado/actualizado correctamente.',
+                icon: 'success',
+                confirmButtonColor: '#6366f1'
+            }).then(() => location.reload());
+
+        } catch (err) {
+            btn.disabled = false;
+            btn.innerHTML = `Guardar Usuario <i class="fa-solid fa-user-check ml-2"></i>`;
+            Swal.fire('Error', 'No se pudo procesar la solicitud: ' + err.message, 'error');
+        }
+    });
+
+</script>
+</body>
+</html>
