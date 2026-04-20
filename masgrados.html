@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Gestión de Grados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Niveles Académicos</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Configuración de Grados</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <aside class="lg:col-span-1">
+                <div class="glass-card p-8 sticky top-8">
+                    <h2 id="form-title" class="text-xl font-black text-slate-800 uppercase italic mb-8">Registrar Grado</h2>
+                    
+                    <form id="form-grado" class="space-y-6">
+                        <input type="hidden" id="grado-id">
+                        
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Seleccionar Grado/Año</label>
+                            <select id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" onchange="autoCompletarNivel()">
+                                <option value="">Elegir...</option>
+                                <option value="Preparatoria">Preparatoria</option>
+                                <option value="Segundo Grado">Segundo Grado</option>
+                                <option value="Tercer Grado">Tercer Grado</option>
+                                <option value="Cuarto Grado">Cuarto Grado</option>
+                                <option value="Quinto Grado">Quinto Grado</option>
+                                <option value="Sexto Grado">Sexto Grado</option>
+                                <option value="Séptimo Grado">Séptimo Grado</option>
+                                <option value="Octavo Grado">Octavo Grado</option>
+                                <option value="Noveno Grado">Noveno Grado</option>
+                                <option value="Décimo Grado">Décimo Grado</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nivel (Auto-asignado)</label>
+                            <input type="text" id="in_nivel" readonly class="w-full p-4 bg-slate-100 border-2 border-slate-100 rounded-2xl font-bold text-indigo-600 uppercase text-xs" placeholder="Se asignará solo">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Número de Grado</label>
+                            <input type="text" id="in_numero" readonly class="w-full p-4 bg-slate-100 border-2 border-slate-100 rounded-2xl font-bold text-slate-500 text-center" placeholder="-">
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" id="btn-save" class="w-full bg-indigo-600 hover:bg-black text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all">
+                                Guardar Configuración <i class="fa-solid fa-layer-group ml-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <main class="lg:col-span-2">
+                <div class="glass-card p-8">
+                    <h2 class="text-xl font-black text-slate-800 uppercase italic mb-8">Grados en el Sistema</h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-[10px] font-black text-slate-400 uppercase border-b border-slate-100">
+                                    <th class="p-4 text-center">ID</th>
+                                    <th class="p-4">Grado</th>
+                                    <th class="p-4">Nivel / Subnivel</th>
+                                    <th class="p-4 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-grados" class="divide-y divide-slate-50">
+                                <tr><td colspan="4" class="p-10 text-center text-slate-300 font-bold italic uppercase text-xs">Cargando niveles...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // --- LÓGICA DE AUTO-COMPLETADO ---
+    window.autoCompletarNivel = () => {
+        const nombre = document.getElementById('in_nombre').value;
+        const nivelInput = document.getElementById('in_nivel');
+        const numeroInput = document.getElementById('in_numero');
+
+        const reglas = {
+            "Preparatoria": { nivel: "Básica Elemental", num: "1" },
+            "Segundo Grado": { nivel: "Básica Elemental", num: "2" },
+            "Tercer Grado": { nivel: "Básica Elemental", num: "3" },
+            "Cuarto Grado": { nivel: "Básica Elemental", num: "4" },
+            "Quinto Grado": { nivel: "Básica Media", num: "5" },
+            "Sexto Grado": { nivel: "Básica Media", num: "6" },
+            "Séptimo Grado": { nivel: "Básica Media", num: "7" },
+            "Octavo Grado": { nivel: "Básica Superior", num: "8" },
+            "Noveno Grado": { nivel: "Básica Superior", num: "9" },
+            "Décimo Grado": { nivel: "Básica Superior", num: "10" }
+        };
+
+        if (reglas[nombre]) {
+            nivelInput.value = reglas[nombre].nivel;
+            numeroInput.value = reglas[nombre].num;
+        } else {
+            nivelInput.value = "";
+            numeroInput.value = "";
+        }
+    };
+
+    // --- LISTAR GRADOS ---
+    function loadGrados() {
+        const q = query(collection(db, "grados"), orderBy("numero", "asc"));
+        onSnapshot(q, (snapshot) => {
+            const tbody = document.getElementById('tabla-grados');
+            tbody.innerHTML = "";
+            
+            snapshot.forEach(docSnap => {
+                const g = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-all group";
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-mono text-[10px] text-slate-400 font-bold">${docSnap.id}</td>
+                    <td class="p-4 font-black text-indigo-950 text-sm uppercase">${g.nombre}</td>
+                    <td class="p-4">
+                        <span class="text-[9px] font-black bg-indigo-50 text-indigo-500 px-3 py-1 rounded-full uppercase tracking-tighter">
+                            ${g.nivel}
+                        </span>
+                    </td>
+                    <td class="p-4 text-right">
+                        <button onclick="deleteGrado('${docSnap.id}')" class="text-slate-200 hover:text-red-500 transition-all">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+    }
+
+    // --- GUARDAR ---
+    document.getElementById('form-grado').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btn-save');
+        const num = document.getElementById('in_numero').value;
+        
+        // Generamos ID: grado_01, grado_05, etc.
+        const idDoc = "grado_" + num.padStart(2, '0');
+
+        const payload = {
+            nombre: document.getElementById('in_nombre').value,
+            nivel: document.getElementById('in_nivel').value,
+            numero: num
+        };
+
+        try {
+            btn.disabled = true;
+            await setDoc(doc(db, "grados", idDoc), payload);
+            Swal.fire({ title: 'Grado Configurado', icon: 'success', timer: 1500, showConfirmButton: false });
+            document.getElementById('form-grado').reset();
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo guardar', 'error');
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    window.deleteGrado = async (id) => {
+        const res = await Swal.fire({
+            title: '¿Eliminar este nivel?',
+            text: "Se borrará la configuración del grado.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444'
+        });
+        if (res.isConfirmed) await deleteDoc(doc(db, "grados", id));
+    };
+
+    loadGrados();
+</script>
+</body>
+</html>
