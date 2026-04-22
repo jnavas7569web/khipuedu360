@@ -54,6 +54,7 @@
                             Sincronizado <i class="fa-solid fa-cloud-check ml-1"></i>
                         </div>
                     </div>
+                    <i class="fa-solid fa-calendar-check absolute -right-4 -bottom-4 text-8xl text-white/5"></i>
                 </div>
             </div>
 
@@ -62,7 +63,7 @@
                     
                     <div class="md:col-span-2">
                         <label class="label-style">Nombres del Estudiante</label>
-                        <input type="text" id="res_nombre" readonly class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-600 uppercase">
+                        <input type="text" id="res_nombre" readonly class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-600 uppercase tracking-tight">
                     </div>
 
                     <div class="md:col-span-2 p-6 bg-blue-50 rounded-3xl border border-blue-100">
@@ -86,7 +87,7 @@
                     <div>
                         <label class="label-style">Paralelo Destino</label>
                         <select id="res_paralelo" required class="w-full p-4 input-style rounded-2xl outline-none appearance-none">
-                            <option value="">Cargando...</option>
+                            <option value="">Seleccione Paralelo</option>
                         </select>
                     </div>
 
@@ -99,13 +100,14 @@
                             <div>
                                 <h4 id="res_docente_nombre" class="font-black text-slate-400 uppercase italic">Esperando selección de curso...</h4>
                                 <input type="hidden" id="id_docente">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Asignación detectada en tiempo real</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-end mt-12 gap-4 items-center">
-                    <button type="button" onclick="location.reload()" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-500 transition-all">Limpiar</button>
+                    <button type="button" onclick="location.reload()" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-500 transition-all">Limpiar Formulario</button>
                     <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed hover:bg-black text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95">
                         Confirmar Matrícula <i class="fa-solid fa-file-circle-check ml-2"></i>
                     </button>
@@ -132,15 +134,17 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // SEGURIDAD
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
         else {
             const userDoc = await getDoc(doc(db, "usuario", user.uid));
-            if (userDoc.exists() && (userDoc.data().rol === 'admin' || userDoc.data().rol === 'docente')) {
+            const uData = userDoc.data();
+            if (uData && (uData.rol === 'admin' || uData.rol === 'docente')) {
                 document.body.style.opacity = "1";
                 inicializarPagina();
-            } else { window.location.href = "dashboard.html"; }
+            } else {
+                window.location.href = "dashboard.html";
+            }
         }
     });
 
@@ -156,10 +160,10 @@
         selG.innerHTML = '<option value="">Elegir Grado</option>';
         gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
 
-        // Paralelos
+        // Paralelos (Corrección: Eliminado 'P.')
         const pSnap = await getDocs(collection(db, "paralelos"));
         const selP = document.getElementById('res_paralelo');
-        selP.innerHTML = '<option value="">P.</option>';
+        selP.innerHTML = '<option value="">Seleccione Paralelo</option>';
         pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.data().nombre || d.id}</option>`);
     }
 
@@ -172,7 +176,6 @@
         }
     }
 
-    // BÚSQUEDA DE ESTUDIANTE
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
         const ced = e.target.value;
         if (ced.length === 10) {
@@ -191,13 +194,12 @@
                 }
                 validarAsignacionDinamica();
             } else {
-                Swal.fire('Error', 'Estudiante no registrado.', 'error');
+                Swal.fire('Estudiante no encontrado', 'Verifique la cédula.', 'error');
             }
             document.getElementById('loader-est').classList.add('hidden');
         }
     });
 
-    // VALIDACIÓN DINÁMICA DE DOCENTE
     async function validarAsignacionDinamica() {
         const grado = document.getElementById('id_grado').value;
         const paralelo = document.getElementById('res_paralelo').value;
@@ -206,16 +208,20 @@
         const btn = document.getElementById('btn-save');
 
         if (grado && paralelo) {
-            const qAsig = query(collection(db, "asignaciones"), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
+            const qAsig = query(collection(db, "asignaciones"), 
+                where("grado_id", "==", grado), 
+                where("paralelo_id", "==", paralelo));
+            
             const asigSnap = await getDocs(qAsig);
 
             if (!asigSnap.empty) {
                 const asig = asigSnap.docs[0].data();
                 const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
                 document.getElementById('id_docente').value = asig.docente_id;
-                resDoc.innerText = dSnap.exists() ? dSnap.data().nombre : "Docente Asignado";
+                resDoc.innerText = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
                 boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100 transition-all";
                 resDoc.className = "font-black text-emerald-900 uppercase tracking-tight";
+                document.getElementById('docente-icon').className = "w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl";
                 btn.disabled = false;
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
@@ -231,11 +237,12 @@
     document.getElementById('id_grado').addEventListener('change', validarAsignacionDinamica);
     document.getElementById('res_paralelo').addEventListener('change', validarAsignacionDinamica);
 
-    // GUARDADO
     document.getElementById('form-matricula').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...';
+
         const pId = document.getElementById('in_periodo').value;
         const ced = document.getElementById('in_cedula').value;
 
@@ -254,8 +261,9 @@
             });
             Swal.fire('¡Éxito!', 'Matrícula procesada correctamente.', 'success').then(() => location.reload());
         } catch (err) {
-            Swal.fire('Error', 'Fallo en la base de datos.', 'error');
+            Swal.fire('Error Critico', 'No se pudo sincronizar la matrícula.', 'error');
             btn.disabled = false;
+            btn.innerText = 'Confirmar Matrícula';
         }
     });
 </script>
