@@ -13,6 +13,13 @@
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .badge-curso { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; }
+        
+        /* Ajuste responsivo para el buscador */
+        @media (max-width: 640px) {
+            .search-container { flex-direction: column; gap: 10px; }
+            .search-button { position: static !important; width: 100%; padding: 15px !important; }
+            .search-input { padding-right: 14px !important; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -28,14 +35,18 @@
             </button>
         </header>
 
-        <section class="glass-card p-8 mb-8">
-            <div class="relative max-w-xl mx-auto">
-                <input type="text" id="input-busqueda" 
-                    class="w-full p-5 pl-14 input-style rounded-3xl font-black text-slate-700 outline-none text-lg uppercase" 
-                    placeholder="NOMBRE O APELLIDO DEL ALUMNO..."
-                    onkeyup="if(event.key === 'Enter') buscarEstudiante()">
-                <div class="absolute left-5 top-5 text-slate-300 text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
-                <button onclick="buscarEstudiante()" class="absolute right-3 top-3 bg-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase hover:bg-black transition-all">Buscar</button>
+        <section class="glass-card p-6 md:p-8 mb-8">
+            <div class="relative max-w-xl mx-auto flex search-container">
+                <div class="relative w-full">
+                    <input type="text" id="input-busqueda" 
+                        class="w-full p-5 pl-14 search-input input-style rounded-3xl font-black text-slate-700 outline-none text-lg uppercase" 
+                        placeholder="NOMBRE O APELLIDO..."
+                        onkeyup="if(event.key === 'Enter') buscarEstudiante()">
+                    <div class="absolute left-5 top-5 text-slate-300 text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
+                </div>
+                <button onclick="buscarEstudiante()" class="search-button md:absolute right-3 top-3 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase hover:bg-black transition-all shadow-lg active:scale-95">
+                    Buscar
+                </button>
             </div>
         </section>
 
@@ -71,7 +82,6 @@
         contenedor.innerHTML = '<div class="md:col-span-2 text-center py-20 font-black text-indigo-900 animate-pulse uppercase">Escaneando nóminas...</div>';
 
         try {
-            // 1. Obtener todos los alumnos (para búsqueda flexible)
             const snapEstu = await getDocs(collection(db, "estudiantes"));
             let alumnosEncontrados = [];
 
@@ -89,20 +99,16 @@
 
             contenedor.innerHTML = "";
 
-            // 2. Procesar cada alumno para traer su curso y su representante
             for (const alumno of alumnosEncontrados) {
-                // Buscamos su grado y paralelo en la colección 'matriculas'
-                const qMat = query(collection(db, "matriculas"), where("cedula_estudiante", "==", alumno.cedula));
+                const qMat = query(collection(db, "matriculas"), where("estudiante_id", "==", alumno.cedula));
                 const snapMat = await getDocs(qMat);
                 
                 let infoCurso = "SIN MATRÍCULA";
                 if(!snapMat.empty) {
                     const m = snapMat.docs[0].data();
-                    // Usamos los IDs de grado y paralelo que tengas guardados
-                    infoCurso = `${m.id_grado || ''} "${m.id_paralelo || ''}"`.toUpperCase();
+                    infoCurso = `${m.grado_id || ''} "${m.paralelo_id || ''}"`.toUpperCase();
                 }
 
-                // Buscamos al representante
                 const docR = await getDoc(doc(db, "representantes", alumno.representante_id));
                 
                 if(docR.exists()) {
@@ -116,12 +122,12 @@
                                         <span class="font-black text-slate-800 text-sm">${alumno.nombres} ${alumno.apellidos}</span>
                                         <span class="badge-curso w-fit">${infoCurso}</span>
                                     </div>
-                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-black text-[8px] uppercase tracking-tighter">${r.parentesco}</span>
+                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-black text-[8px] uppercase tracking-tighter">${r.parentesco || 'REPRE.'}</span>
                                 </div>
                                 
                                 <div class="mt-4 pt-4 border-t border-slate-50">
                                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">REPRESENTANTE:</p>
-                                    <h3 class="font-bold text-slate-700 uppercase text-md">${r.nombre_completo}</h3>
+                                    <h3 class="font-bold text-slate-700 uppercase text-md">${r.nombre_completo || r.nombres}</h3>
                                 </div>
                             </div>
 
@@ -129,7 +135,7 @@
                                 <a href="tel:${r.telefono}" class="bg-slate-800 text-white p-3 rounded-2xl text-center hover:bg-black transition-all text-xs font-bold">
                                     <i class="fa-solid fa-phone mr-2"></i> LLAMAR
                                 </a>
-                                <a href="https://wa.me/593${r.telefono.replace(/^0/, '')}?text=Estimado(a)%20${r.nombres},%20le%20saludo%20de%20la%20Escuela%20Gran%20Colombia.%20Me%20comunico%20por%20su%20hijo(a)%20${alumno.nombres}%20de%20${infoCurso}." 
+                                <a href="https://wa.me/593${r.telefono.replace(/^0/, '')}?text=Estimado(a)%20${r.nombres || r.nombre_completo},%20le%20saludo%20de%20la%20Escuela%20Gran%20Colombia.%20Me%20comunico%20por%20su%20hijo(a)%20${alumno.nombres}%20de%20${infoCurso}." 
                                    target="_blank" class="bg-emerald-500 text-white p-3 rounded-2xl text-center hover:bg-emerald-600 transition-all text-xs font-bold">
                                     <i class="fa-brands fa-whatsapp mr-2"></i> WHATSAPP
                                 </a>
@@ -139,10 +145,9 @@
                     contenedor.innerHTML += card;
                 }
             }
-
         } catch (err) {
             console.error(err);
-            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error de red.</div>`;
+            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error de conexión.</div>`;
         }
     };
 </script>
