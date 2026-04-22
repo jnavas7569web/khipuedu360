@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Gestión de Periodos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
+        .badge-active { background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 10px; font-weight: 800; font-size: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Periodos Lectivos</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Configuración del Cronograma</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </header>
+
+        <div id="status-periodo" class="glass-card p-10 mb-8 border-l-8 border-indigo-600 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2">Periodo de Referencia Actual</p>
+                <h2 id="periodo-vigent-nombre" class="text-5xl font-black text-slate-800 tracking-tighter uppercase italic">Cargando...</h2>
+            </div>
+            <div class="text-center md:text-right">
+                <span class="badge-active uppercase tracking-widest">Estado: Activo</span>
+                <p id="fechas-vigentes" class="text-xs font-bold text-slate-400 mt-3 uppercase italic">---</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card p-8">
+                <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 border-b pb-4">Registrar Nuevo Periodo</h3>
+                <form id="form-periodo" class="space-y-5">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Nombre (Ej: 2026-2027)</label>
+                        <input type="text" id="p_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Inicio</label>
+                            <input type="date" id="p_inicio" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase ml-1">Fin</label>
+                            <input type="date" id="p_fin" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-black text-white font-black py-4 rounded-2xl uppercase text-[10px] tracking-widest transition-all">
+                        Guardar Periodo <i class="fa-solid fa-calendar-plus ml-2"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="glass-card p-8">
+                <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 border-b pb-4">Historial de Periodos</h3>
+                <div id="lista-periodos" class="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, updateDoc, setDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // ESCUDO DE SEGURIDAD (Solo Admin)
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "index.html"; }
+        else {
+            const userDoc = await getDoc(doc(db, "usuario", user.uid));
+            if (userDoc.exists() && userDoc.data().rol === 'admin') {
+                document.body.style.opacity = "1";
+                fetchPeriodos();
+            } else {
+                Swal.fire('Acceso Denegado', 'Solo administradores pueden gestionar periodos.', 'error')
+                .then(() => window.location.href = "dashboard.html");
+            }
+        }
+    });
+
+    async function fetchPeriodos() {
+        const snap = await getDocs(collection(db, "periodos_lectivos"));
+        const lista = document.getElementById('lista-periodos');
+        lista.innerHTML = "";
+        
+        snap.forEach(d => {
+            const p = d.data();
+            if(p.estado === "activo") {
+                document.getElementById('periodo-vigent-nombre').innerText = p.nombre;
+                document.getElementById('fechas-vigentes').innerText = `Desde: ${p.fecha_inicio} | Hasta: ${p.fecha_fin}`;
+            }
+
+            lista.innerHTML += `
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div>
+                        <p class="font-black text-slate-800 text-xs">${p.nombre}</p>
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">${p.fecha_inicio} / ${p.fecha_fin}</p>
+                    </div>
+                    ${p.estado === 'activo' ? 
+                        '<span class="text-emerald-500 text-[10px] font-black italic">VIGENTE</span>' : 
+                        `<button onclick="activarPeriodo('${d.id}')" class="text-[8px] font-black bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-600 hover:text-white transition-all">ACTIVAR</button>`
+                    }
+                </div>
+            `;
+        });
+    }
+
+    // ACTIVAR UN PERIODO (Y desactivar los demás)
+    window.activarPeriodo = async (id) => {
+        Swal.fire({
+            title: '¿Cambiar periodo vigente?',
+            text: "Esto afectará a las nuevas matrículas y registros de notas.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5',
+            confirmButtonText: 'Sí, cambiar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const batch = writeBatch(db);
+                const allP = await getDocs(collection(db, "periodos_lectivos"));
+                
+                // Desactivar todos
+                allP.forEach(pDoc => {
+                    batch.update(doc(db, "periodos_lectivos", pDoc.id), { estado: "inactivo" });
+                });
+                
+                // Activar el seleccionado
+                batch.update(doc(db, "periodos_lectivos", id), { estado: "activo" });
+                
+                await batch.commit();
+                Swal.fire('¡Actualizado!', 'Nuevo periodo establecido como vigente.', 'success')
+                .then(() => location.reload());
+            }
+        });
+    };
+
+    // GUARDAR NUEVO
+    document.getElementById('form-periodo').onsubmit = async (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById('p_nombre').value;
+        const idGenerated = nombre.replace(/\s+/g, '_').toLowerCase(); // Ej: 2026-2027 -> 2026-2027
+
+        await setDoc(doc(db, "periodos_lectivos", idGenerated), {
+            nombre: nombre,
+            fecha_inicio: document.getElementById('p_inicio').value,
+            fecha_fin: document.getElementById('p_fin').value,
+            estado: "inactivo" // Se crea inactivo por defecto
+        });
+
+        Swal.fire('Registrado', 'Periodo creado en el historial.', 'success')
+        .then(() => location.reload());
+    };
+
+</script>
+</body>
+</html>
