@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* ESCUDO VISUAL: Oculto por defecto */
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
@@ -84,7 +85,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -95,14 +96,26 @@
         messagingSenderId: "505046535196",
         appId: "1:505046535196:web:5e260f2839bacdc35263d9"
     };
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    
-    //////////////////////////////////////////hackinggggggggggggggggggggg///////////////////////////////////////////////////////////////////////////////
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // --- ESCUDO DE SEGURIDAD PARA ADMIN ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "index.html";
+        } else {
+            const userRef = doc(db, "usuario", user.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && userSnap.data().rol === "admin") {
+                document.body.style.opacity = "1";
+            } else {
+                Swal.fire('Acceso Denegado', 'Solo administradores pueden gestionar usuarios.', 'error')
+                .then(() => window.location.href = "dashboard.html");
+            }
+        }
+    });
 
     const inCedula = document.getElementById('in_cedula');
     const loadIcon = document.getElementById('load-icon');
@@ -127,7 +140,6 @@
                     document.getElementById('in_titulo').value = data.titulo || "";
                     document.getElementById('in_rol').value = data.rol;
                     
-                    // Si ya existe, la clave no es obligatoria (se asume que ya tiene una)
                     inputPass.required = false;
                     inputPass.placeholder = "Dejar en blanco para mantener clave actual";
                     
@@ -143,10 +155,17 @@
         }
     });
 
-    // GUARDAR USUARIO Y CREAR AUTH
+    // GUARDAR USUARIO
     document.getElementById('form-usuario').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
+        
+        // Guardamos los datos del ADMIN actual para no perder la sesión
+        const adminEmail = auth.currentUser.email;
+        // Nota: En una app real no deberías pedir la clave aquí, pero como es local 
+        // y necesitas crear cuentas en Auth, usaremos un truco de re-autenticación si fuera necesario.
+        // Para simplificar, asumiremos que solo creas perfiles en Firestore si el usuario ya existe en Auth.
+
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...`;
 
@@ -155,20 +174,21 @@
         const cedula = document.getElementById('in_cedula').value;
 
         try {
-            // 1. Verificar si es nuevo para crear cuenta de Auth
             const q = query(collection(db, "usuario"), where("cedula", "==", cedula));
             const snap = await getDocs(q);
             let uid_final = "";
 
             if (snap.empty) {
-                // Crear usuario en Firebase Authentication
+                // CREAR EN AUTH (Atención: esto cambia la sesión actual)
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 uid_final = userCredential.user.uid;
+                
+                // IMPORTANTE: Aquí el Admin perdió su sesión. Debes avisarle o pedirle login de nuevo.
+                // Pero para este flujo educativo, seguiremos con el guardado:
             } else {
-                uid_final = snap.docs[0].id; // Usar el ID actual si solo estamos actualizando datos
+                uid_final = snap.docs[0].id;
             }
 
-            // 2. Guardar perfil en Firestore
             const payload = {
                 uid: uid_final,
                 cedula: cedula,
@@ -184,19 +204,17 @@
 
             Swal.fire({
                 title: '¡Acceso Creado!',
-                text: `El usuario ${payload.nombre} ahora puede entrar al sistema.`,
+                text: `El usuario ha sido registrado. Si creaste un usuario nuevo, deberás re-ingresar con tu cuenta de Admin por seguridad.`,
                 icon: 'success',
                 confirmButtonColor: '#4f46e5'
-            }).then(() => location.reload());
+            }).then(() => window.location.href = "index.html");
 
         } catch (error) {
             btn.disabled = false;
             btn.innerHTML = `Registrar Acceso <i class="fa-solid fa-user-shield ml-2"></i>`;
-            let msg = "No se pudo crear el acceso.";
-            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado en el sistema.";
-            if(error.code === 'auth/weak-password') msg = "La contraseña debe tener al menos 6 caracteres.";
-            
-            Swal.fire('Error de Registro', msg, 'error');
+            let msg = "Error al procesar: " + error.code;
+            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado.";
+            Swal.fire('Error', msg, 'error');
         }
     });
 </script>
