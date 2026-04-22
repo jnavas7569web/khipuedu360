@@ -99,7 +99,7 @@
         
         .user-profile { display: flex; align-items: center; gap: 12px; }
         .user-info-text { text-align: right; }
-        .user-name { font-weight: 800; font-size: 0.9rem; display: block; }
+        .user-name { font-weight: 800; font-size: 0.9rem; display: block; text-transform: uppercase; }
         .user-role { font-size: 0.7rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
         
         .avatar-img {
@@ -122,15 +122,15 @@
         .stat-card { color: white; border: none; }
         .card-naranja { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
         
-        .stat-value { font-size: 3rem; font-weight: 900; margin: 5px 0; }
-        .stat-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; opacity: 0.9; }
+        .stat-value { font-size: 1.8rem; font-weight: 900; margin: 5px 0; text-transform: uppercase; }
+        .stat-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; opacity: 0.9; letter-spacing: 1px; }
         .stat-icon-bg { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.2; transform: rotate(-15deg); }
 
         .cards-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
-    gap: 20px; 
-}
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); 
+            gap: 20px; 
+        }
 
         .action-card {
             cursor: pointer; transition: 0.3s; color: white; min-height: 140px;
@@ -171,8 +171,7 @@
               <a href="estudiantes.html" class="sidebar-link"><i class="fa-solid fa-user-graduate"></i> Estudiantes</a>
             <a href="matriculas.html" class="sidebar-link"><i class="fa-solid fa-id-card-clip"></i> Matrículas</a>
                <a href="enconstruccion.html" class="sidebar-link"><i class="fa-solid fa-chart-line"></i> Reportes</a>
-            <!-- //salto p// -->
-               <a href="contactar.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
+            <a href="contactar.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
        
         </div>
         <div class="sidebar-footer">
@@ -204,15 +203,18 @@
                     </div>
                 </div>
 
-                <div class="card stat-card card-naranja" onclick="window.location.href='estudiantes.html'" style="cursor: pointer;">
-                    <div class="stat-label">Estudiantes Registrados</div>
-                    <div class="stat-value" id="count-estudiantes">0</div>
-                    <i class="fa-solid fa-graduation-cap stat-icon-bg"></i>
+                <div class="card stat-card card-naranja">
+                    <div class="stat-label">Institución Educativa</div>
+                    <div class="stat-value" style="font-size: 1.4rem;">Esc. de EGB Fiscal Gran Colombia</div>
+                    <div id="tutor-info" class="stat-label" style="margin-top: 10px; background: rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 8px; display: none;">
+                        <i class="fa-solid fa-chalkboard-user mr-2"></i> Tutor: <span id="curso-tutor">---</span>
+                    </div>
+                    <i class="fa-solid fa-school stat-icon-bg"></i>
                 </div>
             </div>
 
             <div class="cards-grid">
-                             <div class="card action-card" style="background: #10b981;" onclick="window.location.href='enconstruccion.html'">
+                <div class="card action-card" style="background: #10b981;" onclick="window.location.href='enconstruccion.html'">
                     <i class="fa-solid fa-check-to-slot"></i>
                     <span>Pasar Asistencias</span>
                 </div>
@@ -220,16 +222,13 @@
                     <i class="fa-solid fa-pen-nib"></i>
                     <span>Ingresar Notas</span>
                 </div>
-                <!-- ///////////// -->
-       
-                <!-- ////////////// -->
                 <div class="card action-card" style="background: #8b5cf6;" onclick="window.location.href='enconstruccion.html'">
                     <i class="fa-solid fa-file-export"></i>
                     <span>Generar Reportes</span>
                 </div>
                 <div class="card action-card" style="background: #64748b;" onclick="window.location.href='configuracion.html'">
-                <i class="fa-solid fa-gears"></i>
-                <span>Configuración</span>
+                    <i class="fa-solid fa-gears"></i>
+                    <span>Configuración</span>
                 </div>
             </div>
 
@@ -240,10 +239,10 @@
                         <i class="fa-solid fa-user-plus text-xl text-indigo-400"></i>
                         <span>AÑADIR USUARIO</span>
                     </a>
-                              <div onclick="abrirMenuGestion()" class="btn-admin cursor-pointer" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1);">
-    <i class="fa-solid fa-layer-group text-xl text-indigo-400"></i>
-    <span>GESTIÓN MATERIAS Y GRADOS</span>
-</div>
+                    <div onclick="abrirMenuGestion()" class="btn-admin cursor-pointer" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1);">
+                        <i class="fa-solid fa-layer-group text-xl text-indigo-400"></i>
+                        <span>GESTIÓN MATERIAS Y GRADOS</span>
+                    </div>
                     <a href="asignaciones.html" class="btn-admin" style="background: #1e293b;">
                         <i class="fa-solid fa-users-gear text-xl"></i>
                         <span>GESTIONAR PERSONAL</span>
@@ -260,7 +259,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -282,23 +281,34 @@
                     if (userDoc.exists()) {
                         const data = userDoc.data();
                         
-                        // Llenar datos de usuario
-                        document.getElementById('nav-user-name').innerText = `${data.nombre} ${data.apellido}`;
+                        // CORRECCIÓN: Usar solo data.nombre (sin apellido) para evitar el 'undefined'
+                        document.getElementById('nav-user-name').innerText = data.nombre;
                         document.getElementById('nav-user-role').innerText = data.rol;
-                        document.getElementById('welcome-text').innerText = `¡Hola, ${data.nombre}!`;
-                        document.getElementById('nav-avatar').src = data.foto_url || `https://ui-avatars.com/api/?name=${data.nombre}+${data.apellido}&background=random`;
+                        document.getElementById('welcome-text').innerText = `¡Hola, ${data.nombre.split(' ')[0]}!`;
+                        document.getElementById('nav-avatar').src = data.foto_url || `https://ui-avatars.com/api/?name=${data.nombre}&background=random&color=fff`;
 
                         // LÓGICA DE SEGURIDAD POR ROL
                         const adminPanel = document.getElementById('admin-panel');
                         if (data.rol === 'admin' || data.rol === 'superadmin') {
                             adminPanel.classList.remove('hidden');
                         } else {
-                            adminPanel.remove(); // Borra el panel si no es admin
+                            adminPanel.remove();
                         }
 
-                        // Contador de estudiantes
-                        const snapshot = await getCountFromServer(collection(db, "estudiantes"));
-                        document.getElementById('count-estudiantes').innerText = snapshot.data().count;
+                        // NUEVA LÓGICA: Buscar si es tutor
+                        const qAsig = query(collection(db, "asignaciones"), where("docente_id", "==", user.uid), where("tutor", "==", true));
+                        const asigSnap = await getDocs(qAsig);
+                        
+                        if (!asigSnap.empty) {
+                            const asigData = asigSnap.docs[0].data();
+                            // Buscar nombre del grado
+                            const gradoSnap = await getDoc(doc(db, "grados", asigData.grado_id));
+                            const gradoNombre = gradoSnap.exists() ? gradoSnap.data().nombre : asigData.grado_id;
+                            
+                            document.getElementById('tutor-info').style.display = 'block';
+                            document.getElementById('curso-tutor').innerText = `${gradoNombre} "${asigData.paralelo_id}"`;
+                        }
+
                     } else {
                         signOut(auth);
                     }
@@ -328,32 +338,33 @@
                 }
             });
         });
+
         window.abrirMenuGestion = () => {
-    Swal.fire({
-        title: 'Gestión Académica',
-        text: '¿Qué sección deseas configurar hoy?',
-        icon: 'question',
-        showCancelButton: true,
-        showDenyButton: true,
-        confirmButtonText: '<i class="fa-solid fa-book-open mr-2"></i> Materias',
-        denyButtonText: '<i class="fa-solid fa-graduation-cap mr-2"></i> Grados / Años',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#4f46e5', // Color Indigo
-        denyButtonColor: '#1e293b',    // Color Slate
-        customClass: {
-            popup: 'rounded-3xl',
-            confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
-            denyButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
-            cancelButton: 'rounded-xl font-bold uppercase text-xs'
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = 'masmaterias.html';
-        } else if (result.isDenied) {
-            window.location.href = 'masgrados.html';
-        }
-    });
-};
+            Swal.fire({
+                title: 'Gestión Académica',
+                text: '¿Qué sección deseas configurar hoy?',
+                icon: 'question',
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: '<i class="fa-solid fa-book-open mr-2"></i> Materias',
+                denyButtonText: '<i class="fa-solid fa-graduation-cap mr-2"></i> Grados / Años',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#4f46e5',
+                denyButtonColor: '#1e293b',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
+                    denyButton: 'rounded-xl font-bold uppercase text-xs px-6 py-3',
+                    cancelButton: 'rounded-xl font-bold uppercase text-xs'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'masmaterias.html';
+                } else if (result.isDenied) {
+                    window.location.href = 'masgrados.html';
+                }
+            });
+        };
     </script>
 </body>
 </html>
