@@ -22,7 +22,7 @@
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Matrículas Oficiales</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Gestión Académica</p>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Portoviejo</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
@@ -32,7 +32,7 @@
         <form id="form-matricula" class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="md:col-span-1 space-y-6">
                 <div class="glass-card p-8">
-                    <label class="label-style">Cédula Estudiante</label>
+                    <label class="label-style">Cédula del Estudiante</label>
                     <div class="relative">
                         <input type="text" id="in_cedula" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-black text-xl text-indigo-600 tracking-widest" placeholder="0000000000">
                         <div id="loader-est" class="hidden absolute right-4 top-4 text-indigo-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
@@ -40,23 +40,23 @@
                     <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic">Valide la cédula para habilitar el registro.</p>
                 </div>
 
-                <div class="glass-card p-8 bg-indigo-900 text-white border-none">
-                    <label class="label-style text-indigo-300">Periodo Lectivo</label>
-                    <select id="in_periodo" required class="w-full p-4 bg-indigo-800 border-none rounded-2xl font-black text-white outline-none">
-                        <option value="">Cargando...</option>
-                    </select>
+                <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-indigo-200 shadow-xl">
+                    <label class="label-style text-indigo-300">Periodo Lectivo Actual</label>
+                    <div id="periodo_display" class="text-2xl font-black tracking-tighter italic">Buscando periodo...</div>
+                    <input type="hidden" id="in_periodo">
+                    <p class="text-[9px] font-bold text-indigo-400 uppercase mt-2 tracking-widest">Sincronizado con base de datos</p>
                 </div>
             </div>
 
             <div class="md:col-span-2 glass-card p-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="md:col-span-2">
-                        <label class="label-style">Estudiante Encontrado</label>
+                        <label class="label-style">Nombres Completos</label>
                         <input type="text" id="res_nombre" readonly class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-500 uppercase">
                     </div>
                     
                     <div>
-                        <label class="label-style">Grado</label>
+                        <label class="label-style">Grado Sugerido</label>
                         <input type="text" id="res_grado_nombre" readonly class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-bold text-slate-500 uppercase">
                         <input type="hidden" id="id_grado">
                     </div>
@@ -67,7 +67,7 @@
                     </div>
 
                     <div id="box-docente" class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 transition-all">
-                        <label class="label-style">Docente Asignado</label>
+                        <label class="label-style">Docente Responsable</label>
                         <div class="flex items-center gap-4">
                             <div id="docente-icon" class="w-12 h-12 bg-slate-300 rounded-xl flex items-center justify-center text-white text-xl">
                                 <i class="fa-solid fa-user-tie"></i>
@@ -80,9 +80,9 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end mt-10 gap-4">
-                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed hover:bg-black text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all">
-                        Confirmar Matrícula <i class="fa-solid fa-file-signature ml-2"></i>
+                <div class="flex justify-end mt-10">
+                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed hover:bg-black text-white px-10 py-5 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                        Finalizar Matrícula <i class="fa-solid fa-file-signature ml-2"></i>
                     </button>
                 </div>
             </div>
@@ -107,43 +107,43 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // --- SEGURIDAD Y CONTROL DE ACCESO ---
+    // --- SEGURIDAD: SOLO ADMIN O DOCENTE ---
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
         else {
             const userDoc = await getDoc(doc(db, "usuario", user.uid));
-            const userData = userDoc.data();
-            if (userData && (userData.rol === 'admin' || userData.rol === 'docente')) {
+            const uData = userDoc.data();
+            if (uData && (uData.rol === 'admin' || uData.rol === 'docente')) {
                 document.body.style.opacity = "1";
-                loadPeriodos();
+                detectarPeriodoActivo();
             } else {
-                Swal.fire('Acceso Denegado', 'No tienes permisos para matricular.', 'error')
-                .then(() => window.location.href = "dashboard.html");
+                window.location.href = "dashboard.html";
             }
         }
     });
 
-    // --- CARGA DE PERIODOS (CORREGIDO) ---
-    async function loadPeriodos() {
+    // --- CARGA AUTOMÁTICA DE PERIODO ACTUAL (Imagen 3: periodos_lectivos) ---
+    async function detectarPeriodoActivo() {
         try {
-            const snap = await getDocs(collection(db, "periodos"));
-            const sel = document.getElementById('in_periodo');
-            sel.innerHTML = '<option value="">Seleccione Periodo</option>';
-            snap.forEach(d => {
-                const p = d.data();
-                // Usamos p.nombre que es donde guardas "2026-2027"
-                sel.innerHTML += `<option value="${d.id}">${p.nombre || d.id}</option>`;
-            });
-        } catch (e) { console.error("Error cargando periodos:", e); }
+            const q = query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"));
+            const snap = await getDocs(q);
+            
+            if (!snap.empty) {
+                const pActivo = snap.docs[0];
+                document.getElementById('periodo_display').innerText = pActivo.data().nombre;
+                document.getElementById('in_periodo').value = pActivo.id;
+            } else {
+                document.getElementById('periodo_display').innerText = "NO HAY PERIODO ACTIVO";
+                Swal.fire('Atención', 'Debes activar un periodo lectivo en el panel de configuración.', 'warning');
+            }
+        } catch (e) { console.error(e); }
     }
 
-    // --- BÚSQUEDA ESTRICTA ---
+    // --- BÚSQUEDA DE ESTUDIANTE Y ASIGNACIÓN (Imagen 2: asignaciones) ---
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
         const ced = e.target.value;
         const btn = document.getElementById('btn-save');
-        const boxDoc = document.getElementById('box-docente');
         const resDoc = document.getElementById('res_docente_nombre');
-        const iconDoc = document.getElementById('docente-icon');
 
         if (ced.length === 10) {
             document.getElementById('loader-est').classList.remove('hidden');
@@ -158,7 +158,7 @@
                 const gSnap = await getDoc(doc(db, "grados", est.grado));
                 document.getElementById('res_grado_nombre').value = gSnap.exists() ? gSnap.data().nombre : est.grado;
 
-                // VALIDAR ASIGNACIÓN (MODO ESTRICTO)
+                // BUSCAR ASIGNACIÓN DE DOCENTE (Imagen 2)
                 const qAsig = query(collection(db, "asignaciones"), 
                     where("grado_id", "==", est.grado), 
                     where("paralelo_id", "==", est.paralelo));
@@ -171,50 +171,51 @@
                     const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
                     
                     resDoc.innerText = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
+                    document.getElementById('box-docente').className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-200";
+                    document.getElementById('docente-icon').className = "w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl";
                     resDoc.classList.replace('text-slate-400', 'text-emerald-700');
-                    boxDoc.classList.replace('bg-slate-50', 'bg-emerald-50');
-                    iconDoc.classList.replace('bg-slate-300', 'bg-emerald-600');
                     
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 } else {
-                    resDoc.innerText = "SIN DOCENTE ASIGNADO";
+                    resDoc.innerText = "SIN DOCENTE ASIGNADO A ESTE CURSO";
+                    document.getElementById('box-docente').className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-200";
                     resDoc.classList.replace('text-slate-400', 'text-red-600');
-                    boxDoc.classList.replace('bg-slate-50', 'bg-red-50');
-                    iconDoc.classList.replace('bg-slate-300', 'bg-red-600');
                     btn.disabled = true;
                     btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    Swal.fire('Atención', 'No existe docente asignado para este grado/paralelo.', 'warning');
                 }
             } else {
-                Swal.fire('Error', 'Estudiante no encontrado.', 'error');
+                Swal.fire('Error', 'Estudiante no registrado.', 'error');
             }
             document.getElementById('loader-est').classList.add('hidden');
         }
     });
 
-    // --- GUARDAR MATRÍCULA ---
+    // --- GUARDAR EN TABLA matriculas (Imagen 2) ---
     document.getElementById('form-matricula').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
 
+        const pId = document.getElementById('in_periodo').value;
+        const ced = document.getElementById('in_cedula').value;
+
         const data = {
-            estudiante_id: document.getElementById('in_cedula').value,
-            id_docente: document.getElementById('id_docente').value,
+            estudiante_id: ced,
+            docente_id: document.getElementById('id_docente').value,
             grado_id: document.getElementById('id_grado').value,
             paralelo_id: document.getElementById('res_paralelo').value,
-            periodo_id: document.getElementById('in_periodo').value,
+            periodo_id: pId,
             fecha_matricula: serverTimestamp(),
             estado: "activa"
         };
 
         try {
-            const mId = `${data.estudiante_id}_${data.periodo_id}`;
-            await setDoc(doc(db, "matriculas", mId), data);
-            Swal.fire('Éxito', 'Matrícula registrada correctamente.', 'success').then(() => location.reload());
+            // ID de matrícula único por alumno y periodo
+            await setDoc(doc(db, "matriculas", `${ced}_${pId}`), data);
+            Swal.fire('¡Listo!', 'Matrícula completada con éxito.', 'success').then(() => location.reload());
         } catch (err) {
-            Swal.fire('Error', 'No se pudo guardar.', 'error');
+            Swal.fire('Error', 'Hubo un fallo al guardar.', 'error');
             btn.disabled = false;
         }
     });
