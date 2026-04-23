@@ -14,8 +14,6 @@
         .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 800; font-size: 1.1rem; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
         .nee-badge { background: #fee2e2; color: #ef4444; font-size: 11px; padding: 4px 10px; border-radius: 10px; font-weight: 900; letter-spacing: 0.5px; border: 1px solid #fecaca; }
-        .status-presente { color: #10b981; border-color: #10b981; }
-        .status-ausente { color: #ef4444; border-color: #ef4444; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -112,7 +110,6 @@
         if (!user) window.location.href = "index.html";
         else {
             document.body.style.opacity = "1";
-            // Ajuste zona horaria local Ecuador
             const local = new Date();
             local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
             document.getElementById('fecha_asistencia').value = local.toJSON().slice(0,10);
@@ -121,15 +118,23 @@
     });
 
     async function cargarFiltros() {
+        // SOLUCIÓN: Eliminamos el filtro 'where' para evitar errores de índices innecesarios
         const [gSnap, pSnap] = await Promise.all([
-            getDocs(query(collection(db, "grados"), where("estado", "==", "activo"))),
+            getDocs(collection(db, "grados")),
             getDocs(collection(db, "paralelos"))
         ]);
+        
         const selG = document.getElementById('sel_grado');
         const selP = document.getElementById('sel_paralelo');
         
         selG.innerHTML = '<option value="">Elegir Grado</option>';
-        gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
+        gSnap.forEach(d => {
+            const data = d.data();
+            // Filtramos manualmente en el cliente si es necesario, así no dependemos de índices
+            if(data.estado === "activo") {
+                selG.innerHTML += `<option value="${d.id}">${data.nombre}</option>`;
+            }
+        });
         
         selP.innerHTML = '<option value="">Paralelo</option>';
         pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.id}</option>`);
@@ -142,7 +147,6 @@
 
         if (!grado || !paralelo || !fecha) return Swal.fire('Parámetros incompletos', 'Seleccione Grado, Paralelo y Fecha.', 'info');
 
-        // 1. Buscar Tutor Real de este curso
         const qTutor = query(collection(db, "asignaciones"), 
             where("grado_id", "==", grado), 
             where("paralelo_id", "==", paralelo),
@@ -156,7 +160,6 @@
             document.getElementById('nombre-tutor').innerText = "Sin tutor asignado";
         }
 
-        // 2. Revisar si ya alguien tomó lista
         const qA = query(collection(db, "asistencias"), where("fecha", "==", fecha), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
         const aSnap = await getDocs(qA);
         let registrosPrevios = {};
@@ -170,7 +173,6 @@
             document.getElementById('info-alerta').classList.add('hidden');
         }
 
-        // 3. Cargar Estudiantes
         const estSnap = await getDocs(query(collection(db, "estudiantes"), where("grado", "==", grado), where("paralelo", "==", paralelo), where("estado", "==", "activo")));
         let estudiantes = [];
         estSnap.forEach(d => estudiantes.push({id: d.id, ...d.data()}));
@@ -227,7 +229,6 @@
         try {
             for (let s of sel) {
                 const eid = s.dataset.id;
-                // El ID del documento garantiza que solo haya 1 registro por alumno por día
                 await setDoc(doc(db, "asistencias", `${eid}_${fecha}`), {
                     estudiante_id: eid,
                     fecha,
