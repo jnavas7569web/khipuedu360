@@ -9,115 +9,122 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
-        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        /* Diseño de alto contraste */
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .tag { background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 5px; }
+        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
+        /* Títulos Azul Twitter/X */
+        .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
+        .tag { background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 12px; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 8px; border: 1px solid #c7d2fe; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-5xl mx-auto">
-        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Representantes</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Módulo de Familia</p>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
-                <i class="fa-solid fa-house text-lg"></i>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
             </button>
         </header>
 
         <section class="glass-card p-10">
             <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Ficha del Representante</h2>
-                <div id="status-repre" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest">Nueva Ficha</div>
+                <h2 class="text-2xl font-black text-slate-800 uppercase italic underline decoration-sky-500 decoration-4 underline-offset-8">Ficha del Representante</h2>
+                <div id="status-repre" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest border border-slate-200">Nueva Ficha</div>
             </div>
 
             <form id="form-representante" class="space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="relative">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Cédula de Identidad</label>
-                        <input type="text" id="in_cedula" maxlength="10" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700" placeholder="13XXXXXXXX">
+                <div class="bg-slate-50/80 p-8 rounded-[2.5rem] border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="relative">
+                            <label class="label-style">Cédula de Identidad</label>
+                            <input type="text" id="in_cedula" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="13XXXXXXXX">
+                        </div>
+                        <div>
+                            <label class="label-style">Nombres</label>
+                            <input type="text" id="in_nombres" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                        </div>
+                        <div>
+                            <label class="label-style">Apellidos</label>
+                            <input type="text" id="in_apellidos" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombres</label>
-                        <input type="text" id="in_nombres" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Apellidos</label>
-                        <input type="text" id="in_apellidos" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase">
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div>
+                            <label class="label-style">Fecha de Nacimiento</label>
+                            <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="label-style">Estado Civil</label>
+                            <select id="in_estado_civil" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
+                                <option value="SOLTERO/A">SOLTERO/A</option>
+                                <option value="CASADO/A">CASADO/A</option>
+                                <option value="DIVORCIADO/A">DIVORCIADO/A</option>
+                                <option value="VIUDO/A">VIUDO/A</option>
+                                <option value="UNION LIBRE">UNIÓN LIBRE</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label-style">Ocupación / Trabajo</label>
+                            <input type="text" id="in_ocupacion" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Ej: Cajera">
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Fecha de Nacimiento</label>
-                        <input type="date" id="in_nacimiento" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
+                <div class="bg-sky-50/50 p-8 rounded-[2.5rem] border border-sky-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="label-style">Dirección de Domicilio</label>
+                            <input type="text" id="in_direccion" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Calle, Sector, Referencia">
+                        </div>
+                        <div>
+                            <label class="label-style">Parentesco</label>
+                            <select id="in_parentesco" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
+                                <option value="MADRE">MADRE</option>
+                                <option value="PADRE">PADRE</option>
+                                <option value="ABUELO/A">ABUELO/A</option>
+                                <option value="TIO/A">TIO/A</option>
+                                <option value="HERMANO/A">HERMANO/A</option>
+                                <option value="TUTOR LEGAL">TUTOR LEGAL</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Estado Civil</label>
-                        <select id="in_estado_civil" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
-                            <option value="SOLTERO/A">SOLTERO/A</option>
-                            <option value="CASADO/A">CASADO/A</option>
-                            <option value="DIVORCIADO/A">DIVORCIADO/A</option>
-                            <option value="VIUDO/A">VIUDO/A</option>
-                            <option value="UNION LIBRE">UNIÓN LIBRE</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Ocupación / Trabajo</label>
-                        <input type="text" id="in_ocupacion" class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase" placeholder="Ej: Cajera">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label class="label-style">Teléfono Principal</label>
+                            <input type="text" id="in_telefono" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="09XXXXXXXX">
+                        </div>
+                        <div>
+                            <label class="label-style">Correo Electrónico</label>
+                            <input type="email" id="in_correo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="correo@ejemplo.com">
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Dirección de Domicilio</label>
-                        <input type="text" id="in_direccion" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700 uppercase" placeholder="Calle, Sector, Referencia">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Parentesco</label>
-                        <select id="in_parentesco" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
-                            <option value="MADRE">MADRE</option>
-                            <option value="PADRE">PADRE</option>
-                            <option value="ABUELO/A">ABUELO/A</option>
-                            <option value="TIO/A">TIO/A</option>
-                            <option value="HERMANO/A">HERMANO/A</option>
-                            <option value="TUTOR LEGAL">TUTOR LEGAL</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Teléfono Principal</label>
-                        <input type="text" id="in_telefono" required class="w-full p-3 input-style rounded-xl font-bold text-slate-700" placeholder="09XXXXXXXX">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Correo Electrónico</label>
-                        <input type="email" id="in_correo" class="w-full p-3 input-style rounded-xl font-bold text-slate-700">
-                    </div>
-                </div>
-
-                <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
-                    <h4 class="text-indigo-600 font-black text-[10px] uppercase mb-4 tracking-widest border-b border-indigo-200 pb-2">Estudiantes a Cargo (Hijos/Pupilos)</h4>
-                    <div class="flex gap-3 mb-4">
-                        <input type="text" id="in_estudiante_cedula" maxlength="10" class="flex-1 p-3 input-style rounded-xl font-bold text-slate-700" placeholder="Cédula del Estudiante">
-                        <button type="button" id="btn-add-hijo" class="bg-indigo-600 text-white px-6 rounded-xl font-black text-[10px] uppercase hover:bg-black transition-all shadow-md">
+                <div class="bg-indigo-50/50 p-8 rounded-[2.5rem] border border-indigo-100">
+                    <h4 class="label-style text-indigo-600 mb-4">Estudiantes a Cargo (Hijos/Pupilos)</h4>
+                    <div class="flex gap-3 mb-6">
+                        <input type="text" id="in_estudiante_cedula" maxlength="10" class="flex-1 p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Cédula del Estudiante">
+                        <button type="button" id="btn-add-hijo" class="bg-indigo-600 text-white px-8 rounded-2xl font-black text-[10px] uppercase hover:bg-black transition-all shadow-lg active:scale-95">
                             Vincular <i class="fa-solid fa-plus ml-1"></i>
                         </button>
                     </div>
-                    <div id="lista-hijos" class="flex flex-wrap gap-2">
+                    <div id="lista-hijos" class="flex flex-wrap gap-3">
                         <p id="no-hijos" class="text-[10px] font-bold text-indigo-300 uppercase italic">No hay estudiantes vinculados aún</p>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3 pt-6 border-t border-slate-50">
-                    <button type="button" onclick="location.reload()" class="px-8 py-3 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all tracking-widest">Limpiar Formulario</button>
-                    <button type="submit" id="btn-save" class="bg-indigo-600 hover:bg-black text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
-                        Guardar Representante <i class="fa-solid fa-save ml-2"></i>
+                <div class="flex justify-end gap-4 pt-6">
+                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all tracking-widest">Descartar</button>
+                    <button type="submit" id="btn-save" class="bg-emerald-600 hover:bg-black text-white px-14 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-emerald-100 transition-all active:scale-95">
+                        Guardar Representante <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
                     </button>
                 </div>
             </form>
@@ -127,6 +134,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -139,33 +147,43 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    // --- ESCUDO DE SEGURIDAD ---
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "index.html"; }
+        else {
+            const userDoc = await getDoc(doc(db, "usuario", user.uid));
+            if (userDoc.exists() && (userDoc.data().rol === 'admin' || userDoc.data().rol === 'docente')) {
+                document.body.style.opacity = "1";
+            } else {
+                Swal.fire('Acceso Restringido', 'No tienes permisos para gestionar familia.', 'error')
+                .then(() => window.location.href = "dashboard.html");
+            }
+        }
+    });
 
     let estudiantesVinculados = [];
-
-    // Lógica para añadir tags de hijos
-    const btnAddHijo = document.getElementById('btn-add-hijo');
-    const inputHijo = document.getElementById('in_estudiante_cedula');
     const contenedorHijos = document.getElementById('lista-hijos');
 
-    btnAddHijo.addEventListener('click', () => {
-        const ced = inputHijo.value.trim();
+    document.getElementById('btn-add-hijo').addEventListener('click', () => {
+        const ced = document.getElementById('in_estudiante_cedula').value.trim();
         if(ced.length === 10 && !estudiantesVinculados.includes(ced)) {
             estudiantesVinculados.push(ced);
             renderHijos();
-            inputHijo.value = "";
+            document.getElementById('in_estudiante_cedula').value = "";
         } else {
-            Swal.fire('Atención', 'Ingrese una cédula válida de 10 dígitos o verifique si ya fue añadida.', 'warning');
+            Swal.fire('Error', 'Cédula no válida o ya vinculada.', 'warning');
         }
     });
 
     function renderHijos() {
         document.getElementById('no-hijos').style.display = estudiantesVinculados.length > 0 ? 'none' : 'block';
         contenedorHijos.querySelectorAll('.tag').forEach(t => t.remove());
-        
         estudiantesVinculados.forEach(ced => {
             const div = document.createElement('div');
             div.className = "tag";
-            div.innerHTML = `<span>${ced}</span><i class="fa-solid fa-xmark cursor-pointer hover:text-red-500" onclick="eliminarHijo('${ced}')"></i>`;
+            div.innerHTML = `<span>${ced}</span><i class="fa-solid fa-circle-xmark cursor-pointer hover:text-red-500" onclick="eliminarHijo('${ced}')"></i>`;
             contenedorHijos.appendChild(div);
         });
     }
@@ -175,19 +193,12 @@
         renderHijos();
     };
 
-    // Guardar en Firestore
     document.getElementById('form-representante').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        if(estudiantesVinculados.length === 0) {
-            Swal.fire('Nómina Vacía', 'Debe vincular al menos a un estudiante (hijo/pupilo).', 'info');
-            return;
-        }
+        if(estudiantesVinculados.length === 0) return Swal.fire('Faltan datos', 'Debe vincular al menos un alumno.', 'info');
 
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> PROCESANDO...`;
-        
         const cedulaRepre = document.getElementById('in_cedula').value;
 
         const payload = {
@@ -209,26 +220,21 @@
 
         try {
             await setDoc(doc(db, "representantes", cedulaRepre), payload);
-            Swal.fire({
-                title: '¡Registro Exitoso!',
-                text: 'Los datos del representante han sido sincronizados.',
-                icon: 'success',
-                confirmButtonColor: '#4f46e5'
-            }).then(() => location.reload());
+            Swal.fire({ title: '¡Guardado!', text: 'Sincronización exitosa.', icon: 'success' })
+            .then(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube al inicio
+                location.reload();
+            });
         } catch (error) {
-            console.error(error);
             btn.disabled = false;
-            btn.innerText = "Guardar Representante";
-            Swal.fire('Error', 'No se pudo guardar la información en la nube.', 'error');
+            Swal.fire('Error', 'No se pudo guardar la ficha.', 'error');
         }
     });
 
-    // Cargar datos si ya existe al escribir cédula
     document.getElementById('in_cedula').addEventListener('blur', async (e) => {
         const ced = e.target.value;
         if(ced.length === 10) {
-            const docRef = doc(db, "representantes", ced);
-            const docSnap = await getDoc(docRef);
+            const docSnap = await getDoc(doc(db, "representantes", ced));
             if(docSnap.exists()) {
                 const data = docSnap.data();
                 document.getElementById('in_nombres').value = data.nombres;
@@ -239,17 +245,11 @@
                 document.getElementById('in_direccion').value = data.direccion || "";
                 document.getElementById('in_estado_civil').value = data.estado_civil || "SOLTERO/A";
                 document.getElementById('in_ocupacion').value = data.ocupacion || "";
-                
-                if(data.nacimiento) {
-                    const date = data.nacimiento.toDate().toISOString().split('T')[0];
-                    document.getElementById('in_nacimiento').value = date;
-                }
-
+                if(data.nacimiento) document.getElementById('in_nacimiento').value = data.nacimiento.toDate().toISOString().split('T')[0];
                 estudiantesVinculados = data.estudiantes_ids || [];
                 renderHijos();
-                
-                document.getElementById('status-repre').innerText = "Editando Registro Existente";
-                document.getElementById('status-repre').className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest";
+                document.getElementById('status-repre').innerText = "Editando Registro";
+                document.getElementById('status-repre').className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest border border-amber-200";
             }
         }
     });
