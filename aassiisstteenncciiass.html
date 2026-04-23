@@ -43,7 +43,7 @@
             <div>
                 <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-4 block ml-2">Grado Académico</label>
                 <select id="sel_grado" class="w-full p-6 input-style rounded-3xl outline-none appearance-none cursor-pointer text-indigo-950 uppercase">
-                    <option value="">Cargando grados...</option>
+                    <option value="">Cargando...</option>
                 </select>
             </div>
             <div>
@@ -118,26 +118,31 @@
     });
 
     async function cargarFiltros() {
-        // SOLUCIÓN: Eliminamos el filtro 'where' para evitar errores de índices innecesarios
-        const [gSnap, pSnap] = await Promise.all([
-            getDocs(collection(db, "grados")),
-            getDocs(collection(db, "paralelos"))
-        ]);
-        
         const selG = document.getElementById('sel_grado');
         const selP = document.getElementById('sel_paralelo');
         
-        selG.innerHTML = '<option value="">Elegir Grado</option>';
-        gSnap.forEach(d => {
-            const data = d.data();
-            // Filtramos manualmente en el cliente si es necesario, así no dependemos de índices
-            if(data.estado === "activo") {
-                selG.innerHTML += `<option value="${d.id}">${data.nombre}</option>`;
-            }
-        });
-        
-        selP.innerHTML = '<option value="">Paralelo</option>';
-        pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.id}</option>`);
+        try {
+            // CARGA SECUENCIAL SIN FILTROS (MÁS ESTABLE)
+            const gSnap = await getDocs(collection(db, "grados"));
+            selG.innerHTML = '<option value="">Elegir Grado</option>';
+            gSnap.forEach(d => {
+                const data = d.data();
+                if (!data.estado || data.estado === "activo") {
+                    selG.innerHTML += `<option value="${d.id}">${data.nombre || d.id}</option>`;
+                }
+            });
+
+            const pSnap = await getDocs(collection(db, "paralelos"));
+            selP.innerHTML = '<option value="">Paralelo</option>';
+            pSnap.forEach(d => {
+                const dataP = d.data();
+                selP.innerHTML += `<option value="${d.id}">${dataP.nombre || d.id}</option>`;
+            });
+
+        } catch (error) {
+            console.error("Error cargando filtros:", error);
+            selG.innerHTML = '<option value="">Error conexión</option>';
+        }
     }
 
     document.getElementById('btn-generar').addEventListener('click', async () => {
@@ -145,8 +150,9 @@
         const paralelo = document.getElementById('sel_paralelo').value;
         const fecha = document.getElementById('fecha_asistencia').value;
 
-        if (!grado || !paralelo || !fecha) return Swal.fire('Parámetros incompletos', 'Seleccione Grado, Paralelo y Fecha.', 'info');
+        if (!grado || !paralelo || !fecha) return Swal.fire('Incompleto', 'Seleccione Grado, Paralelo y Fecha.', 'info');
 
+        // 1. Buscar Tutor
         const qTutor = query(collection(db, "asignaciones"), 
             where("grado_id", "==", grado), 
             where("paralelo_id", "==", paralelo),
@@ -160,6 +166,7 @@
             document.getElementById('nombre-tutor').innerText = "Sin tutor asignado";
         }
 
+        // 2. Revisar Duplicados
         const qA = query(collection(db, "asistencias"), where("fecha", "==", fecha), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
         const aSnap = await getDocs(qA);
         let registrosPrevios = {};
@@ -167,12 +174,13 @@
         if (!aSnap.empty) {
             const pDoc = await getDoc(doc(db, "usuario", aSnap.docs[0].data().registrado_por));
             document.getElementById('info-alerta').classList.remove('hidden');
-            document.getElementById('txt-alerta').innerHTML = `Atención: Esta nómina ya fue registrada hoy por: <strong class="text-amber-600 underline">${pDoc.exists() ? pDoc.data().nombre : 'otro docente'}</strong>. Puedes editar y resincronizar.`;
+            document.getElementById('txt-alerta').innerHTML = `Asistencia registrada hoy por: <strong class="text-amber-600 underline">${pDoc.exists() ? pDoc.data().nombre : 'otro docente'}</strong>.`;
             aSnap.forEach(d => registrosPrevios[d.data().estudiante_id] = d.data());
         } else {
             document.getElementById('info-alerta').classList.add('hidden');
         }
 
+        // 3. Nómina Estudiantes
         const estSnap = await getDocs(query(collection(db, "estudiantes"), where("grado", "==", grado), where("paralelo", "==", paralelo), where("estado", "==", "activo")));
         let estudiantes = [];
         estSnap.forEach(d => estudiantes.push({id: d.id, ...d.data()}));
@@ -182,7 +190,7 @@
         tbody.innerHTML = '';
         
         if(estudiantes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-bold italic text-xl uppercase">No hay estudiantes matriculados en este curso.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-bold italic text-xl uppercase">No hay alumnos matriculados.</td></tr>';
             document.getElementById('container-nomina').classList.remove('hidden');
             return;
         }
@@ -194,7 +202,7 @@
                     <td class="p-10">
                         <div class="font-black text-slate-900 uppercase text-2xl tracking-tighter leading-none">${est.apellidos} ${est.nombres}</div>
                         <div class="text-[12px] text-slate-400 font-bold tracking-widest mt-2 uppercase flex items-center gap-3">
-                            ID: ${est.id} ${est.nee ? '<span class="nee-badge">DIAGNÓSTICO NEE</span>' : ''}
+                            ID: ${est.id} ${est.nee ? '<span class="nee-badge">NEE</span>' : ''}
                         </div>
                     </td>
                     <td class="p-10 text-center">
@@ -209,7 +217,7 @@
                         <button onclick="document.getElementById('obs_${est.id}').classList.toggle('hidden')" class="${pre.observacion?'text-indigo-600':'text-slate-200'} p-4 hover:scale-125 transition-transform">
                             <i class="fa-solid fa-comment-dots text-4xl"></i>
                         </button>
-                        <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Nota interna..." class="${pre.observacion?'':'hidden'} w-full mt-4 p-4 text-sm font-black border-2 border-indigo-100 outline-none bg-indigo-50/50 rounded-2xl uppercase shadow-inner">
+                        <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Nota..." class="${pre.observacion?'':'hidden'} w-full mt-4 p-4 text-sm font-black border-2 border-indigo-100 outline-none bg-indigo-50/50 rounded-2xl uppercase shadow-inner">
                     </td>
                 </tr>`;
         });
@@ -224,34 +232,22 @@
         const btn = document.getElementById('btn-guardar');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-3"></i> SINCRONIZANDO...';
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-3"></i> GUARDANDO...';
 
         try {
             for (let s of sel) {
                 const eid = s.dataset.id;
                 await setDoc(doc(db, "asistencias", `${eid}_${fecha}`), {
-                    estudiante_id: eid,
-                    fecha,
-                    estado: s.value,
+                    estudiante_id: eid, fecha, estado: s.value,
                     observacion: document.getElementById(`obs_${eid}`).value.toUpperCase(),
-                    grado_id: grado,
-                    paralelo_id: paralelo,
-                    registrado_por: auth.currentUser.uid,
-                    timestamp: serverTimestamp()
+                    grado_id: grado, paralelo_id: paralelo,
+                    registrado_por: auth.currentUser.uid, timestamp: serverTimestamp()
                 }, { merge: true });
             }
-            
-            Swal.fire({
-                title: '¡Sincronización Exitosa!',
-                text: 'La asistencia ha sido guardada en la nube.',
-                icon: 'success',
-                confirmButtonColor: '#10b981',
-                confirmButtonText: 'ENTENDIDO'
-            }).then(() => location.reload());
-            
+            Swal.fire('Guardado', 'Asistencia sincronizada.', 'success').then(() => location.reload());
         } catch(e) { 
             console.error(e);
-            Swal.fire('Error de Conexión', 'No se pudo guardar. Intente de nuevo.', 'error'); 
+            Swal.fire('Error', 'No se pudo guardar.', 'error'); 
             btn.disabled = false;
             btn.innerText = "Sincronizar y Guardar";
         }
