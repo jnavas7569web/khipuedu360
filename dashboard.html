@@ -222,10 +222,10 @@
                     <i class="fa-solid fa-pen-nib"></i>
                     <span>Ingresar Notas</span>
                 </div>
-                <div class="card action-card" style="background: #8b5cf6;" onclick="window.location.href='enconstruccion.html'">
-                    <i class="fa-solid fa-file-export"></i>
-                    <span>Generar Reportes</span>
-                </div>
+              <div class="card action-card cursor-pointer" style="background: #8b5cf6;" onclick="abrirModalReportes()">
+    <i class="fa-solid fa-file-export"></i>
+    <span>Generar Reportes</span>
+</div>
                 <div class="card action-card" style="background: #64748b;" onclick="window.location.href='configuracion.html'">
                     <i class="fa-solid fa-gears"></i>
                     <span>Configuración - Cambio de clave</span>
@@ -365,6 +365,34 @@
                 }
             });
         };
+
+///// PARA LAS ACCIONES DEL BUTTON REPOOOOOOOOOORTE
+        function abrirModalReportes() {
+    Swal.fire({
+        title: 'Centro de Reportes',
+        text: '¿Qué tipo de informe deseas generar hoy?',
+        icon: 'question',
+        showConfirmButton: false,
+        showCancelButton: false,
+        html: `
+            <div class="grid grid-cols-1 gap-4 mt-6">
+                <button onclick="window.location.href='reporte_estudiantes.html'" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-user-graduate"></i> De Estudiantes
+                </button>
+                <button onclick="window.location.href='reporte_asistencias.html'" class="bg-emerald-500 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-calendar-check"></i> De Asistencias
+                </button>
+                <button onclick="window.location.href='reporte_notas.html'" class="bg-amber-500 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-star"></i> De Calificaciones (Notas)
+                </button>
+                <button onclick="Swal.close()" class="bg-slate-400 hover:bg-slate-600 text-white p-3 rounded-xl font-bold uppercase text-[10px] mt-2">
+                    Cancelar
+                </button>
+            </div>
+        `
+    });
+}
+       ///////////////////HASTA AQUI.. LOS MODALS DE REPORTES 
     </script>
 </body>
 </html>
