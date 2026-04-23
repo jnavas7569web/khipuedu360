@@ -60,7 +60,7 @@
                         </div>
                         <div>
                             <label class="label-style">Título / Especialidad</label>
-                            <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Ej: ING. EN SISTEMAS">
+                            <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Ej: INGENIERO">
                         </div>
                     </div>
                 </div>
@@ -86,8 +86,8 @@
                 </div>
 
                 <div class="flex flex-wrap justify-end gap-4 pt-6">
-                    <button type="button" id="btn-eliminar" class="hidden px-8 py-4 font-black uppercase text-[10px] text-red-500 hover:bg-red-50 rounded-2xl transition-all tracking-widest border border-transparent hover:border-red-200">
-                        <i class="fa-solid fa-trash-can mr-2"></i> Eliminar Usuario
+                    <button type="button" id="btn-suspender" class="hidden px-8 py-4 font-black uppercase text-[10px] text-red-500 hover:bg-red-50 rounded-2xl transition-all tracking-widest border border-transparent hover:border-red-200">
+                        <i class="fa-solid fa-user-slash mr-2"></i> Suspender Acceso
                     </button>
                     <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-indigo-600 transition-all tracking-widest">Descartar</button>
                     <button type="submit" id="btn-save" class="bg-sky-500 hover:bg-black text-white px-12 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-sky-200 transition-all active:scale-95">
@@ -100,8 +100,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, deleteUser, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -116,62 +116,67 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let usuarioEncontradoUID = null;
+    let usuarioEncontrado = null; // Guardará el objeto completo de Firestore
 
-    // --- ESCUDO DE SEGURIDAD PARA ADMIN ---
+    // ESCUDO ADMIN
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
         else {
-            const userRef = doc(db, "usuario", user.uid);
-            const userSnap = await getDoc(userRef);
+            const userSnap = await getDoc(doc(db, "usuario", user.uid));
             if (userSnap.exists() && userSnap.data().rol === "admin") {
                 document.body.style.opacity = "1";
             } else {
-                Swal.fire('Acceso Denegado', 'Solo administradores pueden entrar aquí.', 'error')
-                .then(() => window.location.href = "dashboard.html");
+                Swal.fire('Acceso Denegado', 'Área exclusiva de administración.', 'error').then(() => window.location.href = "dashboard.html");
             }
         }
     });
 
-    const inCedula = document.getElementById('in_cedula');
-    const statUser = document.getElementById('status-user');
-    const inputPass = document.getElementById('in_pass');
-    const btnEliminar = document.getElementById('btn-eliminar');
-
-    // BUSCADOR DE USUARIO EXISTENTE
-    inCedula.addEventListener('input', async (e) => {
+    // BUSCADOR POR CÉDULA
+    document.getElementById('in_cedula').addEventListener('input', async (e) => {
         const ced = e.target.value;
         if (ced.length === 10) {
             document.getElementById('load-icon').classList.remove('hidden');
-            try {
-                const q = query(collection(db, "usuario"), where("cedula", "==", ced));
-                const snap = await getDocs(q);
+            const q = query(collection(db, "usuario"), where("cedula", "==", ced));
+            const snap = await getDocs(q);
 
-                if (!snap.empty) {
-                    const data = snap.docs[0].data();
-                    usuarioEncontradoUID = data.uid;
-                    document.getElementById('in_nombre').value = data.nombre;
-                    document.getElementById('in_correo').value = data.correo;
-                    document.getElementById('in_titulo').value = data.titulo || "";
-                    document.getElementById('in_rol').value = data.rol;
-                    document.getElementById('in_telefono').value = data.telefono || "";
-                    if(data.nacimiento) document.getElementById('in_nacimiento').value = data.nacimiento.toDate().toISOString().split('T')[0];
-                    
-                    inputPass.required = false;
-                    inputPass.placeholder = "Dejar en blanco para no cambiar";
-                    statUser.innerText = "MODO EDICIÓN";
-                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest border border-amber-200";
-                    btnEliminar.classList.remove('hidden');
-                    document.getElementById('btn-save').innerText = "Actualizar Usuario";
+            if (!snap.empty) {
+                usuarioEncontrado = snap.docs[0].data();
+                usuarioEncontrado.docId = snap.docs[0].id;
+                
+                document.getElementById('in_nombre').value = usuarioEncontrado.nombre;
+                document.getElementById('in_correo').value = usuarioEncontrado.correo;
+                document.getElementById('in_titulo').value = usuarioEncontrado.titulo || "";
+                document.getElementById('in_rol').value = usuarioEncontrado.rol;
+                document.getElementById('in_telefono').value = usuarioEncontrado.telefono || "";
+                if(usuarioEncontrado.nacimiento) document.getElementById('in_nacimiento').value = usuarioEncontrado.nacimiento.toDate().toISOString().split('T')[0];
+                
+                document.getElementById('in_pass').required = false;
+                document.getElementById('in_pass').placeholder = "Sin cambios (Clave protegida)";
+                
+                const status = document.getElementById('status-user');
+                const btnSuspender = document.getElementById('btn-suspender');
+                
+                btnSuspender.classList.remove('hidden');
+                if(usuarioEncontrado.estado === 'activo') {
+                    status.innerText = "USUARIO ACTIVO - MODO EDICIÓN";
+                    status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
+                    btnSuspender.innerHTML = `<i class="fa-solid fa-user-slash mr-2"></i> Suspender Acceso`;
+                    btnSuspender.className = btnSuspender.className.replace('text-emerald-500', 'text-red-500');
                 } else {
-                    usuarioEncontradoUID = null;
-                    inputPass.required = true;
-                    inputPass.placeholder = "Mínimo 6 caracteres";
-                    statUser.innerText = "NUEVO REGISTRO";
-                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
-                    btnEliminar.classList.add('hidden');
+                    status.innerText = "USUARIO SUSPENDIDO (INACTIVO)";
+                    status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-red-100 text-red-600 tracking-widest border border-red-200";
+                    btnSuspender.innerHTML = `<i class="fa-solid fa-user-check mr-2"></i> Reactivar Usuario`;
+                    btnSuspender.className = btnSuspender.className.replace('text-red-500', 'text-emerald-500');
                 }
-            } catch (err) { console.error(err); } finally { document.getElementById('load-icon').classList.add('hidden'); }
+                document.getElementById('btn-save').innerText = "Actualizar Perfil";
+            } else {
+                usuarioEncontrado = null;
+                document.getElementById('in_pass').required = true;
+                document.getElementById('btn-suspender').classList.add('hidden');
+                document.getElementById('status-user').innerText = "NUEVO REGISTRO";
+                document.getElementById('status-user').className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-blue-100 text-blue-600 tracking-widest border border-blue-200";
+            }
+            document.getElementById('load-icon').classList.add('hidden');
         }
     });
 
@@ -187,10 +192,10 @@
         const cedula = document.getElementById('in_cedula').value;
 
         try {
-            let uid_final = usuarioEncontradoUID;
+            let uid_final = usuarioEncontrado ? usuarioEncontrado.uid : null;
 
             if (!uid_final) {
-                // ES NUEVO: Crear en Auth
+                // Registro nuevo en Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 uid_final = userCredential.user.uid;
             }
@@ -204,40 +209,44 @@
                 nacimiento: new Date(document.getElementById('in_nacimiento').value),
                 titulo: document.getElementById('in_titulo').value.trim().toUpperCase(),
                 rol: document.getElementById('in_rol').value,
-                estado: "activo",
+                estado: usuarioEncontrado ? usuarioEncontrado.estado : "activo",
                 updated_at: serverTimestamp()
             };
 
             await setDoc(doc(db, "usuario", uid_final), payload, { merge: true });
 
-            Swal.fire({
-                title: usuarioEncontradoUID ? '¡Actualizado!' : '¡Creado!',
-                text: usuarioEncontradoUID ? 'Los datos se sincronizaron.' : 'El usuario debe re-iniciar sesión si cambió su correo.',
-                icon: 'success'
-            }).then(() => location.reload());
+            Swal.fire({ title: '¡Sincronizado!', text: 'El usuario ha sido procesado correctamente.', icon: 'success' })
+            .then(() => location.reload());
 
         } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'No se pudo procesar. Si cambió el correo, el sistema requiere re-login del Admin.', 'error');
+            let msg = "No se pudo crear. Si el correo ya existe en Auth, bórrelo en la consola de Firebase.";
+            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está en uso por otro usuario en el autenticador.";
+            Swal.fire('Error de Registro', msg, 'error');
             btn.disabled = false;
             btn.innerText = "Registrar Acceso";
         }
     });
 
-    // ELIMINAR USUARIO (Solo Firestore en este ejemplo por seguridad de Auth)
-    btnEliminar.onclick = async () => {
+    // SUSPENDER O REACTIVAR (BAJA LÓGICA)
+    document.getElementById('btn-suspender').onclick = async () => {
+        if (!usuarioEncontrado) return;
+        
+        const nuevoEstado = usuarioEncontrado.estado === 'activo' ? 'inactivo' : 'activo';
+        const tituloAccion = nuevoEstado === 'inactivo' ? '¿Suspender Acceso?' : '¿Reactivar Usuario?';
+        
         const result = await Swal.fire({
-            title: '¿Eliminar acceso?',
-            text: "El usuario ya no podrá entrar al sistema.",
+            title: tituloAccion,
+            text: nuevoEstado === 'inactivo' ? "El usuario no podrá entrar al sistema hasta que lo reactives." : "El usuario recuperará el acceso inmediatamente.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Sí, eliminar'
+            confirmButtonColor: nuevoEstado === 'inactivo' ? '#ef4444' : '#10b981',
+            confirmButtonText: 'Sí, confirmar'
         });
 
-        if (result.isConfirmed && usuarioEncontradoUID) {
-            await deleteDoc(doc(db, "usuario", usuarioEncontradoUID));
-            Swal.fire('Eliminado', 'El perfil de Firestore ha sido borrado.', 'success').then(() => location.reload());
+        if (result.isConfirmed) {
+            await updateDoc(doc(db, "usuario", usuarioEncontrado.docId), { estado: nuevoEstado });
+            Swal.fire('Estado Actualizado', `Usuario marcado como ${nuevoEstado.toUpperCase()}.`, 'success')
+            .then(() => location.reload());
         }
     };
 </script>
