@@ -9,81 +9,82 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        /* Texto aumentado y contraste mejorado */
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; font-size: 16px; }
-        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; font-size: 1.1rem; }
+        .glass-card { background: white; border-radius: 2.5rem; border: 1px solid #e2e8f0; box-shadow: 0 15px 30px -5px rgba(0,0,0,0.04); }
+        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 800; font-size: 1.1rem; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
-        .nee-badge { background: #fee2e2; color: #ef4444; font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 900; letter-spacing: 0.5px; }
-        .status-select { font-size: 14px !important; }
-        th { font-size: 12px !important; }
+        .nee-badge { background: #fee2e2; color: #ef4444; font-size: 11px; padding: 4px 10px; border-radius: 10px; font-weight: 900; letter-spacing: 0.5px; border: 1px solid #fecaca; }
+        .status-presente { color: #10b981; border-color: #10b981; }
+        .status-ausente { color: #ef4444; border-color: #ef4444; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <header class="flex justify-between items-center mb-10 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
             <div>
-                <h1 class="text-4xl font-black text-indigo-950 tracking-tighter italic uppercase">Control de Asistencia</h1>
-                <p class="text-slate-400 text-[12px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Registro Diario</p>
+                <h1 class="text-5xl font-black text-indigo-950 tracking-tighter italic uppercase">Control de Asistencia</h1>
+                <p class="text-slate-400 text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Khipu Edu 360 • Registro Diario</p>
             </div>
-            <div class="flex gap-3">
-                <input type="date" id="fecha_asistencia" class="p-4 bg-slate-100 rounded-2xl font-black text-indigo-600 border-none outline-none text-md shadow-inner">
-                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-14 h-14 rounded-2xl transition-all flex items-center justify-center shadow-sm">
-                    <i class="fa-solid fa-house text-xl"></i>
+            <div class="flex gap-4">
+                <input type="date" id="fecha_asistencia" class="p-5 bg-slate-100 rounded-3xl font-black text-indigo-600 border-none outline-none text-lg shadow-inner cursor-pointer">
+                <button onclick="window.location.href='dashboard.html'" class="bg-slate-50 hover:bg-indigo-600 hover:text-white text-slate-400 w-16 h-16 rounded-3xl transition-all flex items-center justify-center shadow-sm">
+                    <i class="fa-solid fa-house text-2xl"></i>
                 </button>
             </div>
         </header>
 
-        <div id="info-alerta" class="hidden mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm font-black uppercase tracking-wider flex items-center gap-4 shadow-sm">
-            <i class="fa-solid fa-circle-exclamation text-2xl"></i>
+        <div id="info-alerta" class="hidden mb-8 p-6 rounded-[2rem] bg-amber-50 border-2 border-amber-200 text-amber-900 text-[12px] font-black uppercase tracking-wider flex items-center gap-5 shadow-xl shadow-amber-100/50">
+            <div class="w-12 h-12 bg-amber-200 rounded-2xl flex items-center justify-center text-amber-700">
+                <i class="fa-solid fa-bell-concierge text-2xl"></i>
+            </div>
             <span id="txt-alerta"></span>
         </div>
 
-        <div class="glass-card p-10 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+        <div class="glass-card p-12 mb-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
             <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Grado Seleccionado</label>
-                <select id="sel_grado" class="w-full p-5 input-style rounded-2xl outline-none appearance-none cursor-pointer">
-                    <option value="">Cargando...</option>
+                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-4 block ml-2">Grado Académico</label>
+                <select id="sel_grado" class="w-full p-6 input-style rounded-3xl outline-none appearance-none cursor-pointer text-indigo-950 uppercase">
+                    <option value="">Cargando grados...</option>
                 </select>
             </div>
             <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Paralelo</label>
-                <select id="sel_paralelo" class="w-full p-5 input-style rounded-2xl outline-none appearance-none cursor-pointer">
+                <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-4 block ml-2">Paralelo</label>
+                <select id="sel_paralelo" class="w-full p-6 input-style rounded-3xl outline-none appearance-none cursor-pointer text-indigo-950 uppercase">
                     <option value="">Paralelo</option>
                 </select>
             </div>
-            <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white p-5 rounded-2xl font-black uppercase text-[12px] tracking-widest transition-all shadow-xl shadow-indigo-100 active:scale-95">
+            <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white p-6 rounded-3xl font-black uppercase text-[14px] tracking-widest transition-all shadow-2xl shadow-indigo-100 active:scale-95 mb-1">
                 Generar Nómina <i class="fa-solid fa-users-viewfinder ml-2"></i>
             </button>
         </div>
 
         <div id="container-nomina" class="hidden">
-            <div class="glass-card overflow-hidden mb-8 border-b-4 border-indigo-500">
+            <div class="glass-card overflow-hidden mb-10 border-b-8 border-indigo-600">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100 text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                            <th class="p-8">Estudiante</th>
-                            <th class="p-8 text-center">Estado de Asistencia</th>
-                            <th class="p-8 text-right">Observación</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-[12px] font-black text-slate-400 uppercase tracking-widest">
+                            <th class="p-10">Estudiante</th>
+                            <th class="p-10 text-center">Estado de Asistencia</th>
+                            <th class="p-10 text-right">Observaciones</th>
                         </tr>
                     </thead>
                     <tbody id="lista-estudiantes"></tbody>
                 </table>
             </div>
 
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl mb-10">
-                <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm">
-                        <i class="fa-solid fa-user-tie text-3xl"></i>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-10 bg-white p-12 rounded-[3rem] border border-slate-100 shadow-2xl mb-16">
+                <div class="flex items-center gap-6">
+                    <div class="w-20 h-20 bg-indigo-50 rounded-[1.5rem] flex items-center justify-center text-indigo-600 shadow-inner">
+                        <i class="fa-solid fa-id-card-clip text-4xl"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-tighter">Docente Tutor asignado</p>
-                        <h4 id="nombre-tutor" class="text-xl font-black text-slate-800 uppercase italic">Buscando...</h4>
+                        <p class="text-[12px] font-black text-slate-400 uppercase tracking-tighter">Responsable del Aula</p>
+                        <h4 id="nombre-tutor" class="text-2xl font-black text-slate-900 uppercase italic tracking-tight">Buscando...</h4>
                     </div>
                 </div>
-                <button id="btn-guardar" class="w-full md:w-auto bg-emerald-500 hover:bg-black text-white px-16 py-6 rounded-2xl font-black uppercase text-[13px] tracking-[0.2em] shadow-2xl shadow-emerald-100 transition-all active:scale-95">
-                    Sincronizar y Limpiar <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
+                <button id="btn-guardar" class="w-full md:w-auto bg-emerald-500 hover:bg-black text-white px-20 py-7 rounded-3xl font-black uppercase text-[15px] tracking-[0.2em] shadow-2xl shadow-emerald-200 transition-all active:scale-95">
+                    Sincronizar y Guardar <i class="fa-solid fa-cloud-arrow-up ml-3 text-white/50"></i>
                 </button>
             </div>
         </div>
@@ -111,22 +112,27 @@
         if (!user) window.location.href = "index.html";
         else {
             document.body.style.opacity = "1";
-            document.getElementById('fecha_asistencia').valueAsDate = new Date();
+            // Ajuste zona horaria local Ecuador
+            const local = new Date();
+            local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+            document.getElementById('fecha_asistencia').value = local.toJSON().slice(0,10);
             cargarFiltros();
         }
     });
 
     async function cargarFiltros() {
         const [gSnap, pSnap] = await Promise.all([
-            getDocs(collection(db, "grados")),
+            getDocs(query(collection(db, "grados"), where("estado", "==", "activo"))),
             getDocs(collection(db, "paralelos"))
         ]);
         const selG = document.getElementById('sel_grado');
         const selP = document.getElementById('sel_paralelo');
+        
         selG.innerHTML = '<option value="">Elegir Grado</option>';
         gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
+        
         selP.innerHTML = '<option value="">Paralelo</option>';
-        pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.data().nombre || d.id}</option>`);
+        pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.id}</option>`);
     }
 
     document.getElementById('btn-generar').addEventListener('click', async () => {
@@ -134,10 +140,14 @@
         const paralelo = document.getElementById('sel_paralelo').value;
         const fecha = document.getElementById('fecha_asistencia').value;
 
-        if (!grado || !paralelo || !fecha) return Swal.fire('Incompleto', 'Seleccione todos los parámetros.', 'info');
+        if (!grado || !paralelo || !fecha) return Swal.fire('Parámetros incompletos', 'Seleccione Grado, Paralelo y Fecha.', 'info');
 
-        // 1. Buscar Tutor
-        const qTutor = query(collection(db, "asignaciones"), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
+        // 1. Buscar Tutor Real de este curso
+        const qTutor = query(collection(db, "asignaciones"), 
+            where("grado_id", "==", grado), 
+            where("paralelo_id", "==", paralelo),
+            where("tutor", "==", true)
+        );
         const tutorSnap = await getDocs(qTutor);
         if (!tutorSnap.empty) {
             const docRef = await getDoc(doc(db, "usuario", tutorSnap.docs[0].data().docente_id));
@@ -146,55 +156,64 @@
             document.getElementById('nombre-tutor').innerText = "Sin tutor asignado";
         }
 
-        // 2. Duplicidad
+        // 2. Revisar si ya alguien tomó lista
         const qA = query(collection(db, "asistencias"), where("fecha", "==", fecha), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
         const aSnap = await getDocs(qA);
         let registrosPrevios = {};
+        
         if (!aSnap.empty) {
             const pDoc = await getDoc(doc(db, "usuario", aSnap.docs[0].data().registrado_por));
             document.getElementById('info-alerta').classList.remove('hidden');
-            document.getElementById('txt-alerta').innerText = `Asistencia registrada hoy por: ${pDoc.exists() ? pDoc.data().nombre : 'otro docente'}`;
+            document.getElementById('txt-alerta').innerHTML = `Atención: Esta nómina ya fue registrada hoy por: <strong class="text-amber-600 underline">${pDoc.exists() ? pDoc.data().nombre : 'otro docente'}</strong>. Puedes editar y resincronizar.`;
             aSnap.forEach(d => registrosPrevios[d.data().estudiante_id] = d.data());
         } else {
             document.getElementById('info-alerta').classList.add('hidden');
         }
 
-        // 3. Nómina
-        const estSnap = await getDocs(query(collection(db, "estudiantes"), where("grado", "==", grado), where("paralelo", "==", paralelo)));
+        // 3. Cargar Estudiantes
+        const estSnap = await getDocs(query(collection(db, "estudiantes"), where("grado", "==", grado), where("paralelo", "==", paralelo), where("estado", "==", "activo")));
         let estudiantes = [];
         estSnap.forEach(d => estudiantes.push({id: d.id, ...d.data()}));
         estudiantes.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
 
         const tbody = document.getElementById('lista-estudiantes');
         tbody.innerHTML = '';
+        
+        if(estudiantes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-bold italic text-xl uppercase">No hay estudiantes matriculados en este curso.</td></tr>';
+            document.getElementById('container-nomina').classList.remove('hidden');
+            return;
+        }
+
         estudiantes.forEach(est => {
             const pre = registrosPrevios[est.id] || { estado: 'presente', observacion: '' };
             tbody.innerHTML += `
-                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-all">
-                    <td class="p-8">
-                        <div class="font-black text-slate-800 uppercase text-lg tracking-tight">${est.apellidos} ${est.nombres}</div>
-                        <div class="text-[10px] text-slate-400 font-bold tracking-widest mt-1">${est.id} ${est.nee ? '<span class="nee-badge ml-3">NEE</span>' : ''}</div>
+                <tr class="border-b border-slate-50 hover:bg-indigo-50/20 transition-all">
+                    <td class="p-10">
+                        <div class="font-black text-slate-900 uppercase text-2xl tracking-tighter leading-none">${est.apellidos} ${est.nombres}</div>
+                        <div class="text-[12px] text-slate-400 font-bold tracking-widest mt-2 uppercase flex items-center gap-3">
+                            ID: ${est.id} ${est.nee ? '<span class="nee-badge">DIAGNÓSTICO NEE</span>' : ''}
+                        </div>
                     </td>
-                    <td class="p-8 text-center">
-                        <select class="status-select w-full max-w-[200px] p-4 bg-white border-2 border-slate-100 rounded-2xl font-black text-indigo-600 outline-none shadow-sm focus:border-indigo-400" data-id="${est.id}">
+                    <td class="p-10 text-center">
+                        <select class="status-select w-full max-w-[220px] p-5 bg-white border-4 border-slate-100 rounded-[1.5rem] font-black text-indigo-600 outline-none shadow-sm focus:border-indigo-400 text-lg appearance-none cursor-pointer text-center" data-id="${est.id}">
                             <option value="presente" ${pre.estado==='presente'?'selected':''}>✅ PRESENTE</option>
                             <option value="ausente" ${pre.estado==='ausente'?'selected':''}>❌ AUSENTE</option>
                             <option value="atraso" ${pre.estado==='atraso'?'selected':''}>⏳ ATRASO</option>
                             <option value="justificado" ${pre.estado==='justificado'?'selected':''}>📝 JUSTIFICADO</option>
                         </select>
                     </td>
-                    <td class="p-8 text-right">
-                        <button onclick="document.getElementById('obs_${est.id}').classList.toggle('hidden')" class="${pre.observacion?'text-indigo-600':'text-slate-300'} p-3 hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-comment-dots text-3xl"></i>
+                    <td class="p-10 text-right">
+                        <button onclick="document.getElementById('obs_${est.id}').classList.toggle('hidden')" class="${pre.observacion?'text-indigo-600':'text-slate-200'} p-4 hover:scale-125 transition-transform">
+                            <i class="fa-solid fa-comment-dots text-4xl"></i>
                         </button>
-                        <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Añadir nota..." class="${pre.observacion?'':'hidden'} w-full mt-3 p-3 text-xs font-bold border-b-2 border-indigo-200 outline-none bg-indigo-50/30 rounded-xl">
+                        <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Nota interna..." class="${pre.observacion?'':'hidden'} w-full mt-4 p-4 text-sm font-black border-2 border-indigo-100 outline-none bg-indigo-50/50 rounded-2xl uppercase shadow-inner">
                     </td>
                 </tr>`;
         });
         document.getElementById('container-nomina').classList.remove('hidden');
     });
 
-    // GUARDAR Y REFRESCAR
     document.getElementById('btn-guardar').addEventListener('click', async () => {
         const sel = document.querySelectorAll('.status-select');
         const fecha = document.getElementById('fecha_asistencia').value;
@@ -203,30 +222,37 @@
         const btn = document.getElementById('btn-guardar');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> PROCESANDO...';
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-3"></i> SINCRONIZANDO...';
 
         try {
             for (let s of sel) {
                 const eid = s.dataset.id;
+                // El ID del documento garantiza que solo haya 1 registro por alumno por día
                 await setDoc(doc(db, "asistencias", `${eid}_${fecha}`), {
-                    estudiante_id: eid, fecha, estado: s.value,
-                    observacion: document.getElementById(`obs_${eid}`).value,
-                    grado_id: grado, paralelo_id: paralelo,
-                    registrado_por: auth.currentUser.uid, timestamp: serverTimestamp()
-                });
+                    estudiante_id: eid,
+                    fecha,
+                    estado: s.value,
+                    observacion: document.getElementById(`obs_${eid}`).value.toUpperCase(),
+                    grado_id: grado,
+                    paralelo_id: paralelo,
+                    registrado_por: auth.currentUser.uid,
+                    timestamp: serverTimestamp()
+                }, { merge: true });
             }
+            
             Swal.fire({
-                title: '¡Sincronizado!',
-                text: 'La asistencia ha sido guardada. La página se reiniciará.',
+                title: '¡Sincronización Exitosa!',
+                text: 'La asistencia ha sido guardada en la nube.',
                 icon: 'success',
-                confirmButtonColor: '#10b981'
-            }).then(() => {
-                location.reload(); // Refresca toda la página
-            });
+                confirmButtonColor: '#10b981',
+                confirmButtonText: 'ENTENDIDO'
+            }).then(() => location.reload());
+            
         } catch(e) { 
-            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error'); 
+            console.error(e);
+            Swal.fire('Error de Conexión', 'No se pudo guardar. Intente de nuevo.', 'error'); 
             btn.disabled = false;
-            btn.innerText = "Sincronizar y Limpiar";
+            btn.innerText = "Sincronizar y Guardar";
         }
     });
 </script>
