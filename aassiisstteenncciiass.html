@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Control de Asistencia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; }
+        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
+        .nee-badge { background: #fee2e2; color: #ef4444; font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 900; }
+        .already-taken { border: 2px solid #fbbf24; background-color: #fffbeb; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Control de Asistencia</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Registro Diario</p>
+            </div>
+            <div class="flex gap-3">
+                <input type="date" id="fecha_asistencia" class="p-3 bg-slate-100 rounded-xl font-bold text-slate-600 border-none outline-none text-sm">
+                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+        </header>
+
+        <div id="info-alerta" class="hidden mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider flex items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+            <span id="txt-alerta"></span>
+        </div>
+
+        <div class="glass-card p-8 mb-8 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Grado Seleccionado</label>
+                <select id="sel_grado" class="w-full p-4 input-style rounded-2xl outline-none appearance-none">
+                    <option value="">Cargando grados...</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Paralelo</label>
+                <select id="sel_paralelo" class="w-full p-4 input-style rounded-2xl outline-none appearance-none">
+                    <option value="">Seleccione Paralelo</option>
+                </select>
+            </div>
+            <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all shadow-lg">
+                Generar Nómina <i class="fa-solid fa-users-viewfinder ml-2"></i>
+            </button>
+        </div>
+
+        <div id="container-nomina" class="hidden">
+            <div class="glass-card overflow-hidden mb-6">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                            <th class="p-6">Estudiante</th>
+                            <th class="p-6 text-center">Estado</th>
+                            <th class="p-6 text-right">Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-estudiantes"></tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Tutor del Grado</p>
+                        <h4 id="nombre-tutor" class="font-black text-slate-700 uppercase italic">---</h4>
+                    </div>
+                </div>
+                <button id="btn-guardar" class="w-full md:w-auto bg-emerald-500 hover:bg-black text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl transition-all">
+                    Actualizar Asistencia <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let asistenciasExistentes = {}; // Para guardar estados previos si existen
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) window.location.href = "index.html";
+        else {
+            const userDoc = await getDoc(doc(db, "usuario", user.uid));
+            if (userDoc.exists()) {
+                document.body.style.opacity = "1";
+                document.getElementById('fecha_asistencia').valueAsDate = new Date();
+                cargarFiltros();
+            } else window.location.href = "index.html";
+        }
+    });
+
+    async function cargarFiltros() {
+        const gSnap = await getDocs(collection(db, "grados"));
+        const selG = document.getElementById('sel_grado');
+        selG.innerHTML = '<option value="">Elegir Grado</option>';
+        gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
+
+        const pSnap = await getDocs(collection(db, "paralelos"));
+        const selP = document.getElementById('sel_paralelo');
+        selP.innerHTML = '<option value="">Paralelo</option>';
+        pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.data().nombre || d.id}</option>`);
+    }
+
+    document.getElementById('btn-generar').addEventListener('click', async () => {
+        const grado = document.getElementById('sel_grado').value;
+        const paralelo = document.getElementById('sel_paralelo').value;
+        const fecha = document.getElementById('fecha_asistencia').value;
+
+        if (!grado || !paralelo || !fecha) return Swal.fire('Error', 'Complete los filtros', 'warning');
+
+        // 1. Verificar si ya existe asistencia este día
+        const qExiste = query(collection(db, "asistencias"), 
+            where("fecha", "==", fecha), 
+            where("grado_id", "==", grado), 
+            where("paralelo_id", "==", paralelo));
+        
+        const existeSnap = await getDocs(qExiste);
+        asistenciasExistentes = {};
+        
+        if (!existeSnap.empty) {
+            const primerRegistro = existeSnap.docs[0].data();
+            const profDoc = await getDoc(doc(db, "usuario", primerRegistro.registrado_por));
+            const nombreProf = profDoc.exists() ? profDoc.data().nombre : "Otro docente";
+
+            document.getElementById('info-alerta').classList.remove('hidden');
+            document.getElementById('txt-alerta').innerText = `Atención: Este curso ya fue listado por el profesor: ${nombreProf}. Solo puede editar estados.`;
+            
+            existeSnap.forEach(doc => {
+                asistenciasExistentes[doc.data().estudiante_id] = doc.data();
+            });
+        } else {
+            document.getElementById('info-alerta').classList.add('hidden');
+        }
+
+        // 2. Cargar Estudiantes
+        const qEst = query(collection(db, "estudiantes"), where("grado", "==", grado), where("paralelo", "==", paralelo));
+        const estSnap = await getDocs(qEst);
+        
+        let lista = [];
+        estSnap.forEach(d => lista.push({id: d.id, ...d.data()}));
+        lista.sort((a, b) => a.apellidos.localeCompare(b.apellidos));
+
+        const tbody = document.getElementById('lista-estudiantes');
+        tbody.innerHTML = '';
+
+        lista.forEach(est => {
+            const prevData = asistenciasExistentes[est.id] || { estado: 'presente', observacion: '' };
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-50";
+            tr.innerHTML = `
+                <td class="p-6">
+                    <div class="font-black text-slate-700 uppercase text-sm">${est.apellidos} ${est.nombres}</div>
+                    <div class="text-[9px] text-slate-400 font-bold">${est.id} ${est.nee ? '<span class="nee-badge ml-2">NEE</span>' : ''}</div>
+                </td>
+                <td class="p-6">
+                    <select class="status-select w-full p-3 bg-white border-2 border-slate-100 rounded-xl font-bold text-xs" data-id="${est.id}">
+                        <option value="presente" ${prevData.estado === 'presente' ? 'selected' : ''}>✅ PRESENTE</option>
+                        <option value="ausente" ${prevData.estado === 'ausente' ? 'selected' : ''}>❌ AUSENTE</option>
+                        <option value="atraso" ${prevData.estado === 'atraso' ? 'selected' : ''}>⏳ ATRASO</option>
+                        <option value="justificado" ${prevData.estado === 'justificado' ? 'selected' : ''}>📝 JUSTIFICADO</option>
+                    </select>
+                </td>
+                <td class="p-6 text-right">
+                    <button onclick="toggleObs('${est.id}')" class="${prevData.observacion ? 'text-indigo-600' : 'text-slate-300'} p-2">
+                        <i class="fa-solid fa-comment-dots text-xl"></i>
+                    </button>
+                    <input type="text" id="obs_${est.id}" value="${prevData.observacion}" class="${prevData.observacion ? '' : 'hidden'} w-full mt-2 p-2 text-[10px] font-bold border-b-2 border-indigo-200 outline-none">
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        document.getElementById('container-nomina').classList.remove('hidden');
+    });
+
+    window.toggleObs = (id) => document.getElementById(`obs_${id}`).classList.toggle('hidden');
+
+    document.getElementById('btn-guardar').addEventListener('click', async () => {
+        const selects = document.querySelectorAll('.status-select');
+        const fecha = document.getElementById('fecha_asistencia').value;
+        const grado = document.getElementById('sel_grado').value;
+        const paralelo = document.getElementById('sel_paralelo').value;
+        const btn = document.getElementById('btn-guardar');
+
+        btn.disabled = true;
+        btn.innerText = "ACTUALIZANDO...";
+
+        try {
+            for (let sel of selects) {
+                const estId = sel.dataset.id;
+                const docId = `${estId}_${fecha}`;
+                
+                await setDoc(doc(db, "asistencias", docId), {
+                    estudiante_id: estId,
+                    fecha: fecha,
+                    estado: sel.value,
+                    observacion: document.getElementById(`obs_${estId}`).value,
+                    grado_id: grado,
+                    paralelo_id: paralelo,
+                    registrado_por: auth.currentUser.uid,
+                    timestamp: serverTimestamp()
+                });
+            }
+            Swal.fire('Sincronizado', 'Asistencia registrada/actualizada.', 'success');
+        } catch (e) {
+            Swal.fire('Error', 'No se pudo guardar.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Actualizar Asistencia";
+        }
+    });
+</script>
+</body>
+</html>
