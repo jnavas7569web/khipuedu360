@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Registro de Usuarios</title>
+    <title>Khipu Edu 360 - Gestión de Usuarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        /* ESCUDO VISUAL: Oculto por defecto */
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
-        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
-        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
+        .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div class="max-w-4xl mx-auto">
-        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión de Usuarios</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Control de Acceso</p>
@@ -30,52 +30,67 @@
         </header>
 
         <section class="glass-card p-10">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-black text-indigo-900 uppercase italic">Ficha de Usuario</h2>
-                <div id="status-user" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest">Listo para escanear</div>
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="text-2xl font-black text-slate-800 uppercase italic underline decoration-sky-500 decoration-4 underline-offset-8">Ficha de Usuario</h2>
+                <div id="status-user" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest border border-slate-200">Listo para escanear</div>
             </div>
 
-            <form id="form-usuario" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="md:col-span-2 relative">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Número de Cédula</label>
-                    <input type="text" id="in_cedula" maxlength="10" required 
-                        class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 outline-none text-xl tracking-widest" placeholder="13XXXXXXXX">
-                    <div id="load-icon" class="hidden absolute right-4 top-[3.2rem] text-indigo-500">
-                        <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
+            <form id="form-usuario" class="space-y-8">
+                <div class="bg-slate-50/80 p-8 rounded-[2.5rem] border border-slate-200">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="relative md:col-span-1">
+                            <label class="label-style">Número de Cédula</label>
+                            <input type="text" id="in_cedula" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="13XXXXXXXX">
+                            <div id="load-icon" class="hidden absolute right-4 top-[3.2rem] text-sky-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="label-style">Nombre Completo</label>
+                            <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        <div>
+                            <label class="label-style">Nacimiento</label>
+                            <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="label-style">Teléfono Celular</label>
+                            <input type="text" id="in_telefono" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="09XXXXXXXX">
+                        </div>
+                        <div>
+                            <label class="label-style">Título / Especialidad</label>
+                            <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Ej: ING. EN SISTEMAS">
+                        </div>
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombre Completo</label>
-                    <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                <div class="bg-sky-50/50 p-8 rounded-[2.5rem] border border-sky-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="label-style">Correo Electrónico (Login)</label>
+                            <input type="email" id="in_correo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
+                        </div>
+                        <div>
+                            <label class="label-style">Contraseña de Acceso</label>
+                            <input type="password" id="in_pass" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <div>
+                            <label class="label-style">Rol en el Sistema</label>
+                            <select id="in_rol" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
+                                <option value="docente">DOCENTE</option>
+                                <option value="admin">ADMINISTRADOR</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Correo Electrónico (Login)</label>
-                    <input type="email" id="in_correo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                </div>
-
-                <div id="container-pass">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Contraseña de Acceso</label>
-                    <input type="password" id="in_pass" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Mínimo 6 caracteres">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Título / Especialidad</label>
-                    <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Rol en el Sistema</label>
-                    <select id="in_rol" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                        <option value="docente">DOCENTE</option>
-                        <option value="admin">ADMINISTRADOR</option>
-                    </select>
-                </div>
-
-                <div class="md:col-span-2 flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all">Descartar</button>
-                    <button type="submit" id="btn-save" class="bg-indigo-600 hover:bg-black text-white px-12 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                <div class="flex flex-wrap justify-end gap-4 pt-6">
+                    <button type="button" id="btn-eliminar" class="hidden px-8 py-4 font-black uppercase text-[10px] text-red-500 hover:bg-red-50 rounded-2xl transition-all tracking-widest border border-transparent hover:border-red-200">
+                        <i class="fa-solid fa-trash-can mr-2"></i> Eliminar Usuario
+                    </button>
+                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-indigo-600 transition-all tracking-widest">Descartar</button>
+                    <button type="submit" id="btn-save" class="bg-sky-500 hover:bg-black text-white px-12 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-sky-200 transition-all active:scale-95">
                         Registrar Acceso <i class="fa-solid fa-user-shield ml-2"></i>
                     </button>
                 </div>
@@ -85,8 +100,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, deleteUser, updateEmail, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -101,71 +116,69 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let usuarioEncontradoUID = null;
+
     // --- ESCUDO DE SEGURIDAD PARA ADMIN ---
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = "index.html";
-        } else {
+        if (!user) { window.location.href = "index.html"; }
+        else {
             const userRef = doc(db, "usuario", user.uid);
             const userSnap = await getDoc(userRef);
             if (userSnap.exists() && userSnap.data().rol === "admin") {
                 document.body.style.opacity = "1";
             } else {
-                Swal.fire('Acceso Denegado', 'Solo administradores pueden gestionar usuarios.', 'error')
+                Swal.fire('Acceso Denegado', 'Solo administradores pueden entrar aquí.', 'error')
                 .then(() => window.location.href = "dashboard.html");
             }
         }
     });
 
     const inCedula = document.getElementById('in_cedula');
-    const loadIcon = document.getElementById('load-icon');
     const statUser = document.getElementById('status-user');
     const inputPass = document.getElementById('in_pass');
+    const btnEliminar = document.getElementById('btn-eliminar');
 
     // BUSCADOR DE USUARIO EXISTENTE
     inCedula.addEventListener('input', async (e) => {
         const ced = e.target.value;
         if (ced.length === 10) {
-            loadIcon.classList.remove('hidden');
-            statUser.innerText = "Buscando...";
-            
+            document.getElementById('load-icon').classList.remove('hidden');
             try {
                 const q = query(collection(db, "usuario"), where("cedula", "==", ced));
                 const snap = await getDocs(q);
 
                 if (!snap.empty) {
                     const data = snap.docs[0].data();
+                    usuarioEncontradoUID = data.uid;
                     document.getElementById('in_nombre').value = data.nombre;
                     document.getElementById('in_correo').value = data.correo;
                     document.getElementById('in_titulo').value = data.titulo || "";
                     document.getElementById('in_rol').value = data.rol;
+                    document.getElementById('in_telefono').value = data.telefono || "";
+                    if(data.nacimiento) document.getElementById('in_nacimiento').value = data.nacimiento.toDate().toISOString().split('T')[0];
                     
                     inputPass.required = false;
-                    inputPass.placeholder = "Dejar en blanco para mantener clave actual";
-                    
-                    statUser.innerText = "USUARIO REGISTRADO - MODO EDICIÓN";
-                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest";
+                    inputPass.placeholder = "Dejar en blanco para no cambiar";
+                    statUser.innerText = "MODO EDICIÓN";
+                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest border border-amber-200";
+                    btnEliminar.classList.remove('hidden');
+                    document.getElementById('btn-save').innerText = "Actualizar Usuario";
                 } else {
+                    usuarioEncontradoUID = null;
                     inputPass.required = true;
                     inputPass.placeholder = "Mínimo 6 caracteres";
                     statUser.innerText = "NUEVO REGISTRO";
-                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest";
+                    statUser.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
+                    btnEliminar.classList.add('hidden');
                 }
-            } catch (err) { console.error(err); } finally { loadIcon.classList.add('hidden'); }
+            } catch (err) { console.error(err); } finally { document.getElementById('load-icon').classList.add('hidden'); }
         }
     });
 
-    // GUARDAR USUARIO
+    // GUARDAR O ACTUALIZAR
     document.getElementById('form-usuario').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
-        
-        // Guardamos los datos del ADMIN actual para no perder la sesión
-        const adminEmail = auth.currentUser.email;
-        // Nota: En una app real no deberías pedir la clave aquí, pero como es local 
-        // y necesitas crear cuentas en Auth, usaremos un truco de re-autenticación si fuera necesario.
-        // Para simplificar, asumiremos que solo creas perfiles en Firestore si el usuario ya existe en Auth.
-
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...`;
 
@@ -174,19 +187,12 @@
         const cedula = document.getElementById('in_cedula').value;
 
         try {
-            const q = query(collection(db, "usuario"), where("cedula", "==", cedula));
-            const snap = await getDocs(q);
-            let uid_final = "";
+            let uid_final = usuarioEncontradoUID;
 
-            if (snap.empty) {
-                // CREAR EN AUTH (Atención: esto cambia la sesión actual)
+            if (!uid_final) {
+                // ES NUEVO: Crear en Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 uid_final = userCredential.user.uid;
-                
-                // IMPORTANTE: Aquí el Admin perdió su sesión. Debes avisarle o pedirle login de nuevo.
-                // Pero para este flujo educativo, seguiremos con el guardado:
-            } else {
-                uid_final = snap.docs[0].id;
             }
 
             const payload = {
@@ -194,29 +200,46 @@
                 cedula: cedula,
                 nombre: document.getElementById('in_nombre').value.trim().toUpperCase(),
                 correo: email,
+                telefono: document.getElementById('in_telefono').value,
+                nacimiento: new Date(document.getElementById('in_nacimiento').value),
                 titulo: document.getElementById('in_titulo').value.trim().toUpperCase(),
                 rol: document.getElementById('in_rol').value,
                 estado: "activo",
-                creacion: serverTimestamp()
+                updated_at: serverTimestamp()
             };
 
             await setDoc(doc(db, "usuario", uid_final), payload, { merge: true });
 
             Swal.fire({
-                title: '¡Acceso Creado!',
-                text: `El usuario ha sido registrado. Si creaste un usuario nuevo, deberás re-ingresar con tu cuenta de Admin por seguridad.`,
-                icon: 'success',
-                confirmButtonColor: '#4f46e5'
-            }).then(() => window.location.href = "index.html");
+                title: usuarioEncontradoUID ? '¡Actualizado!' : '¡Creado!',
+                text: usuarioEncontradoUID ? 'Los datos se sincronizaron.' : 'El usuario debe re-iniciar sesión si cambió su correo.',
+                icon: 'success'
+            }).then(() => location.reload());
 
         } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'No se pudo procesar. Si cambió el correo, el sistema requiere re-login del Admin.', 'error');
             btn.disabled = false;
-            btn.innerHTML = `Registrar Acceso <i class="fa-solid fa-user-shield ml-2"></i>`;
-            let msg = "Error al procesar: " + error.code;
-            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está registrado.";
-            Swal.fire('Error', msg, 'error');
+            btn.innerText = "Registrar Acceso";
         }
     });
+
+    // ELIMINAR USUARIO (Solo Firestore en este ejemplo por seguridad de Auth)
+    btnEliminar.onclick = async () => {
+        const result = await Swal.fire({
+            title: '¿Eliminar acceso?',
+            text: "El usuario ya no podrá entrar al sistema.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Sí, eliminar'
+        });
+
+        if (result.isConfirmed && usuarioEncontradoUID) {
+            await deleteDoc(doc(db, "usuario", usuarioEncontradoUID));
+            Swal.fire('Eliminado', 'El perfil de Firestore ha sido borrado.', 'success').then(() => location.reload());
+        }
+    };
 </script>
 </body>
 </html>
