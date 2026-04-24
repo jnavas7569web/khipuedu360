@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Control Disciplinario</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .text-area-dis { 
+            width: 100%; border-radius: 1rem; border: 2px solid #f1f5f9; padding: 1rem; 
+            font-size: 0.85rem; resize: none; transition: all 0.3s; background: #f8fafc;
+        }
+        .text-area-dis:focus { border-color: #6366f1; background: white; outline: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .btn-periodo { padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 0.7rem; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter uppercase italic">Control Disciplinario</h1>
+                <p class="text-slate-400 text-[11px] font-bold uppercase tracking-[0.3em] mt-1">Seguimiento de Incidentes por Trimestre</p>
+            </div>
+            <div class="flex gap-3">
+                <div class="bg-indigo-50 px-4 py-2 rounded-2xl border border-indigo-100 text-center">
+                    <p class="text-[9px] font-black text-indigo-400 uppercase">Periodo Activo</p>
+                    <p class="text-xs font-black text-indigo-900" id="periodo-actual">2026-2027</p>
+                </div>
+                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="glass-card p-6 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <i class="fa-solid fa-filter text-indigo-400"></i>
+                <select id="sel-curso" class="bg-transparent font-black text-indigo-900 outline-none uppercase text-sm cursor-pointer">
+                    <option value="">Cargando mis cursos...</option>
+                </select>
+            </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase italic"><i class="fa-solid fa-circle-info mr-1"></i> Los cambios se guardan automáticamente al salir del campo.</p>
+        </div>
+
+        <div id="lista-disciplina" class="grid grid-cols-1 gap-6">
+            <div class="text-center py-20 text-slate-300 font-bold uppercase italic">Seleccione un curso para empezar el seguimiento.</div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let periodo_id = "2026-2027"; // Valor por defecto
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            cargarFiltros(user.uid);
+        } else { window.location.href = "index.html"; }
+    });
+
+    async function cargarFiltros(uid) {
+        const userDoc = await getDoc(doc(db, "usuario", uid));
+        const isAdmin = userDoc.data().rol === "admin";
+        const select = document.getElementById('sel-curso');
+
+        const qAsig = isAdmin ? 
+            query(collection(db, "asignaciones"), where("tutor", "==", true)) :
+            query(collection(db, "asignaciones"), where("docente_id", "==", uid), where("tutor", "==", true));
+
+        const snapAsig = await getDocs(qAsig);
+        select.innerHTML = '<option value="">Seleccione su Curso...</option>';
+
+        for (const d of snapAsig.docs) {
+            const data = d.data();
+            const gDoc = await getDoc(doc(db, "grados", data.grado_id));
+            select.innerHTML += `<option value="${data.grado_id}|${data.paralelo_id}">${gDoc.data().nombre} - ${data.paralelo_id}</option>`;
+        }
+    }
+
+    document.getElementById('sel-curso').addEventListener('change', async (e) => {
+        const val = e.target.value;
+        if(!val) return;
+        const [grado, paralelo] = val.split('|');
+        
+        // 1. Cargar Estudiantes
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        let estudiantes = [];
+        snapE.forEach(d => {
+            const data = d.data();
+            if(data.grado === grado && data.paralelo === paralelo) estudiantes.push({id: d.id, ...data});
+        });
+        estudiantes.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
+
+        // 2. Cargar Informes Disciplinarios Existentes
+        const snapD = await getDocs(collection(db, "disciplina"));
+        let informesMap = {};
+        snapD.forEach(d => informesMap[d.id] = d.data());
+
+        // 3. Renderizar
+        const container = document.getElementById('lista-disciplina');
+        container.innerHTML = "";
+
+        estudiantes.forEach(est => {
+            const info = informesMap[`${est.id}_${periodo_id}`] || { informe1: "", informe2: "", informe3: "" };
+            
+            const card = document.createElement('div');
+            card.className = "glass-card p-8 transition-all hover:border-indigo-200";
+            card.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="md:w-1/4 border-r border-slate-100 pr-4">
+                        <h3 class="text-lg font-black text-indigo-900 uppercase leading-tight">${est.apellidos} ${est.nombres}</h3>
+                        <p class="text-[10px] font-bold text-slate-400 mt-2 tracking-widest uppercase">Cédula: ${est.id}</p>
+                        ${est.nee ? '<span class="inline-block mt-3 px-3 py-1 bg-red-50 text-red-500 text-[9px] font-black rounded-lg border border-red-100">DIAGNÓSTICO NEE</span>' : ''}
+                    </div>
+                    
+                    <div class="md:w-3/4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-[9px] font-black text-indigo-400 uppercase ml-2 mb-2 block">1er Trimestre</label>
+                            <textarea class="text-area-dis" placeholder="Novedades..." onblur="guardarInforme('${est.id}', 1, this.value)">${info.informe1 || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-indigo-400 uppercase ml-2 mb-2 block">2do Trimestre</label>
+                            <textarea class="text-area-dis" placeholder="Novedades..." onblur="guardarInforme('${est.id}', 2, this.value)">${info.informe2 || ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black text-indigo-400 uppercase ml-2 mb-2 block">3er Trimestre</label>
+                            <textarea class="text-area-dis" placeholder="Novedades..." onblur="guardarInforme('${est.id}', 3, this.value)">${info.informe3 || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    });
+
+    // Función de guardado global
+    window.guardarInforme = async (estudianteId, trimestre, texto) => {
+        const docId = `${estudianteId}_${periodo_id}`;
+        const campo = `informe${trimestre}`;
+        
+        try {
+            await setDoc(doc(db, "disciplina", docId), {
+                id_estudiante: estudianteId,
+                id_periodo: periodo_id,
+                [campo]: texto.toUpperCase(),
+                updated_at: serverTimestamp()
+            }, { merge: true });
+            
+            // Feedback sutil
+            console.log(`Guardado Trimestre ${trimestre} para ${estudianteId}`);
+        } catch (e) {
+            Swal.fire('Error', 'No se pudo guardar el informe.', 'error');
+        }
+    };
+</script>
+</body>
+</html>
