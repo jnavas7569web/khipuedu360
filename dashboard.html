@@ -31,7 +31,35 @@
             height: 100vh;
             overflow: hidden;
         }
+/* /////////////////////////////////// */
 
+/* Etiquetas de sección tipo "Badge" */
+.menu-section-label {
+    margin: 20px 15px 10px;
+    padding: 6px 12px;
+    font-size: 9px;
+    font-weight: 900;
+    color: var(--indigo-pro);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    background-color: #eef2ff; /* Azul muy suave */
+    border-radius: 8px;
+    display: inline-block;
+    border-left: 3px solid var(--indigo-pro);
+}
+
+/* Espaciado extra entre bloques */
+.menu-block {
+    margin-bottom: 25px;
+}
+
+/* Línea divisoria decorativa */
+.menu-divider {
+    margin: 10px 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--gris-suave), transparent);
+}
+        /* /////////////////////////////////////////// */
         /* SIDEBAR */
         .sidebar {
             width: 260px;
@@ -166,17 +194,27 @@
             <span class="sidebar-logo italic uppercase">Khipu Edu 360</span>
             <button class="hamburger" id="closeMenu" style="color:white">×</button>
         </div>
-  <div class="sidebar-menu">
-    <div class="menu-section-label">Gestión Administrativa</div>
-    <a href="representantes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Representantes</a>
-    <a href="estudiantes.html" class="sidebar-link"><i class="fa-solid fa-user-graduate"></i> Estudiantes</a>
-    <a href="matriculas.html" class="sidebar-link"><i class="fa-solid fa-id-card-clip"></i> Matrículas</a>
+<div class="sidebar-menu">
     
+    <div class="menu-block">
+        <div class="menu-section-label">
+            <i class="fa-solid fa-folder-open mr-1"></i> Gestión Administrativa
+        </div>
+        <a href="representantes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Representantes</a>
+        <a href="estudiantes.html" class="sidebar-link"><i class="fa-solid fa-user-graduate"></i> Estudiantes</a>
+        <a href="matriculas.html" class="sidebar-link"><i class="fa-solid fa-id-card-clip"></i> Matrículas</a>
+    </div>
+
     <div class="menu-divider"></div>
 
-    <div class="menu-section-label">Labor Docente</div>
-    <a href="disciplina.html" class="sidebar-link"><i class="fa-solid fa-scale-balanced"></i> Disciplina / Incidentes</a>
-    <a href="contactar.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
+    <div class="menu-block">
+        <div class="menu-section-label">
+            <i class="fa-solid fa-chalkboard-user mr-1"></i> Labor Docente
+        </div>
+        <a href="disciplina.html" class="sidebar-link"><i class="fa-solid fa-scale-balanced"></i> Disciplina / Incidentes</a>
+        <a href="contactar.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
+    </div>
+
 </div>
         <div class="sidebar-footer">
             <button class="btn-salir" id="btn-logout">
