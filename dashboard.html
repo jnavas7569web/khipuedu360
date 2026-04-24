@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         :root {
             --indigo-pro: #4f46e5;
             --indigo-dark: #3730a3;
@@ -22,7 +23,7 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             background-color: var(--gris-fondo);
             color: var(--gris-texto);
@@ -57,7 +58,6 @@
         }
 
         .sidebar-logo { font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; }
-
         .sidebar-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
 
         .sidebar-link {
@@ -170,9 +170,7 @@
              <a href="representantes.html" class="sidebar-link"><i class="fa-solid fa-users"></i> Representantes</a>
               <a href="estudiantes.html" class="sidebar-link"><i class="fa-solid fa-user-graduate"></i> Estudiantes</a>
             <a href="matriculas.html" class="sidebar-link"><i class="fa-solid fa-id-card-clip"></i> Matrículas</a>
-              
             <a href="contactar.html" class="sidebar-link"><i class="fa-solid fa-address-book"></i> Contactar Repre.</a>
-       
         </div>
         <div class="sidebar-footer">
             <button class="btn-salir" id="btn-logout">
@@ -218,14 +216,14 @@
                     <i class="fa-solid fa-check-to-slot"></i>
                     <span>Pasar Asistencias</span>
                 </div>
-                <div class="card action-card" style="background: #0ea5e9;" onclick="window.location.href='enconstruccion.html'">
+                <div class="card action-card" style="background: #0ea5e9;" onclick="window.location.href='reporte_notas.html'">
                     <i class="fa-solid fa-pen-nib"></i>
                     <span>Ingresar Notas</span>
                 </div>
-              <div class="card action-card cursor-pointer" style="background: #8b5cf6;" onclick="abrirModalReportes()">
-    <i class="fa-solid fa-file-export"></i>
-    <span>Generar Reportes</span>
-</div>
+                <div class="card action-card" style="background: #8b5cf6;" onclick="abrirModalReportes()">
+                    <i class="fa-solid fa-file-export"></i>
+                    <span>Generar Reportes</span>
+                </div>
                 <div class="card action-card" style="background: #64748b;" onclick="window.location.href='configuracion.html'">
                     <i class="fa-solid fa-gears"></i>
                     <span>Configuración - Cambio de clave</span>
@@ -281,7 +279,6 @@
                     if (userDoc.exists()) {
                         const data = userDoc.data();
                         
-                        // CORRECCIÓN: Usar solo data.nombre (sin apellido) para evitar el 'undefined'
                         document.getElementById('nav-user-name').innerText = data.nombre;
                         document.getElementById('nav-user-role').innerText = data.rol;
                         document.getElementById('welcome-text').innerText = `¡Hola, ${data.nombre.split(' ')[0]}!`;
@@ -295,13 +292,12 @@
                             adminPanel.remove();
                         }
 
-                        // NUEVA LÓGICA: Buscar si es tutor
+                        // LÓGICA: Buscar si es tutor
                         const qAsig = query(collection(db, "asignaciones"), where("docente_id", "==", user.uid), where("tutor", "==", true));
                         const asigSnap = await getDocs(qAsig);
                         
                         if (!asigSnap.empty) {
                             const asigData = asigSnap.docs[0].data();
-                            // Buscar nombre del grado
                             const gradoSnap = await getDoc(doc(db, "grados", asigData.grado_id));
                             const gradoNombre = gradoSnap.exists() ? gradoSnap.data().nombre : asigData.grado_id;
                             
@@ -320,24 +316,7 @@
             }
         });
 
-        // Sidebar logic
-        const sidebar = document.getElementById('sidebar');
-        document.getElementById('btn-menu').addEventListener('click', () => sidebar.classList.add('active'));
-        document.getElementById('closeMenu').addEventListener('click', () => sidebar.classList.remove('active'));
-
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            Swal.fire({
-                title: '¿Cerrar sesión?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#4f46e5',
-                confirmButtonText: 'Sí, salir'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    signOut(auth).then(() => window.location.href = "index.html");
-                }
-            });
-        });
+        // --- FUNCIONES GLOBALES (VINCULADAS A WINDOW PARA ACCESO HTML) ---
 
         window.abrirMenuGestion = () => {
             Swal.fire({
@@ -366,33 +345,57 @@
             });
         };
 
-///// PARA LAS ACCIONES DEL BUTTON REPOOOOOOOOOORTE
-        function abrirModalReportes() {
-    Swal.fire({
-        title: 'Centro de Reportes',
-        text: '¿Qué tipo de informe deseas generar hoy?',
-        icon: 'question',
-        showConfirmButton: false,
-        showCancelButton: false,
-        html: `
-            <div class="grid grid-cols-1 gap-4 mt-6">
-                <button onclick="window.location.href='enconstruccion.html'" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-user-graduate"></i> De Estudiantes
-                </button>
-                <button onclick="window.location.href='reporte_asistencias.html'" class="bg-emerald-500 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-calendar-check"></i> De Asistencias
-                </button>
-                <button onclick="window.location.href='reporte_notas.html'" class="bg-amber-500 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-center gap-3">
-                    <i class="fa-solid fa-star"></i> De Calificaciones (Notas)
-                </button>
-                <button onclick="Swal.close()" class="bg-slate-400 hover:bg-slate-600 text-white p-3 rounded-xl font-bold uppercase text-[10px] mt-2">
-                    Cancelar
-                </button>
-            </div>
-        `
-    });
-}
-       ///////////////////HASTA AQUI.. LOS MODALS DE REPORTES 
+        window.abrirModalReportes = () => {
+            Swal.fire({
+                title: '<span class="text-indigo-900 font-black italic uppercase">Centro de Reportes</span>',
+                text: '¿Qué tipo de informe deseas generar hoy?',
+                icon: 'info',
+                showConfirmButton: false,
+                showCancelButton: false,
+                customClass: { popup: 'rounded-[2rem]' },
+                html: `
+                    <div class="grid grid-cols-1 gap-4 mt-6">
+                        <button onclick="window.location.href='reporte_estudiantes.html'" class="bg-indigo-600 hover:bg-black text-white p-5 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-between group shadow-lg">
+                            <span><i class="fa-solid fa-user-graduate mr-3 text-lg"></i> Reporte Estudiantes</span>
+                            <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
+                        </button>
+                        
+                        <button onclick="window.location.href='reporte_asistencias.html'" class="bg-emerald-500 hover:bg-black text-white p-5 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-between group shadow-lg">
+                            <span><i class="fa-solid fa-calendar-check mr-3 text-lg"></i> Reporte Asistencias</span>
+                            <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
+                        </button>
+                        
+                        <button onclick="window.location.href='reporte_notas.html'" class="bg-amber-500 hover:bg-black text-white p-5 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all flex items-center justify-between group shadow-lg">
+                            <span><i class="fa-solid fa-star mr-3 text-lg"></i> Cuadro de Notas</span>
+                            <i class="fa-solid fa-chevron-right opacity-0 group-hover:opacity-100 transition-all"></i>
+                        </button>
+                        
+                        <button onclick="Swal.close()" class="mt-4 text-slate-400 font-black uppercase text-[10px] hover:text-red-500 transition-colors">
+                            <i class="fa-solid fa-xmark mr-1"></i> Cancelar
+                        </button>
+                    </div>
+                `
+            });
+        };
+
+        // Sidebar logic
+        const sidebar = document.getElementById('sidebar');
+        document.getElementById('btn-menu').addEventListener('click', () => sidebar.classList.add('active'));
+        document.getElementById('closeMenu').addEventListener('click', () => sidebar.classList.remove('active'));
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            Swal.fire({
+                title: '¿Cerrar sesión?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                confirmButtonText: 'Sí, salir'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    signOut(auth).then(() => window.location.href = "index.html");
+                }
+            });
+        });
     </script>
 </body>
 </html>
