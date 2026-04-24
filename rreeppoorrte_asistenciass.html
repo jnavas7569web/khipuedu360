@@ -9,11 +9,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        :root { --azul: #1a237e; --gris-fondo: #f4f7f6; }
-        body { background-color: var(--gris-fondo); font-family: 'Inter', sans-serif; font-size: 14px; opacity: 0; transition: opacity 0.5s ease; }
+        :root { --azul: #1e1b4b; --gris-fondo: #f8fafc; }
+        body { background-color: var(--gris-fondo); font-family: 'Inter', sans-serif; font-size: 13px; opacity: 0; transition: opacity 0.5s ease; }
+        
         .header-reporte { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%); color: white; }
         
-        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 900; text-transform: uppercase; font-size: 10px; border: 2px solid; display: inline-block; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: 1.5px solid; display: inline-block; }
         .badge-presente { background: #dcfce7; color: #166534; border-color: #166534; }
         .badge-ausente { background: #fee2e2; color: #991b1b; border-color: #991b1b; }
         .badge-atraso { background: #fef3c7; color: #92400e; border-color: #92400e; }
@@ -21,76 +22,88 @@
         .badge-vacio { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; }
 
         @media print {
-            @page { size: A4; margin: 10mm; }
+            @page { size: A4; margin: 8mm; }
             .no-print { display: none !important; }
-            body { background: white; padding: 0; }
+            body { background: white; padding: 0; opacity: 1 !important; }
             .print-card { box-shadow: none !important; border: none !important; width: 100% !important; border-radius: 0 !important; }
-            .header-reporte { background: #1e1b4b !important; padding: 30px !important; -webkit-print-color-adjust: exact; }
+            /* Encabezado compacto para impresión */
+            .header-reporte { 
+                background: #f1f5f9 !important; 
+                color: #1e1b4b !important; 
+                padding: 15px !important; 
+                border-bottom: 2px solid #1e1b4b !important;
+                -webkit-print-color-adjust: exact; 
+            }
+            .header-reporte h1 { font-size: 20px !important; margin-bottom: 5px !important; color: #1e1b4b !important; }
+            .header-reporte p { font-size: 12px !important; margin-top: 0 !important; color: #475569 !important; border: none !important; padding: 0 !important; }
+            td, th { padding: 6px 10px !important; font-size: 11px !important; border-bottom: 1px solid #e2e8f0 !important; }
+            .badge { border-width: 1px !important; }
         }
     </style>
 </head>
 <body class="p-2 md:p-6">
 
-<div class="max-w-6xl mx-auto bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border print-card">
-    <div class="header-reporte p-10 text-center">
-        <h1 class="text-3xl md:text-5xl font-black tracking-tighter uppercase italic">Reporte de Asistencia</h1>
-        <p id="info-filtros" class="text-indigo-100 text-sm md:text-lg font-bold mt-4 uppercase tracking-[0.2em] border-t border-white/20 pt-4 inline-block px-8">
-            Seleccione los parámetros para consultar
+<div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border print-card">
+    <div class="header-reporte p-8 text-center">
+        <h1 class="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">Reporte de Asistencia</h1>
+        <p id="info-filtros" class="text-indigo-100 text-xs md:text-sm font-bold mt-2 uppercase tracking-widest border-t border-white/20 pt-3 inline-block px-6">
+            Seleccione parámetros para consultar
         </p>
     </div>
 
-    <div class="p-8 bg-gray-50 border-b no-print">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+    <div class="p-6 bg-gray-50 border-b no-print">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-                <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Curso / Jornada:</label>
-                <select id="select-curso" class="w-full p-4 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-700 text-sm outline-none focus:border-indigo-500 transition-all">
-                    <option value="">Cargando cursos...</option>
+                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Curso / Jornada:</label>
+                <select id="select-curso" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs outline-none focus:border-indigo-500 transition-all">
+                    <option value="">Cargando opciones...</option>
                 </select>
             </div>
             <div>
-                <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Desde:</label>
-                <input type="date" id="f-desde" class="w-full p-4 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-700 text-sm">
+                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Desde:</label>
+                <input type="date" id="f-desde" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs">
             </div>
             <div>
-                <label class="block text-[10px] font-black text-gray-400 mb-2 uppercase tracking-widest">Hasta:</label>
-                <input type="date" id="f-hasta" class="w-full p-4 bg-white border-2 border-gray-200 rounded-2xl font-black text-gray-700 text-sm">
+                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Hasta:</label>
+                <input type="date" id="f-hasta" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs">
             </div>
-            <button id="btn-procesar" class="bg-indigo-600 hover:bg-black text-white font-black py-5 rounded-2xl text-xs uppercase shadow-xl transition-all active:scale-95">
-                <i class="fa-solid fa-magnifying-glass mr-2"></i> Generar Reporte
+            <button id="btn-procesar" class="bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg transition-all active:scale-95">
+                <i class="fa-solid fa-sync mr-2"></i> Generar Reporte
             </button>
         </div>
     </div>
 
-    <div class="p-6 md:p-10">
+    <div class="p-4 md:p-8">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr id="cabecera-dinamica" class="text-indigo-900 font-black uppercase text-[11px] tracking-widest border-b-4 border-indigo-50">
-                        <th class="px-6 py-5">Información General</th>
+                    <tr id="cabecera-dinamica" class="text-indigo-900 font-black uppercase text-[10px] tracking-widest border-b-2 border-indigo-100">
+                        <th class="px-4 py-3">Información General</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-pro" class="divide-y divide-gray-100 text-gray-700">
-                    <tr><td class="text-center py-24 text-gray-300 italic text-xl font-bold uppercase tracking-tighter">Use los filtros superiores para cargar la información.</td></tr>
+                    <tr><td class="text-center py-20 text-gray-300 italic text-lg font-bold uppercase">Use los filtros superiores.</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <div id="footer-reporte" class="mt-12 hidden flex flex-col md:flex-row justify-between items-center border-t pt-8 border-gray-100">
-            <div class="text-center md:text-left mb-6 md:mb-0">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Responsable / Tutor</p>
-                <h4 id="nombre-tutor" class="text-xl font-black text-indigo-900 uppercase italic">---</h4>
+        <div id="footer-reporte" class="mt-8 hidden flex justify-between items-end border-t pt-6 border-gray-100">
+            <div>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Docente Responsable / Tutor</p>
+                <h4 id="nombre-tutor" class="text-lg font-black text-indigo-900 uppercase italic">---</h4>
+                <div class="w-48 border-t border-indigo-900 mt-8 opacity-30"></div>
             </div>
-            <div class="text-center md:text-right">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Estudiantes</p>
-                <h4 id="total-est" class="text-3xl font-black text-indigo-900 italic">0</h4>
+            <div class="text-right">
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Estudiantes Matriculados</p>
+                <h4 id="total-est" class="text-2xl font-black text-indigo-900 italic">0</h4>
             </div>
         </div>
 
-        <div class="mt-12 flex justify-between items-center no-print">
-            <a href="dashboard.html" class="text-gray-400 hover:text-indigo-600 font-black text-[11px] uppercase tracking-widest transition-colors">
-                <i class="fa-solid fa-circle-arrow-left mr-2"></i> Volver al Dashboard
+        <div class="mt-8 flex justify-between items-center no-print">
+            <a href="dashboard.html" class="text-gray-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest">
+                <i class="fa-solid fa-arrow-left mr-2"></i> Dashboard
             </a>
-            <button onclick="window.print()" class="bg-slate-900 hover:bg-indigo-600 text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase shadow-2xl transition-all active:scale-95">
+            <button onclick="window.print()" class="bg-slate-900 hover:bg-indigo-600 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase shadow-xl transition-all">
                 <i class="fa-solid fa-print mr-2"></i> Imprimir Reporte (A4)
             </button>
         </div>
@@ -118,21 +131,18 @@
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             document.body.style.opacity = "1";
-            // Fechas iniciales: Hoy
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('f-desde').value = hoy;
             document.getElementById('f-hasta').value = hoy;
-            cargarCursos(user.uid);
+            cargarOpciones(user.uid);
         } else { window.location.href = "index.html"; }
     });
 
-    async function cargarCursos(uid) {
+    async function cargarOpciones(uid) {
         const userDoc = await getDoc(doc(db, "usuario", uid));
         const isAdmin = userDoc.data().rol === "admin";
         const select = document.getElementById('select-curso');
-        select.innerHTML = '<option value="">Cargando opciones...</option>';
-
-        // Filtro: Si es docente solo ve donde es Tutor. Admin ve todas las tutorías.
+        
         const qAsig = isAdmin ? 
             query(collection(db, "asignaciones"), where("tutor", "==", true)) :
             query(collection(db, "asignaciones"), where("docente_id", "==", uid), where("tutor", "==", true));
@@ -144,7 +154,6 @@
             const data = d.data();
             const gDoc = await getDoc(doc(db, "grados", data.grado_id));
             const nombreGrado = gDoc.exists() ? gDoc.data().nombre : data.grado_id;
-            // Guardamos ID_GRADO|NOMBRE_PARALELO_EXACTO
             select.innerHTML += `<option value="${data.grado_id}|${data.paralelo_id}">${nombreGrado} - ${data.paralelo_id}</option>`;
         }
     }
@@ -154,38 +163,33 @@
         const dStr = document.getElementById('f-desde').value;
         const hStr = document.getElementById('f-hasta').value;
 
-        if(!cursoVal || !dStr || !hStr) return Swal.fire('Filtros incompletos', 'Seleccione curso y rango de fechas.', 'warning');
+        if(!cursoVal || !dStr || !hStr) return Swal.fire('Error', 'Faltan parámetros', 'warning');
 
         const [grado_id, paralelo_id] = cursoVal.split('|');
         const esMismoDia = (dStr === hStr);
         const btn = document.getElementById('btn-procesar');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> PROCESANDO...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> PROCESANDO...';
 
         try {
-            // 1. Cargar Estudiantes del Grado/Paralelo seleccionado
+            // 1. CARGA DE ESTUDIANTES (Filtro en Cliente)
             const snapE = await getDocs(collection(db, "estudiantes"));
             let estudiantes = [];
             snapE.forEach(d => {
                 const e = d.data();
-                // Comparación exacta para no mezclar matutina/vespertina
                 if(e.grado === grado_id && e.paralelo === paralelo_id) {
                     estudiantes.push({ id: d.id, ...e });
                 }
             });
             estudiantes.sort((a, b) => a.apellidos.localeCompare(b.apellidos));
 
-            // 2. Cargar Asistencias en el rango de fechas
-            const qA = query(collection(db, "asistencias"), 
-                where("grado_id", "==", grado_id),
-                where("paralelo_id", "==", paralelo_id),
-                where("fecha", ">=", dStr), 
-                where("fecha", "<=", hStr));
+            // 2. CARGA DE ASISTENCIAS (Solo por fecha para evitar errores de índice)
+            const qA = query(collection(db, "asistencias"), where("fecha", ">=", dStr), where("fecha", "<=", hStr));
             const snapA = await getDocs(qA);
             const todasAsis = snapA.docs.map(d => d.data());
 
-            // 3. Buscar nombre del Tutor asignado
+            // 3. TUTOR
             const qT = query(collection(db, "asignaciones"), where("grado_id", "==", grado_id), where("paralelo_id", "==", paralelo_id), where("tutor", "==", true));
             const snapT = await getDocs(qT);
             if (!snapT.empty) {
@@ -193,26 +197,23 @@
                 document.getElementById('nombre-tutor').innerText = uDoc.exists() ? uDoc.data().nombre : "No identificado";
             }
 
-            // Renderizado de UI
+            // RENDERIZADO
             const tbody = document.getElementById('tabla-pro');
             const cab = document.getElementById('cabecera-dinamica');
             tbody.innerHTML = "";
             
             if(estudiantes.length === 0) {
-                tbody.innerHTML = '<tr><td class="text-center py-20 text-red-400 font-bold uppercase">No se encontraron estudiantes matriculados en esta sección.</td></tr>';
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-sync mr-2"></i> Generar Reporte';
+                tbody.innerHTML = '<tr><td class="text-center py-20 text-red-400 font-bold uppercase">No hay alumnos registrados.</td></tr>';
                 return;
             }
 
-            // Definir Cabecera según el rango
-            const cabBase = `<th class="px-6 py-5 text-center w-16 text-indigo-300">#</th><th class="px-6 py-5">Apellidos y Nombres</th><th class="px-6 py-5 text-center">NEE</th>`;
-            cab.innerHTML = esMismoDia ? cabBase + `<th class="px-6 py-5 text-right">Asistencia del Día</th>` : 
-                                         cabBase + `<th class="px-6 py-5 text-center text-green-600">P</th><th class="px-6 py-5 text-center text-red-600">F</th><th class="px-6 py-5 text-center text-orange-500">A</th><th class="px-6 py-5 text-center text-blue-500">J</th>`;
+            const cabBase = `<th class="px-4 py-3 text-center w-12 text-indigo-300">#</th><th class="px-4 py-3">Apellidos y Nombres</th><th class="px-4 py-3 text-center w-12">NEE</th>`;
+            cab.innerHTML = esMismoDia ? cabBase + `<th class="px-4 py-3 text-right">Asistencia</th>` : 
+                                         cabBase + `<th class="px-4 py-3 text-center text-green-600">P</th><th class="px-4 py-3 text-center text-red-600">F</th><th class="px-4 py-3 text-center text-orange-500">A</th><th class="px-4 py-3 text-center text-blue-500">J</th>`;
 
             let num = 1;
             estudiantes.forEach(est => {
-                const susAsis = todasAsis.filter(a => a.estudiante_id === est.id);
+                const susAsis = todasAsis.filter(a => a.estudiante_id === est.id && a.grado_id === grado_id);
                 let c = { presente: 0, ausente: 0, atraso: 0, justificado: 0 };
                 let ultimo = "---";
 
@@ -222,31 +223,30 @@
                 });
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-50 hover:bg-indigo-50/20 transition-all";
-                const baseColumnas = `<td class="px-6 py-5 text-center font-black text-gray-300">${num++}</td>
-                                      <td class="px-6 py-5 font-black uppercase text-indigo-950 text-sm">${est.apellidos} ${est.nombres}</td>
-                                      <td class="px-6 py-5 text-center font-bold text-xs text-gray-400">${est.nee ? 'SÍ' : 'NO'}</td>`;
+                tr.className = "border-b border-gray-50 hover:bg-indigo-50/20";
+                const base = `<td class="px-4 py-3 text-center font-black text-gray-300">${num++}</td>
+                              <td class="px-4 py-3 font-black uppercase text-indigo-950 text-[11px]">${est.apellidos} ${est.nombres}</td>
+                              <td class="px-4 py-3 text-center font-bold text-[10px] text-gray-400">${est.nee ? 'SÍ' : 'NO'}</td>`;
 
                 if(esMismoDia) {
-                    tr.innerHTML = baseColumnas + `<td class="px-6 py-5 text-right"><span class="badge badge-${ultimo || 'vacio'}">${traducir(ultimo)}</span></td>`;
+                    tr.innerHTML = base + `<td class="px-4 py-3 text-right"><span class="badge badge-${ultimo}">${traducir(ultimo)}</span></td>`;
                 } else {
-                    tr.innerHTML = baseColumnas + `
-                        <td class="px-6 py-5 text-center font-black text-green-600 text-lg">${c.presente}</td>
-                        <td class="px-6 py-5 text-center font-black text-red-600 text-lg">${c.ausente}</td>
-                        <td class="px-6 py-5 text-center font-black text-orange-500 text-lg">${c.atraso}</td>
-                        <td class="px-6 py-5 text-center font-black text-blue-500 text-lg">${c.justificado}</td>`;
+                    tr.innerHTML = base + `<td class="px-4 py-3 text-center font-black text-green-600 text-xs">${c.presente}</td>
+                                           <td class="px-4 py-3 text-center font-black text-red-600 text-xs">${c.ausente}</td>
+                                           <td class="px-4 py-3 text-center font-black text-orange-500 text-xs">${c.atraso}</td>
+                                           <td class="px-4 py-3 text-center font-black text-blue-500 text-xs">${c.justificado}</td>`;
                 }
                 tbody.appendChild(tr);
             });
 
-            // Mostrar Totales y Footer
             document.getElementById('footer-reporte').classList.remove('hidden');
             document.getElementById('total-est').innerText = estudiantes.length;
-            document.getElementById('info-filtros').innerText = `Periodo: ${dStr} - ${hStr} | Paralelo: ${paralelo_id}`;
+            const cursoLabel = document.getElementById('select-curso').options[document.getElementById('select-curso').selectedIndex].text;
+            document.getElementById('info-filtros').innerText = `${cursoLabel} | Periodo: ${dStr} - ${hStr}`;
 
         } catch (e) {
             console.error(e);
-            Swal.fire('Error', 'No se pudo generar el reporte. Verifique la conexión.', 'error');
+            Swal.fire('Error', 'Fallo de conexión.', 'error');
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-sync mr-2"></i> Generar Reporte';
@@ -254,8 +254,8 @@
     });
 
     function traducir(v) {
-        const m = {"presente":"Presente", "ausente":"Falta", "atraso":"Atraso", "justificado":"Justificado", "---":"Sin Registro"};
-        return m[v] || "N/A";
+        const m = {"presente":"Presente", "ausente":"Falta", "atraso":"Atraso", "justificado":"Justificado", "---":"N/R"};
+        return m[v] || v;
     }
 </script>
 </body>
