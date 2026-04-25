@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Configuración General</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
+        .tab-active { color: #6366f1; border-bottom: 3px solid #6366f1; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Configuración</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Gestión Global del Sistema</p>
+            </div>
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </header>
+
+        <div class="flex gap-8 mb-8 border-b border-slate-200 px-6">
+            <button onclick="switchTab('inst')" id="btn-inst" class="pb-4 font-black uppercase text-[11px] tracking-widest tab-active transition-all">Institución</button>
+            <button onclick="switchTab('jor')" id="btn-jor" class="pb-4 font-black uppercase text-[11px] tracking-widest text-slate-400 hover:text-indigo-600 transition-all">Jornadas</button>
+            <button onclick="switchTab('par')" id="btn-par" class="pb-4 font-black uppercase text-[11px] tracking-widest text-slate-400 hover:text-indigo-600 transition-all">Paralelos</button>
+        </div>
+
+        <div id="tab-inst" class="tab-content">
+            <div class="glass-card p-8 md:p-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Nombre Oficial de la Institución</label>
+                        <input type="text" id="inst-nombre" class="w-full p-5 rounded-2xl input-style text-xl" placeholder="Ej: Escuela Gran Colombia">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Código AMIE</label>
+                        <input type="text" id="inst-amie" class="w-full p-5 rounded-2xl input-style" placeholder="13H00xxx">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Periodo Lectivo Actual</label>
+                        <input type="text" id="inst-periodo" class="w-full p-5 rounded-2xl input-style" placeholder="2026-2027">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Director(a) / Rector(a)</label>
+                        <input type="text" id="inst-director" class="w-full p-5 rounded-2xl input-style" placeholder="Nombre de la autoridad">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">URL Logo (Opcional)</label>
+                        <input type="text" id="inst-logo" class="w-full p-5 rounded-2xl input-style" placeholder="https://...">
+                    </div>
+                </div>
+                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-12 py-5 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-xl shadow-indigo-100">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Actualizar Datos
+                </button>
+            </div>
+        </div>
+
+        <div id="tab-jor" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="lista-jornadas">
+                </div>
+        </div>
+
+        <div id="tab-par" class="tab-content hidden">
+            <div class="glass-card p-8">
+                <div class="flex gap-4 mb-8">
+                    <input type="text" id="nuevo-paralelo" class="flex-1 p-4 rounded-2xl input-style uppercase" placeholder="Letra del nuevo paralelo (C, D, E...)">
+                    <button onclick="agregarParalelo()" class="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4" id="lista-paralelos">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            cargarDatosInstitucion();
+            cargarJornadas();
+            cargarParalelos();
+        } else { window.location.href = "index.html"; }
+    });
+
+    // --- LÓGICA DE PESTAÑAS ---
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('button[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-indigo-600'));
+        document.querySelectorAll('button[id^="btn-"]').forEach(b => b.classList.add('text-slate-400'));
+        
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        document.getElementById('btn-' + tab).classList.add('tab-active', 'text-indigo-600');
+    };
+
+    // --- INSTITUCIÓN ---
+    async function cargarDatosInstitucion() {
+        const d = await getDoc(doc(db, "institucion", "datos_generales"));
+        if (d.exists()) {
+            const data = d.data();
+            document.getElementById('inst-nombre').value = data.nombre || "";
+            document.getElementById('inst-amie').value = data.amie || "";
+            document.getElementById('inst-periodo').value = data.periodo_lectivo || "";
+            document.getElementById('inst-director').value = data.director || "";
+            document.getElementById('inst-logo').value = data.logo_url || "";
+        }
+    }
+
+    window.actualizarInstitucion = async () => {
+        const ref = doc(db, "institucion", "datos_generales");
+        await setDoc(ref, {
+            nombre: document.getElementById('inst-nombre').value,
+            amie: document.getElementById('inst-amie').value,
+            periodo_lectivo: document.getElementById('inst-periodo').value,
+            director: document.getElementById('inst-director').value,
+            logo_url: document.getElementById('inst-logo').value
+        }, { merge: true });
+        Swal.fire('¡Éxito!', 'Datos actualizados', 'success');
+    };
+
+    // --- JORNADAS ---
+    async function cargarJornadas() {
+        const snap = await getDocs(collection(db, "jornadas"));
+        const div = document.getElementById('lista-jornadas');
+        div.innerHTML = "";
+        snap.forEach(d => {
+            const data = d.data();
+            div.innerHTML += `
+                <div class="glass-card p-6 text-center">
+                    <i class="fa-solid fa-clock text-3xl text-indigo-200 mb-4"></i>
+                    <h3 class="font-black text-indigo-950 uppercase text-sm">${data.nombre}</h3>
+                    <p class="text-[10px] font-bold text-slate-400 mt-2">${data.horario}</p>
+                </div>`;
+        });
+    }
+
+    // --- PARALELOS ---
+    async function cargarParalelos() {
+        const snap = await getDocs(collection(db, "paralelos"));
+        const div = document.getElementById('lista-paralelos');
+        div.innerHTML = "";
+        snap.forEach(d => {
+            div.innerHTML += `
+                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
+                    <span class="font-black text-indigo-900">${d.data().nombre}</span>
+                    <button onclick="eliminarParalelo('${d.id}')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                </div>`;
+        });
+    }
+
+    window.agregarParalelo = async () => {
+        const nombre = document.getElementById('nuevo-paralelo').value.trim().toUpperCase();
+        if(!nombre) return;
+        await setDoc(doc(db, "paralelos", nombre.toLowerCase()), { nombre: nombre, estado: true });
+        document.getElementById('nuevo-paralelo').value = "";
+        cargarParalelos();
+    };
+
+    window.eliminarParalelo = async (id) => {
+        await deleteDoc(doc(db, "paralelos", id));
+        cargarParalelos();
+    };
+</script>
+</body>
+</html>
