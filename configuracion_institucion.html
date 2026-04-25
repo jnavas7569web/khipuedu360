@@ -44,29 +44,25 @@
                     <div class="flex flex-col items-center gap-4 w-full md:w-1/4">
                         <label class="text-[10px] font-black text-slate-400 uppercase block">Logo Institucional</label>
                         <img id="img-preview" src="https://via.placeholder.com/150?text=Logo+Escuela" class="logo-preview shadow-sm" alt="Logo">
-                        <p class="text-[9px] text-center text-slate-400 font-medium px-2 italic">Pegue el enlace directo de su imagen abajo.</p>
+                        <p class="text-[9px] text-center text-slate-400 font-medium px-2 italic mt-2">Sincronizado vía URL</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full">
                         <div class="md:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Nombre Institución</label>
-                            <input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Ej: ESCUELA GRAN COLOMBIA">
+                            <input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Ej: ESCUELA DE EGB FISCAL GRAN COLOMBIA">
                         </div>
                         <div>
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">AMIE</label>
-                            <input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style" placeholder="Ej: 13H00000">
+                            <input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style" placeholder="Ej: 13H00156">
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-indigo-500 uppercase mb-2 block">Periodo Lectivo Activo (Sincronizado)</label>
-                            <input type="text" id="inst-periodo" class="w-full p-4 rounded-2xl input-style bg-slate-100 text-indigo-600 cursor-not-allowed font-black" readonly placeholder="Cargando periodo...">
-                        </div>
-                        <div class="md:col-span-2">
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Director/a</label>
                             <input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Nombre de la autoridad">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="text-[10px] font-black text-indigo-400 uppercase mb-2 block italic"><i class="fa-solid fa-link mr-1"></i> URL del Logo (Drive / Web)</label>
-                            <input type="text" id="inst-logo-url" class="w-full p-4 rounded-2xl input-style text-blue-600 font-normal" placeholder="Enlace de la imagen" oninput="actualizarVistaLogo()">
+                            <label class="text-[10px] font-black text-indigo-400 uppercase mb-2 block italic"><i class="fa-solid fa-link mr-1"></i> URL del Logo (Enlace de Imagen)</label>
+                            <input type="text" id="inst-logo-url" class="w-full p-4 rounded-2xl input-style text-blue-600 font-normal" placeholder="Pegue aquí el enlace directo de su imagen" oninput="actualizarVistaLogo()">
                         </div>
                     </div>
                 </div>
@@ -77,10 +73,7 @@
         <div id="tab-grados" class="tab-content hidden">
             <div class="glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 items-end">
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Nombre Grado</label>
-                        <input type="text" id="grado-nom" class="w-full p-4 rounded-2xl input-style uppercase text-xs" placeholder="Ej: Quinto Año">
-                    </div>
+                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Nombre Grado</label><input type="text" id="grado-nom" class="w-full p-4 rounded-2xl input-style uppercase text-xs" placeholder="Ej: Séptimo Año"></div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Sub-Nivel Académico</label>
                         <select id="grado-sub" class="w-full p-4 rounded-2xl input-style text-xs font-bold">
@@ -92,10 +85,7 @@
                             <option value="Bachillerato">Bachillerato</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Orden (N°)</label>
-                        <input type="number" id="grado-ord" class="w-full p-4 rounded-2xl input-style text-xs">
-                    </div>
+                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Orden (N°)</label><input type="number" id="grado-ord" class="w-full p-4 rounded-2xl input-style text-xs"></div>
                     <button onclick="agregarGrado()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
                 <table class="w-full"><tbody id="lista-grados" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
@@ -106,15 +96,15 @@
             <div class="glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
                     <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Materia">
-                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área">
-                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Guardar Materia</button>
+                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área Académica">
+                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Guardar</button>
                 </div>
                 <table class="w-full"><tbody id="lista-materias" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
             </div>
         </div>
 
         <div id="tab-par" class="tab-content hidden">
-            <div class="glass-card p-8">
+            <div class="glass-card p-8 text-center">
                 <div class="flex gap-4 mb-8 justify-center">
                     <input type="text" id="par-nom" class="p-4 rounded-2xl input-style uppercase text-center w-40" placeholder="Ej: A">
                     <button onclick="agregarParalelo()" class="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
@@ -175,9 +165,8 @@
         if(url) document.getElementById('img-preview').src = url;
     };
 
-    // --- CARGA DE DATOS INSTITUCIONALES Y PERIODO ---
+    // INSTITUCION
     const cargarInst = async () => {
-        // Cargar datos básicos
         const d = await getDoc(doc(db, "institucion", "datos_generales"));
         if(d.exists()){
             const data = d.data();
@@ -186,20 +175,6 @@
             document.getElementById('inst-director').value = data.director || "";
             document.getElementById('inst-logo-url').value = data.logo_url || "";
             if(data.logo_url) document.getElementById('img-preview').src = data.logo_url;
-        }
-
-        // CARGAR PERIODO ACTIVO (DESDE periodos_lectivos)
-        try {
-            const qPeriodo = query(collection(db, "periodos_lectivos"), where("estado", "==", true));
-            const snapP = await getDocs(qPeriodo);
-            if (!snapP.empty) {
-                // Se asume que el campo del nombre del periodo se llama 'nombre'
-                document.getElementById('inst-periodo').value = snapP.docs[0].data().nombre;
-            } else {
-                document.getElementById('inst-periodo').value = "SIN PERIODO ACTIVO";
-            }
-        } catch (e) {
-            document.getElementById('inst-periodo').value = "ERROR DE CONEXIÓN";
         }
     };
 
@@ -210,10 +185,10 @@
             director: document.getElementById('inst-director').value.toUpperCase(),
             logo_url: document.getElementById('inst-logo-url').value
         }, {merge:true});
-        Swal.fire('¡Éxito!', 'Configuración guardada correctamente.', 'success');
+        Swal.fire('Guardado', 'La información de la institución se ha actualizado.', 'success');
     };
 
-    // --- GESTIÓN DE OTRAS TABLAS ---
+    // MATERIAS (SIN DUPLICADOS)
     window.cargarMat = async () => {
         const snap = await getDocs(collection(db, "materias"));
         const tbody = document.getElementById('lista-materias'); tbody.innerHTML = "";
@@ -221,19 +196,19 @@
             tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs uppercase">${d.data().nombre}</td><td class="text-[10px] text-slate-400 font-bold uppercase">Área: ${d.data().area}</td><td class="text-right"><button onclick="eliminarF('materias','${d.id}','cargarMat')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
-
     window.agregarMateria = async () => {
         const n = document.getElementById('mat-nom').value.trim().toUpperCase();
         const a = document.getElementById('mat-are').value.trim().toUpperCase();
         if(!n || !a) return;
         const q = query(collection(db, "materias"), where("nombre", "==", n));
         const res = await getDocs(q);
-        if(!res.empty) return Swal.fire('Error', 'Esta materia ya está registrada.', 'error');
+        if(!res.empty) return Swal.fire('Error', 'Esta materia ya existe.', 'error');
         await addDoc(collection(db, "materias"), { nombre: n, area: a, estado: true });
         document.getElementById('mat-nom').value = ""; document.getElementById('mat-are').value = "";
         cargarMat();
     };
 
+    // GRADOS
     window.cargarGra = async () => {
         const snap = await getDocs(collection(db, "grados"));
         const tbody = document.getElementById('lista-grados'); tbody.innerHTML = "";
@@ -243,7 +218,6 @@
             tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs uppercase">${g.nombre}</td><td class="text-[9px] font-black text-indigo-400 bg-indigo-50 px-2 py-1 rounded-md uppercase">${g.subnivel}</td><td class="text-right"><button onclick="eliminarF('grados','${g.id}','cargarGra')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
-
     window.agregarGrado = async () => {
         const n = document.getElementById('grado-nom').value.trim().toUpperCase();
         const s = document.getElementById('grado-sub').value;
@@ -254,6 +228,7 @@
         cargarGra();
     };
 
+    // JORNADAS
     window.cargarJor = async () => {
         const snap = await getDocs(collection(db, "jornadas"));
         const div = document.getElementById('lista-jornadas'); div.innerHTML = "";
@@ -270,6 +245,7 @@
         cargarJor();
     };
 
+    // PARALELOS JURY NAVAS :)
     window.cargarPar = async () => {
         const snap = await getDocs(collection(db, "paralelos"));
         const div = document.getElementById('lista-paralelos'); div.innerHTML = "";
@@ -286,7 +262,7 @@
     };
 
     window.eliminarF = async (col, id, func) => {
-        const res = await Swal.fire({ title: '¿Eliminar este registro?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
+        const res = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
         if(res.isConfirmed){ await deleteDoc(doc(db, col, id)); window[func](); }
     };
 </script>
