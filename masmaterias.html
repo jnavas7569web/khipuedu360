@@ -5,25 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khipu Edu 360 - Gestión de Materias</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .dot { transition: all 0.3s ease-in-out; }
-        input:checked ~ .dot { transform: translateX(100%); background-color: #10b981; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-10 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+    <div class="max-w-5xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
-                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Catálogo de Materias</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Configuración Académica</p>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Materias</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Configuración Curricular</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
@@ -31,71 +29,60 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <aside class="lg:col-span-1">
-                <div class="glass-card p-8 sticky top-8">
-                    <h2 id="form-title" class="text-xl font-black text-slate-800 uppercase italic mb-8">Nueva Materia</h2>
-                    
-                    <form id="form-materia" class="space-y-6">
-                        <input type="hidden" id="materia-id">
-                        
+            <div class="lg:col-span-1">
+                <section class="glass-card p-6 sticky top-8">
+                    <h2 class="font-black text-indigo-900 uppercase text-xs mb-6 flex items-center">
+                        <i class="fa-solid fa-plus-circle mr-2 text-lg"></i> Nueva Materia
+                    </h2>
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Código (Ej: LEN-001)</label>
-                            <input type="text" id="in_codigo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="MAT-001">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Nombre de Materia</label>
+                            <input type="text" id="materia-nombre" class="w-full p-4 rounded-2xl input-style font-bold text-slate-700 outline-none uppercase" placeholder="Ej: Matemática">
                         </div>
-
                         <div>
-                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Nombre de la Asignatura</label>
-                            <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Matemáticas">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase ml-2 mb-1">Área Académica</label>
+                            <select id="materia-area" class="w-full p-4 rounded-2xl input-style font-bold text-slate-700 outline-none">
+                                <option value="TRONCAL">TRONCAL (BÁSICA)</option>
+                                <option value="ESPECIAL">ESPECIAL / TÉCNICA</option>
+                                <option value="PROYECTO">PROYECTO ESCOLAR</option>
+                                <option value="OTRA">OTRA</option>
+                            </select>
                         </div>
+                        <button onclick="guardarMateria()" class="w-full bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg shadow-indigo-200">
+                            Guardar Materia
+                        </button>
+                    </div>
+                </section>
+            </div>
 
-                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">¿Materia Activa?</span>
-                            <label class="flex items-center cursor-pointer">
-                                <div class="relative">
-                                    <input type="checkbox" id="in_activa" class="sr-only" checked>
-                                    <div class="block bg-slate-200 w-14 h-8 rounded-full"></div>
-                                    <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition shadow-sm"></div>
-                                </div>
-                            </label>
-                        </div>
-
-                        <div class="pt-4 flex gap-2">
-                            <button type="submit" id="btn-save" class="flex-1 bg-indigo-600 hover:bg-black text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] shadow-xl transition-all">
-                                Guardar Materia <i class="fa-solid fa-save ml-2"></i>
-                            </button>
-                            <button type="button" id="btn-cancel" onclick="resetForm()" class="hidden bg-slate-100 text-slate-400 px-6 rounded-2xl hover:text-red-500 transition-all font-black">X</button>
-                        </div>
-                    </form>
-                </div>
-            </aside>
-
-            <main class="lg:col-span-2">
-                <div class="glass-card p-8">
-                    <h2 class="text-xl font-black text-slate-800 uppercase italic mb-8">Asignaturas Registradas</h2>
+            <div class="lg:col-span-2">
+                <section class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-black text-indigo-900 uppercase text-xs">Materias Registradas</h2>
+                        <span id="contador-materias" class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black">0 TOTAL</span>
+                    </div>
                     
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left">
+                        <table class="w-full">
                             <thead>
-                                <tr class="text-[10px] font-black text-slate-400 uppercase border-b border-slate-100">
-                                    <th class="p-4">Código</th>
-                                    <th class="p-4">Nombre</th>
-                                    <th class="p-4 text-center">Estado</th>
-                                    <th class="p-4 text-right">Acciones</th>
+                                <tr class="text-left border-b border-slate-50">
+                                    <th class="pb-4 text-[10px] font-black text-slate-400 uppercase px-2">Nombre</th>
+                                    <th class="pb-4 text-[10px] font-black text-slate-400 uppercase px-2">Área</th>
+                                    <th class="pb-4 text-[10px] font-black text-slate-400 uppercase px-2 text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-materias" class="divide-y divide-slate-50">
-                                <tr><td colspan="4" class="p-10 text-center font-bold text-slate-300 italic animate-pulse uppercase text-xs">Cargando catálogo...</td></tr>
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
-                </div>
-            </main>
+                </section>
+            </div>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -109,105 +96,82 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- LISTAR MATERIAS (Real-time) ---
-    function loadMaterias() {
-        const q = query(collection(db, "materias"), orderBy("nombre", "asc"));
-        onSnapshot(q, (snapshot) => {
-            const tbody = document.getElementById('tabla-materias');
-            tbody.innerHTML = "";
-            
-            if (snapshot.empty) {
-                tbody.innerHTML = `<tr><td colspan="4" class="p-10 text-center text-slate-300 font-bold italic uppercase text-xs">No hay materias registradas</td></tr>`;
-                return;
-            }
+    // GUARDAR MATERIA
+    window.guardarMateria = async () => {
+        const nombre = document.getElementById('materia-nombre').value.trim().toUpperCase();
+        const area = document.getElementById('materia-area').value;
 
-            snapshot.forEach(docSnap => {
-                const m = docSnap.data();
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-all group";
-                tr.innerHTML = `
-                    <td class="p-4 font-mono text-xs font-bold text-indigo-500">${m.codigo}</td>
-                    <td class="p-4 font-black text-slate-700 text-sm uppercase">${m.nombre}</td>
-                    <td class="p-4 text-center">
-                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase ${m.activa ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">
-                            ${m.activa ? 'Activa' : 'Inactiva'}
-                        </span>
-                    </td>
-                    <td class="p-4 text-right flex justify-end gap-2">
-                        <button onclick="editMateria('${docSnap.id}', '${m.codigo}', '${m.nombre}', ${m.activa})" class="text-slate-300 hover:text-indigo-600 transition-all"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteMateria('${docSnap.id}')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        });
-    }
-
-    // --- GUARDAR / ACTUALIZAR ---
-    document.getElementById('form-materia').onsubmit = async (e) => {
-        e.preventDefault();
-        const btn = document.getElementById('btn-save');
-        const id = document.getElementById('materia-id').value;
-        const codigo = document.getElementById('in_codigo').value.trim().toUpperCase();
-        
-        btn.disabled = true;
-        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Procesando...`;
-
-        // Generamos el ID basado en el código si es nueva, o usamos el ID oculto si es edición
-        const docID = id || "mat_" + codigo.toLowerCase().replace(/[^a-z0-9]/g, "_");
-
-        const payload = {
-            codigo: codigo,
-            nombre: document.getElementById('in_nombre').value.trim().toUpperCase(),
-            activa: document.getElementById('in_activa').checked
-        };
+        if(!nombre) return Swal.fire('Error', 'Escriba el nombre de la materia', 'error');
 
         try {
-            await setDoc(doc(db, "materias", docID), payload, { merge: true });
-            Swal.fire({ title: '¡Éxito!', text: 'Materia guardada correctamente.', icon: 'success', timer: 1500, showConfirmButton: false });
-            resetForm();
-        } catch (error) {
-            Swal.fire('Error', 'No se pudo guardar: ' + error.message, 'error');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = `Guardar Materia <i class="fa-solid fa-save ml-2"></i>`;
+            await addDoc(collection(db, "materias"), {
+                nombre,
+                area,
+                estado: true,
+                fecha_creacion: new Date()
+            });
+            document.getElementById('materia-nombre').value = "";
+            Swal.fire('¡Éxito!', 'Materia registrada correctamente', 'success');
+            cargarMaterias();
+        } catch (e) {
+            console.error(e);
+            Swal.fire('Error', 'No se pudo guardar', 'error');
         }
     };
 
-    // --- FUNCIONES GLOBALES ---
-    window.editMateria = (id, cod, nom, act) => {
-        document.getElementById('form-title').innerText = "Editar Materia";
-        document.getElementById('materia-id').value = id;
-        document.getElementById('in_codigo').value = cod;
-        document.getElementById('in_nombre').value = nom;
-        document.getElementById('in_activa').checked = act;
-        document.getElementById('btn-cancel').classList.remove('hidden');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // CARGAR MATERIAS
+    window.cargarMaterias = async () => {
+        const tbody = document.getElementById('tabla-materias');
+        tbody.innerHTML = '<tr><td colspan="3" class="py-10 text-center animate-pulse font-black text-slate-300 text-xs">CARGANDO MATERIAS...</td></tr>';
+        
+        try {
+            const q = query(collection(db, "materias"), orderBy("nombre", "asc"));
+            const snap = await getDocs(q);
+            tbody.innerHTML = "";
+            
+            document.getElementById('contador-materias').innerText = `${snap.size} TOTAL`;
+
+            snap.forEach(docSnap => {
+                const mat = docSnap.data();
+                const id = docSnap.id;
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-2 font-bold text-slate-700 text-sm">${mat.nombre}</td>
+                        <td class="py-4 px-2 text-[10px] font-black text-indigo-500 uppercase">${mat.area}</td>
+                        <td class="py-4 px-2 text-center">
+                            <button onclick="eliminarMateria('${id}')" class="text-slate-300 hover:text-red-500 transition-all mx-2">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (e) {
+            console.error(e);
+        }
     };
 
-    window.resetForm = () => {
-        document.getElementById('form-materia').reset();
-        document.getElementById('materia-id').value = "";
-        document.getElementById('form-title').innerText = "Nueva Materia";
-        document.getElementById('btn-cancel').classList.add('hidden');
-    };
-
-    window.deleteMateria = async (id) => {
-        const res = await Swal.fire({
+    // ELIMINAR MATERIA
+    window.eliminarMateria = async (id) => {
+        const result = await Swal.fire({
             title: '¿Eliminar materia?',
             text: "Esta acción no se puede deshacer.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Sí, borrar'
+            confirmButtonColor: '#6366f1',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
         });
 
-        if (res.isConfirmed) {
+        if (result.isConfirmed) {
             await deleteDoc(doc(db, "materias", id));
+            cargarMaterias();
         }
     };
 
-    loadMaterias();
+    // Inicializar
+    cargarMaterias();
 </script>
 </body>
 </html>
