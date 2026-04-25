@@ -14,7 +14,6 @@
         .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .badge-curso { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; }
         
-        /* Ajuste responsivo para el buscador */
         @media (max-width: 640px) {
             .search-container { flex-direction: column; gap: 10px; }
             .search-button { position: static !important; width: 100%; padding: 15px !important; }
@@ -40,7 +39,7 @@
                 <div class="relative w-full">
                     <input type="text" id="input-busqueda" 
                         class="w-full p-5 pl-14 search-input input-style rounded-3xl font-black text-slate-700 outline-none text-lg uppercase" 
-                        placeholder="NOMBRE O APELLIDO..."
+                        placeholder="NOMBRE O APELLIDO DEL ALUMNO..."
                         onkeyup="if(event.key === 'Enter') buscarEstudiante()">
                     <div class="absolute left-5 top-5 text-slate-300 text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
                 </div>
@@ -60,7 +59,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -82,13 +81,26 @@
         contenedor.innerHTML = '<div class="md:col-span-2 text-center py-20 font-black text-indigo-900 animate-pulse uppercase">Escaneando nóminas...</div>';
 
         try {
-            const snapEstu = await getDocs(collection(db, "estudiantes"));
+            // 1. Cargamos estudiantes y matrículas por separado para evitar errores de índice
+            const [snapEstu, snapMatr] = await Promise.all([
+                getDocs(collection(db, "estudiantes")),
+                getDocs(collection(db, "matriculas"))
+            ]);
+
             let alumnosEncontrados = [];
+            let matriculasMap = {};
+
+            // Mapeamos las matrículas para búsqueda rápida por ID de estudiante
+            snapMatr.forEach(docM => {
+                const m = docM.data();
+                matriculasMap[m.estudiante_id] = m;
+            });
 
             snapEstu.forEach(docE => {
                 const d = docE.data();
-                if (`${d.nombres} ${d.apellidos}`.toUpperCase().includes(busqueda)) {
-                    alumnosEncontrados.push(d);
+                const nombreCompleto = `${d.nombres} ${d.apellidos}`.toUpperCase();
+                if (nombreCompleto.includes(busqueda)) {
+                    alumnosEncontrados.push({ id: docE.id, ...d });
                 }
             });
 
@@ -100,15 +112,11 @@
             contenedor.innerHTML = "";
 
             for (const alumno of alumnosEncontrados) {
-                const qMat = query(collection(db, "matriculas"), where("estudiante_id", "==", alumno.cedula));
-                const snapMat = await getDocs(qMat);
-                
-                let infoCurso = "SIN MATRÍCULA";
-                if(!snapMat.empty) {
-                    const m = snapMat.docs[0].data();
-                    infoCurso = `${m.grado_id || ''} "${m.paralelo_id || ''}"`.toUpperCase();
-                }
+                // Buscamos la matrícula en nuestro mapa local (sin usar query de Firebase)
+                const m = matriculasMap[alumno.cedula || alumno.id];
+                const infoCurso = m ? `${m.grado_id || ''} "${m.paralelo_id || ''}"`.toUpperCase() : "SIN MATRÍCULA";
 
+                // Buscamos al representante
                 const docR = await getDoc(doc(db, "representantes", alumno.representante_id));
                 
                 if(docR.exists()) {
@@ -146,8 +154,8 @@
                 }
             }
         } catch (err) {
-            console.error(err);
-            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error de conexión.</div>`;
+            console.error("Detalle del error:", err);
+            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error al recuperar datos. Intente de nuevo.</div>`;
         }
     };
 </script>
