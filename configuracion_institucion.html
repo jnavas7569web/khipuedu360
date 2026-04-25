@@ -23,7 +23,7 @@
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Configuración</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Gestión Maestra del Sistema</p>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Gestión Maestra de la Institución</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
@@ -42,50 +42,62 @@
             <div class="glass-card p-10">
                 <div class="flex flex-col md:flex-row gap-10 mb-8 items-start">
                     <div class="flex flex-col items-center gap-4 w-full md:w-1/4">
-                        <label class="text-[10px] font-black text-slate-400 uppercase block">Logo Institucional</label>
+                        <label class="text-[10px] font-black text-slate-400 uppercase block text-center">Escudo / Logo</label>
                         <img id="img-preview" src="https://via.placeholder.com/150?text=Logo+Escuela" class="logo-preview shadow-sm" alt="Logo">
-                        <p class="text-[9px] text-center text-slate-400 font-medium px-2 italic mt-2">Sincronizado vía URL</p>
+                        <p class="text-[9px] text-center text-slate-400 font-medium px-2 italic mt-2">Pegue el enlace directo abajo</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 w-full text-slate-700">
                         <div class="md:col-span-2">
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Nombre Institución</label>
-                            <input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Ej: ESCUELA DE EGB FISCAL GRAN COLOMBIA">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Nombre de la Institución</label>
+                            <input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Nombre Oficial">
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">AMIE</label>
-                            <input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style" placeholder="Ej: 13H00156">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Código AMIE</label>
+                            <input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style uppercase">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Distrito</label>
+                            <input type="text" id="inst-distrito" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Ej: 13D01">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Dirección Domiciliaria (dir)</label>
+                            <input type="text" id="inst-dir" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Calle y Avenidas">
                         </div>
                         <div>
                             <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Director/a</label>
-                            <input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase" placeholder="Nombre de la autoridad">
+                            <input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Teléfono de contacto</label>
+                            <input type="text" id="inst-telefono" class="w-full p-4 rounded-2xl input-style" placeholder="Ej: 0989898988">
                         </div>
                         <div class="md:col-span-2">
-                            <label class="text-[10px] font-black text-indigo-400 uppercase mb-2 block italic"><i class="fa-solid fa-link mr-1"></i> URL del Logo (Enlace de Imagen)</label>
-                            <input type="text" id="inst-logo-url" class="w-full p-4 rounded-2xl input-style text-blue-600 font-normal" placeholder="Pegue aquí el enlace directo de su imagen" oninput="actualizarVistaLogo()">
+                            <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Correo Electrónico (mail)</label>
+                            <input type="email" id="inst-mail" class="w-full p-4 rounded-2xl input-style lowercase" placeholder="correoescuela@gmail.com">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-[10px] font-black text-indigo-400 uppercase mb-2 block italic"><i class="fa-solid fa-link mr-1"></i> URL del Logo (logo_url)</label>
+                            <input type="text" id="inst-logo-url" class="w-full p-4 rounded-2xl input-style text-blue-600 font-normal" oninput="actualizarVistaLogo()">
                         </div>
                     </div>
                 </div>
-                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg">Guardar Configuración General</button>
+                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg">Actualizar Datos Generales</button>
             </div>
         </div>
 
         <div id="tab-grados" class="tab-content hidden">
             <div class="glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 items-end">
-                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Nombre Grado</label><input type="text" id="grado-nom" class="w-full p-4 rounded-2xl input-style uppercase text-xs" placeholder="Ej: Séptimo Año"></div>
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Sub-Nivel Académico</label>
-                        <select id="grado-sub" class="w-full p-4 rounded-2xl input-style text-xs font-bold">
-                            <option value="">Seleccionar...</option>
-                            <option value="Básica Preparatoria">Básica Preparatoria</option>
-                            <option value="Básica Elemental">Básica Elemental</option>
-                            <option value="Básica Media">Básica Media</option>
-                            <option value="Básica Superior">Básica Superior</option>
-                            <option value="Bachillerato">Bachillerato</option>
-                        </select>
-                    </div>
-                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Orden (N°)</label><input type="number" id="grado-ord" class="w-full p-4 rounded-2xl input-style text-xs"></div>
+                    <input type="text" id="grado-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Grado">
+                    <select id="grado-sub" class="p-4 rounded-2xl input-style text-xs font-bold">
+                        <option value="Básica Preparatoria">Básica Preparatoria</option>
+                        <option value="Básica Elemental">Básica Elemental</option>
+                        <option value="Básica Media">Básica Media</option>
+                        <option value="Básica Superior">Básica Superior</option>
+                        <option value="Bachillerato">Bachillerato</option>
+                    </select>
+                    <input type="number" id="grado-ord" class="p-4 rounded-2xl input-style text-xs" placeholder="Orden">
                     <button onclick="agregarGrado()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
                 <table class="w-full"><tbody id="lista-grados" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
@@ -96,8 +108,8 @@
             <div class="glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
                     <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Materia">
-                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área Académica">
-                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Guardar</button>
+                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área">
+                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
                 <table class="w-full"><tbody id="lista-materias" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
             </div>
@@ -114,16 +126,15 @@
         </div>
 
         <div id="tab-jor" class="tab-content hidden">
-            <div class="glass-card p-8">
+            <div class="glass-card p-8 text-slate-700">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
-                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Jornada">
+                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Matutina">
                     <input type="text" id="jor-hor" class="p-4 rounded-2xl input-style text-xs" placeholder="07:15 - 12:15">
                     <button onclick="agregarJornada()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
                 <div id="lista-jornadas" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </div>
-
     </div>
 
 <script type="module">
@@ -145,10 +156,8 @@
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.body.style.opacity = "1";
-            cargarTodo();
-        } else { window.location.href = "index.html"; }
+        if (user) { document.body.style.opacity = "1"; cargarTodo(); }
+        else { window.location.href = "index.html"; }
     });
 
     window.switchTab = (tab) => {
@@ -165,35 +174,44 @@
         if(url) document.getElementById('img-preview').src = url;
     };
 
-    // INSTITUCION
+    // --- CARGA DE TODOS LOS CAMPOS DE LA BD (Pestaña 1) ---
     const cargarInst = async () => {
         const d = await getDoc(doc(db, "institucion", "datos_generales"));
         if(d.exists()){
             const data = d.data();
             document.getElementById('inst-nombre').value = data.nombre || "";
             document.getElementById('inst-amie').value = data.amie || "";
+            document.getElementById('inst-distrito').value = data.distrito || "";
+            document.getElementById('inst-dir').value = data.dir || "";
             document.getElementById('inst-director').value = data.director || "";
+            document.getElementById('inst-telefono').value = data.telefono || "";
+            document.getElementById('inst-mail').value = data.mail || "";
             document.getElementById('inst-logo-url').value = data.logo_url || "";
             if(data.logo_url) document.getElementById('img-preview').src = data.logo_url;
         }
     };
 
+    // --- GUARDAR TODOS LOS CAMPOS ---
     window.actualizarInstitucion = async () => {
         await setDoc(doc(db, "institucion", "datos_generales"), {
             nombre: document.getElementById('inst-nombre').value.toUpperCase(),
-            amie: document.getElementById('inst-amie').value,
+            amie: document.getElementById('inst-amie').value.toUpperCase(),
+            distrito: document.getElementById('inst-distrito').value.toUpperCase(),
+            dir: document.getElementById('inst-dir').value.toUpperCase(),
             director: document.getElementById('inst-director').value.toUpperCase(),
+            telefono: document.getElementById('inst-telefono').value,
+            mail: document.getElementById('inst-mail').value.toLowerCase(),
             logo_url: document.getElementById('inst-logo-url').value
         }, {merge:true});
-        Swal.fire('Guardado', 'La información de la institución se ha actualizado.', 'success');
+        Swal.fire('¡Éxito!', 'Información actualizada correctamente.', 'success');
     };
 
-    // MATERIAS (SIN DUPLICADOS)
+    // --- RESTO DE FUNCIONES (MATERIAS, GRADOS, JORNADAS, PARALELOS) ---
     window.cargarMat = async () => {
         const snap = await getDocs(collection(db, "materias"));
         const tbody = document.getElementById('lista-materias'); tbody.innerHTML = "";
         snap.forEach(d => {
-            tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs uppercase">${d.data().nombre}</td><td class="text-[10px] text-slate-400 font-bold uppercase">Área: ${d.data().area}</td><td class="text-right"><button onclick="eliminarF('materias','${d.id}','cargarMat')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+            tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs uppercase">${d.data().nombre}</td><td>${d.data().area}</td><td class="text-right"><button onclick="eliminarF('materias','${d.id}','cargarMat')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
     window.agregarMateria = async () => {
@@ -202,20 +220,18 @@
         if(!n || !a) return;
         const q = query(collection(db, "materias"), where("nombre", "==", n));
         const res = await getDocs(q);
-        if(!res.empty) return Swal.fire('Error', 'Esta materia ya existe.', 'error');
+        if(!res.empty) return Swal.fire('Error','Materia ya existe','error');
         await addDoc(collection(db, "materias"), { nombre: n, area: a, estado: true });
-        document.getElementById('mat-nom').value = ""; document.getElementById('mat-are').value = "";
-        cargarMat();
+        document.getElementById('mat-nom').value = ""; document.getElementById('mat-are').value = ""; cargarMat();
     };
 
-    // GRADOS
     window.cargarGra = async () => {
         const snap = await getDocs(collection(db, "grados"));
         const tbody = document.getElementById('lista-grados'); tbody.innerHTML = "";
         let gs = []; snap.forEach(d => gs.push({id:d.id, ...d.data()}));
         gs.sort((a,b) => a.orden - b.orden);
         gs.forEach(g => {
-            tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs uppercase">${g.nombre}</td><td class="text-[9px] font-black text-indigo-400 bg-indigo-50 px-2 py-1 rounded-md uppercase">${g.subnivel}</td><td class="text-right"><button onclick="eliminarF('grados','${g.id}','cargarGra')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+            tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs uppercase">${g.nombre}</td><td>${g.subnivel}</td><td class="text-right"><button onclick="eliminarF('grados','${g.id}','cargarGra')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
     window.agregarGrado = async () => {
@@ -224,16 +240,14 @@
         const o = document.getElementById('grado-ord').value;
         if(!n || !s || !o) return;
         await addDoc(collection(db, "grados"), { nombre: n, subnivel: s, orden: parseInt(o), estado: true });
-        document.getElementById('grado-nom').value = ""; document.getElementById('grado-ord').value = "";
-        cargarGra();
+        document.getElementById('grado-nom').value = ""; document.getElementById('grado-ord').value = ""; cargarGra();
     };
 
-    // JORNADAS
     window.cargarJor = async () => {
         const snap = await getDocs(collection(db, "jornadas"));
         const div = document.getElementById('lista-jornadas'); div.innerHTML = "";
         snap.forEach(d => {
-            div.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><div><p class="font-black text-xs uppercase">${d.data().nombre}</p><p class="text-[9px] text-slate-400">${d.data().horario}</p></div><button onclick="eliminarF('jornadas','${d.id}','cargarJor')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            div.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border"><div><p class="font-black text-xs uppercase">${d.data().nombre}</p><p class="text-[9px]">${d.data().horario}</p></div><button onclick="eliminarF('jornadas','${d.id}','cargarJor')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button></div>`;
         });
     };
     window.agregarJornada = async () => {
@@ -241,24 +255,21 @@
         const h = document.getElementById('jor-hor').value.trim();
         if(!n || !h) return;
         await addDoc(collection(db, "jornadas"), { nombre: n, horario: h, estado: true });
-        document.getElementById('jor-nom').value = ""; document.getElementById('jor-hor').value = "";
-        cargarJor();
+        document.getElementById('jor-nom').value = ""; document.getElementById('jor-hor').value = ""; cargarJor();
     };
 
-    // PARALELOS JURY NAVAS :)
     window.cargarPar = async () => {
         const snap = await getDocs(collection(db, "paralelos"));
         const div = document.getElementById('lista-paralelos'); div.innerHTML = "";
         snap.forEach(d => {
-            div.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="font-black text-indigo-900">${d.data().nombre}</span><button onclick="eliminarF('paralelos','${d.id}','cargarPar')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>`;
+            div.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border"><span class="font-black text-indigo-900">${d.data().nombre}</span><button onclick="eliminarF('paralelos','${d.id}','cargarPar')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>`;
         });
     };
     window.agregarParalelo = async () => {
         const n = document.getElementById('par-nom').value.trim().toUpperCase();
         if(!n) return;
         await addDoc(collection(db, "paralelos"), { nombre: n, estado: true });
-        document.getElementById('par-nom').value = "";
-        cargarPar();
+        document.getElementById('par-nom').value = ""; cargarPar();
     };
 
     window.eliminarF = async (col, id, func) => {
