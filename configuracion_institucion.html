@@ -42,58 +42,42 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="md:col-span-2"><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Nombre Institución</label><input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase"></div>
                     <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">AMIE</label><input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style"></div>
-                    
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Periodo Lectivo Actual (Solo Lectura)</label><input type="text" id="inst-periodo" class="w-full p-4 rounded-2xl input-style bg-gray-200 text-gray-500" readonly></div>
-                    
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Director/a</label><input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase"></div>
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Rector/a</label><input type="text" id="inst-rector" class="w-full p-4 rounded-2xl input-style uppercase"></div>
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Secretaria/o</label><input type="text" id="inst-secretaria" class="w-full p-4 rounded-2xl input-style uppercase"></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Periodo Lectivo Actual (Solo Lectura)</label><input type="text" id="inst-periodo" class="w-full p-4 rounded-2xl input-style bg-gray-100 text-gray-500 cursor-not-allowed" readonly></div>
+                    <div class="md:col-span-2"><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Director/a</label><input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase"></div>
                 </div>
-                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg shadow-indigo-100">Guardar Datos Institucionales</button>
+                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg">Guardar Datos Institucionales</button>
             </div>
         </div>
 
         <div id="tab-grados" class="tab-content hidden">
             <div class="glass-card p-8">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 items-end">
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Nombre del Grado</label>
-                        <input type="text" id="grado-nom" class="w-full p-4 rounded-2xl input-style uppercase text-xs" placeholder="Ej: Séptimo Año">
-                    </div>
-                    
+                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Nombre Grado</label><input type="text" id="grado-nom" class="w-full p-4 rounded-2xl input-style uppercase text-xs" placeholder="Ej: Séptimo Año"></div>
                     <div>
                         <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Sub-Nivel Académico</label>
                         <select id="grado-sub" class="w-full p-4 rounded-2xl input-style text-xs font-bold">
                             <option value="">Seleccione Subnivel...</option>
-                            <option value="BÁSICA PREPARATORIA">BÁSICA PREPARATORIA (Inicial y Prep.)</option>
-                            <option value="BÁSICA ELEMENTAL">BÁSICA ELEMENTAL (2do-4to)</option>
-                            <option value="BÁSICA MEDIA">BÁSICA MEDIA (5to-7mo)</option>
-                            <option value="BÁSICA SUPERIOR">BÁSICA SUPERIOR (8vo-10mo)</option>
-                            <option value="BACHILLERATO">BACHILLERATO (1ro-3ro)</option>
+                            <option value="Básica Preparatoria">Básica Preparatoria</option>
+                            <option value="Básica Elemental">Básica Elemental</option>
+                            <option value="Básica Media">Básica Media</option>
+                            <option value="Básica Superior">Básica Superior</option>
+                            <option value="Bachillerato">Bachillerato</option>
                         </select>
                     </div>
-                    
-                    <div>
-                        <label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Orden (N°)</label>
-                        <input type="number" id="grado-ord" class="w-full p-4 rounded-2xl input-style text-xs" placeholder="Ej: 7">
-                    </div>
-                    <button onclick="agregarGrado()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px] hover:bg-black transition-all shadow-lg">Añadir Grado</button>
+                    <div><label class="text-[9px] font-black text-slate-400 mb-2 block uppercase">Orden (N°)</label><input type="number" id="grado-ord" class="w-full p-4 rounded-2xl input-style text-xs" placeholder="Ej: 7"></div>
+                    <button onclick="agregarGrado()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir Grado</button>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <tbody id="lista-grados" class="divide-y divide-slate-100 text-slate-700"></tbody>
-                    </table>
-                </div>
+                <table class="w-full"><tbody id="lista-grados" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
             </div>
         </div>
 
         <div id="tab-mat" class="tab-content hidden">
             <div class="glass-card p-8">
-                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6"><i class="fa-solid fa-book mr-2 text-lg text-indigo-300"></i> Gestión Curricular</h2>
+                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6"><i class="fa-solid fa-book mr-2 text-indigo-300"></i> Gestión de Materias</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
-                    <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Materia (Ej: Matemática)">
-                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área (Ej: Ciencias Exactas)">
-                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px] hover:bg-black transition-all">Añadir Materia</button>
+                    <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Materia">
+                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área">
+                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir Materia</button>
                 </div>
                 <table class="w-full"><tbody id="lista-materias" class="divide-y divide-slate-100 text-slate-700"></tbody></table>
             </div>
@@ -101,9 +85,9 @@
 
         <div id="tab-par" class="tab-content hidden">
             <div class="glass-card p-8">
-                <div class="flex gap-4 mb-8">
-                    <input type="text" id="par-nom" class="flex-1 p-4 rounded-2xl input-style uppercase" placeholder="Letra (Ej: A)">
-                    <button onclick="agregarParalelo()" class="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase text-[10px] hover:bg-black">Añadir</button>
+                <div class="flex gap-4 mb-8 text-center items-center justify-center">
+                    <input type="text" id="par-nom" class="w-64 p-4 rounded-2xl input-style uppercase text-center" placeholder="Letra (Ej: A)">
+                    <button onclick="agregarParalelo()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px]">Añadir Paralelo</button>
                 </div>
                 <div id="lista-paralelos" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
             </div>
@@ -111,11 +95,10 @@
 
         <div id="tab-jor" class="tab-content hidden">
             <div class="glass-card p-8">
-                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6"><i class="fa-solid fa-clock mr-2 text-lg text-indigo-300"></i> Horarios Institucionales</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
-                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre (Ej: Matutina)">
-                    <input type="text" id="jor-hor" class="p-4 rounded-2xl input-style text-xs" placeholder="Horario (Ej: 07:15 - 12:12)">
-                    <button onclick="agregarJornada()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px] hover:bg-black">Añadir Jornada</button>
+                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre Jornada">
+                    <input type="text" id="jor-hor" class="p-4 rounded-2xl input-style text-xs" placeholder="Horario">
+                    <button onclick="agregarJornada()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir Jornada</button>
                 </div>
                 <div id="lista-jornadas" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
@@ -148,7 +131,6 @@
         } else { window.location.href = "index.html"; }
     });
 
-    // --- FUNCIONES GLOBALES ---
     window.switchTab = (tab) => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.querySelectorAll('button[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-indigo-600'));
@@ -167,72 +149,58 @@
             document.getElementById('inst-amie').value = data.amie || "";
             document.getElementById('inst-periodo').value = data.periodo_lectivo || "";
             document.getElementById('inst-director').value = data.director || "";
-            document.getElementById('inst-rector').value = data.rector || "";
-            document.getElementById('inst-secretaria').value = data.secretaria || "";
         }
     };
     window.actualizarInstitucion = async () => {
         await setDoc(doc(db, "institucion", "datos_generales"), {
             nombre: document.getElementById('inst-nombre').value.toUpperCase(),
             amie: document.getElementById('inst-amie').value,
-            // El periodo no se actualiza desde aquí
-            director: document.getElementById('inst-director').value.toUpperCase(),
-            rector: document.getElementById('inst-rector').value.toUpperCase(),
-            secretaria: document.getElementById('inst-secretaria').value.toUpperCase(),
+            director: document.getElementById('inst-director').value.toUpperCase()
         }, {merge:true});
-        Swal.fire('Guardado', 'Los datos institucionales se han actualizado.', 'success');
+        Swal.fire('Guardado', 'Los datos se han actualizado correctamente.', 'success');
     };
 
-    // GRADOS
-    window.cargarGra = async () => {
-        const snap = await getDocs(collection(db, "grados"));
-        const tbody = document.getElementById('lista-grados'); tbody.innerHTML = "";
-        let grados = [];
-        snap.forEach(d => grados.push({id: d.id, ...d.data()}));
-        grados.sort((a,b) => a.orden - b.orden);
-
-        grados.forEach(g => {
-            tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs text-slate-700 uppercase">${g.nombre}</td><td class="text-[9px] font-black text-indigo-400 uppercase bg-indigo-50 px-3 py-1 rounded-full">${g.subnivel} (N° ${g.orden})</td><td class="text-right"><button onclick="eliminarF('grados','${g.id}','cargarGra')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+    // JORNADAS
+    window.cargarJor = async () => {
+        const snap = await getDocs(collection(db, "jornadas"));
+        const div = document.getElementById('lista-jornadas'); div.innerHTML = "";
+        snap.forEach(d => {
+            div.innerHTML += `
+                <div class="bg-slate-50 p-5 rounded-2xl flex justify-between items-center border border-slate-100">
+                    <div><p class="font-black text-indigo-950 text-xs uppercase">${d.data().nombre}</p><p class="text-[10px] text-slate-400 font-bold">Horario: ${d.data().horario}</p></div>
+                    <button onclick="eliminarF('jornadas','${d.id}','cargarJor')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`;
         });
     };
-    window.agregarGrado = async () => {
-        const n = document.getElementById('grado-nom').value.trim();
-        const s = document.getElementById('grado-sub').value;
-        const o = document.getElementById('grado-ord').value;
-        if(!n || !s || !o) return Swal.fire('Incompleto','Llene todos los campos','warning');
-        await addDoc(collection(db, "grados"), { nombre: n.toUpperCase(), subnivel: s, orden: parseInt(o), id: n.toLowerCase().replace(/ /g,"_"), estado: true });
-        document.getElementById('grado-nom').value = ""; document.getElementById('grado-ord').value = ""; document.getElementById('grado-sub').value = "";
-        cargarGra();
+    window.agregarJornada = async () => {
+        const n = document.getElementById('jor-nom').value.trim();
+        const h = document.getElementById('jor-hor').value.trim();
+        if(!n || !h) return;
+        await addDoc(collection(db, "jornadas"), { nombre: n.toUpperCase(), horario: h, id: n.toLowerCase(), estado: true });
+        document.getElementById('jor-nom').value = ""; document.getElementById('jor-hor').value = "";
+        cargarJor();
     };
 
-    // MATERIAS
+    // MATERIAS (CON CONTROL DE DUPLICADOS)
     window.cargarMat = async () => {
         const snap = await getDocs(collection(db, "materias"));
         const tbody = document.getElementById('lista-materias'); tbody.innerHTML = "";
-        let materias = [];
-        snap.forEach(d => materias.push({id: d.id, ...d.data()}));
-        materias.sort((a,b) => a.nombre.localeCompare(b.nombre));
-
-        materias.forEach(m => {
-            tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs text-slate-700 uppercase">${m.nombre}</td><td class="text-[10px] text-slate-400 font-bold uppercase"><span class="font-black text-indigo-300">Área:</span> ${m.area}</td><td class="text-right"><button onclick="eliminarF('materias','${m.id}','cargarMat')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+        snap.forEach(d => {
+            tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs text-slate-700 uppercase">${d.data().nombre}</td><td class="text-[10px] text-slate-400 font-bold uppercase">Área: ${d.data().area}</td><td class="text-right"><button onclick="eliminarF('materias','${d.id}','cargarMat')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
     window.agregarMateria = async () => {
-        const n = document.getElementById('mat-nom').value.trim();
-        const a = document.getElementById('mat-are').value.trim();
-        if(!n || !a) return Swal.fire('Incompleto','Llene nombre y área','warning');
-        
-        const nombreAlta = n.toUpperCase();
+        const n = document.getElementById('mat-nom').value.trim().toUpperCase();
+        const a = document.getElementById('mat-are').value.trim().toUpperCase();
+        if(!n || !a) return;
 
-        // CONTROL DE DUPLICADOS
-        const qDupli = query(collection(db, "materias"), where("nombre", "==", nombreAlta));
+        // VERIFICAR DUPLICADO
+        const qDupli = query(collection(db, "materias"), where("nombre", "==", n));
         const snapDupli = await getDocs(qDupli);
 
-        if(!snapDupli.empty){
-            return Swal.fire('Materia Repetida', `La materia "${nombreAlta}" ya está registrada.`, 'error');
-        }
+        if(!snapDupli.empty) return Swal.fire('Error', `La materia "${n}" ya existe.`, 'error');
 
-        await addDoc(collection(db, "materias"), { nombre: nombreAlta, area: a.toUpperCase(), id: n.toLowerCase().replace(/ /g,"_"), estado: true });
+        await addDoc(collection(db, "materias"), { nombre: n, area: a, id: n.toLowerCase().replace(/ /g,"_"), estado: true });
         document.getElementById('mat-nom').value = ""; document.getElementById('mat-are').value = "";
         cargarMat();
     };
@@ -248,51 +216,39 @@
     window.agregarParalelo = async () => {
         const n = document.getElementById('par-nom').value.trim().toUpperCase();
         if(!n) return;
-        
-        // Control Duplicado Simple
-        const qDupli = query(collection(db, "paralelos"), where("nombre", "==", n));
-        const snapDupli = await getDocs(qDupli);
-        if(!snapDupli.empty) return Swal.fire('Repetido','Este paralelo ya existe','error');
-
         await addDoc(collection(db, "paralelos"), { nombre: n, id: n.toLowerCase(), estado: true });
         document.getElementById('par-nom').value = "";
         cargarPar();
     };
 
-    // JORNADAS
-    window.cargarJor = async () => {
-        const snap = await getDocs(collection(db, "jornadas"));
-        const div = document.getElementById('lista-jornadas'); div.innerHTML = "";
-        snap.forEach(d => {
-            div.innerHTML += `
-                <div class="bg-slate-50 p-5 rounded-2xl flex justify-between items-center border border-slate-100 hover:border-indigo-100 transition-all">
-                    <div><p class="font-black text-indigo-950 text-xs uppercase">${d.data().nombre}</p><p class="text-[10px] text-slate-400 font-bold"><span class="font-black text-indigo-300">Horario:</span> ${d.data().horario}</p></div>
-                    <button onclick="eliminarF('jornadas','${d.id}','cargarJor')" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button>
-                </div>`;
+    // GRADOS
+    window.cargarGra = async () => {
+        const snap = await getDocs(collection(db, "grados"));
+        const tbody = document.getElementById('lista-grados'); tbody.innerHTML = "";
+        let grados = [];
+        snap.forEach(d => grados.push({id: d.id, ...d.data()}));
+        grados.sort((a,b) => a.orden - b.orden);
+
+        grados.forEach(g => {
+            tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs text-slate-700 uppercase">${g.nombre}</td><td class="text-[9px] font-black text-indigo-400 bg-indigo-50 px-2 py-1 rounded-md uppercase">${g.subnivel}</td><td class="text-right"><button onclick="eliminarF('grados','${g.id}','cargarGra')" class="text-slate-300 hover:text-red-500 px-4 transition-all"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
     };
-    window.agregarJornada = async () => {
-        const n = document.getElementById('jor-nom').value.trim();
-        const h = document.getElementById('jor-hor').value.trim();
-        if(!n || !h) return Swal.fire('Incompleto','Llene nombre y horario','warning');
-        
-        const nombreAlta = n.toUpperCase();
-        const qDupli = query(collection(db, "jornadas"), where("nombre", "==", nombreAlta));
-        const snapDupli = await getDocs(qDupli);
-        if(!snapDupli.empty) return Swal.fire('Repetido','Esta jornada ya existe','error');
-
-        await addDoc(collection(db, "jornadas"), { nombre: nombreAlta, horario: h, id: n.toLowerCase(), estado: true });
-        document.getElementById('jor-nom').value = ""; document.getElementById('jor-hor').value = "";
-        cargarJor();
+    window.agregarGrado = async () => {
+        const n = document.getElementById('grado-nom').value.trim();
+        const s = document.getElementById('grado-sub').value;
+        const o = document.getElementById('grado-ord').value;
+        if(!n || !s || !o) return Swal.fire('Error','Llene todos los campos','warning');
+        await addDoc(collection(db, "grados"), { nombre: n.toUpperCase(), subnivel: s, orden: parseInt(o), id: n.toLowerCase().replace(/ /g,"_"), estado: true });
+        document.getElementById('grado-nom').value = ""; document.getElementById('grado-ord').value = "";
+        cargarGra();
     };
 
     // ELIMINACION UNIVERSAL
     window.eliminarF = async (col, id, func) => {
-        const res = await Swal.fire({ title: '¿Eliminar registro?', text: "Esta acción no se puede deshacer.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444', cancelButtonText: 'Cancelar' });
+        const res = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí', confirmButtonColor: '#ef4444' });
         if(res.isConfirmed){
             await deleteDoc(doc(db, col, id));
-            Swal.fire('Eliminado','El registro ha sido borrado.','success');
-            window[func](); 
+            window[func]();
         }
     };
 </script>
