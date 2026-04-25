@@ -14,8 +14,6 @@
         .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
         .tab-active { color: #6366f1; border-bottom: 3px solid #6366f1; }
-        .btn-action { transition: all 0.2s ease; }
-        .btn-action:active { scale: 0.95; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -26,74 +24,73 @@
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Configuración</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Gestión Maestra del Sistema</p>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
             </button>
         </header>
 
         <div class="flex gap-4 md:gap-8 mb-8 border-b border-slate-200 px-6 overflow-x-auto whitespace-nowrap">
-            <button onclick="switchTab('inst')" id="btn-inst" class="pb-4 font-black uppercase text-[10px] tracking-widest tab-active">Institución</button>
-            <button onclick="switchTab('jor')" id="btn-jor" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">Jornadas</button>
-            <button onclick="switchTab('mat')" id="btn-mat" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">Materias</button>
-            <button onclick="switchTab('par')" id="btn-par" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">Paralelos</button>
-            <button onclick="switchTab('grados')" id="btn-grados" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">Grados</button>
+            <button onclick="switchTab('inst')" id="btn-inst" class="pb-4 font-black uppercase text-[10px] tracking-widest tab-active">1. Institución</button>
+            <button onclick="switchTab('jor')" id="btn-jor" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">2. Jornadas</button>
+            <button onclick="switchTab('mat')" id="btn-mat" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">3. Materias</button>
+            <button onclick="switchTab('par')" id="btn-par" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">4. Paralelos</button>
+            <button onclick="switchTab('grados')" id="btn-grados" class="pb-4 font-black uppercase text-[10px] tracking-widest text-slate-400">5. Grados</button>
         </div>
 
         <div id="tab-inst" class="tab-content">
-            <div class="glass-card p-6 md:p-10">
+            <div class="glass-card p-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="md:col-span-2"><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Nombre Institución</label><input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style text-lg uppercase"></div>
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Código AMIE</label><input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style"></div>
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Periodo Lectivo</label><input type="text" id="inst-periodo" class="w-full p-4 rounded-2xl input-style"></div>
-                    <div><label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Director/a</label><input type="text" id="inst-director" class="w-full p-4 rounded-2xl input-style uppercase"></div>
+                    <div class="md:col-span-2"><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Nombre Institución</label><input type="text" id="inst-nombre" class="w-full p-4 rounded-2xl input-style uppercase"></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">AMIE</label><input type="text" id="inst-amie" class="w-full p-4 rounded-2xl input-style"></div>
+                    <div><label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Periodo</label><input type="text" id="inst-periodo" class="w-full p-4 rounded-2xl input-style"></div>
                 </div>
-                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg">Guardar Cambios</button>
+                <button onclick="actualizarInstitucion()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs">Guardar Datos</button>
             </div>
         </div>
 
         <div id="tab-jor" class="tab-content hidden">
             <div class="glass-card p-8">
-                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6 flex items-center"><i class="fa-solid fa-clock mr-2 text-lg text-indigo-300"></i> Gestión de Jornadas y Horarios</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
-                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Nombre (Ej: Matutina)">
-                    <input type="text" id="jor-hor" class="p-4 rounded-2xl input-style text-xs" placeholder="Horario (Ej: 07:15 - 12:12)">
-                    <button onclick="agregarJornada()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir Jornada</button>
+                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6"><i class="fa-solid fa-clock mr-2"></i> Jornadas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <input type="text" id="jor-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Matutina">
+                    <input type="text" id="jor-hor" class="p-4 rounded-2xl input-style text-xs" placeholder="07:15 - 12:12">
+                    <button onclick="agregarJornada()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="lista-jornadas"></div>
+                <div id="lista-jornadas" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </div>
 
         <div id="tab-mat" class="tab-content hidden">
             <div class="glass-card p-8">
-                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6 flex items-center"><i class="fa-solid fa-book mr-2 text-lg text-indigo-300"></i> Gestión de Materias y Áreas</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 items-end">
-                    <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Materia (Ej: Matemática)">
-                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área (Ej: Ciencias Exactas)">
-                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir Materia</button>
+                <h2 class="font-black text-indigo-900 uppercase text-xs mb-6"><i class="fa-solid fa-book mr-2"></i> Materias</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <input type="text" id="mat-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Matemática">
+                    <input type="text" id="mat-are" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Área">
+                    <button onclick="agregarMateria()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
-                <table class="w-full"><tbody id="lista-materias" class="divide-y divide-slate-50"></tbody></table>
+                <table class="w-full"><tbody id="lista-materias" class="divide-y divide-slate-100"></tbody></table>
             </div>
         </div>
 
         <div id="tab-par" class="tab-content hidden">
             <div class="glass-card p-8">
                 <div class="flex gap-4 mb-8">
-                    <input type="text" id="par-nom" class="flex-1 p-4 rounded-2xl input-style uppercase" placeholder="Letra (Ej: A)">
+                    <input type="text" id="par-nom" class="flex-1 p-4 rounded-2xl input-style uppercase" placeholder="Letra (A)">
                     <button onclick="agregarParalelo()" class="bg-indigo-600 text-white px-8 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4" id="lista-paralelos"></div>
+                <div id="lista-paralelos" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
             </div>
         </div>
 
         <div id="tab-grados" class="tab-content hidden">
             <div class="glass-card p-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 items-end">
-                    <input type="text" id="grado-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Segundo Grado">
-                    <input type="text" id="grado-sub" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Básica Elemental">
-                    <input type="number" id="grado-ord" class="p-4 rounded-2xl input-style text-xs" placeholder="Orden N°">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <input type="text" id="grado-nom" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Sexto">
+                    <input type="text" id="grado-sub" class="p-4 rounded-2xl input-style uppercase text-xs" placeholder="Básica Media">
+                    <input type="number" id="grado-ord" class="p-4 rounded-2xl input-style text-xs" placeholder="Orden">
                     <button onclick="agregarGrado()" class="bg-indigo-600 text-white p-4 rounded-2xl font-black uppercase text-[10px]">Añadir</button>
                 </div>
-                <table class="w-full"><tbody id="lista-grados" class="divide-y divide-slate-50"></tbody></table>
+                <table class="w-full"><tbody id="lista-grados" class="divide-y divide-slate-100"></tbody></table>
             </div>
         </div>
 
@@ -101,7 +98,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -120,160 +117,117 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             document.body.style.opacity = "1";
-            cargarDatosInstitucion(); cargarJornadas(); cargarMaterias(); cargarParalelos(); cargarGrados();
+            cargarTodo();
         } else { window.location.href = "index.html"; }
     });
 
+    // --- FUNCIONES GLOBALES ---
     window.switchTab = (tab) => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.querySelectorAll('button[id^="btn-"]').forEach(b => b.classList.remove('tab-active', 'text-indigo-600'));
-        document.querySelectorAll('button[id^="btn-"]').forEach(b => b.classList.add('text-slate-400'));
         document.getElementById('tab-' + tab).classList.remove('hidden');
         document.getElementById('btn-' + tab).classList.add('tab-active', 'text-indigo-600');
     };
 
-    // --- INSTITUCIÓN ---
-    async function cargarDatosInstitucion() {
+    const cargarTodo = () => { cargarInst(); cargarJor(); cargarMat(); cargarPar(); cargarGra(); };
+
+    // INSTITUCION
+    const cargarInst = async () => {
         const d = await getDoc(doc(db, "institucion", "datos_generales"));
-        if (d.exists()) {
+        if(d.exists()){
             const data = d.data();
             document.getElementById('inst-nombre').value = data.nombre || "";
             document.getElementById('inst-amie').value = data.amie || "";
             document.getElementById('inst-periodo').value = data.periodo_lectivo || "";
-            document.getElementById('inst-director').value = data.director || "";
         }
-    }
+    };
     window.actualizarInstitucion = async () => {
         await setDoc(doc(db, "institucion", "datos_generales"), {
-            nombre: document.getElementById('inst-nombre').value.toUpperCase(), amie: document.getElementById('inst-amie').value,
-            periodo_lectivo: document.getElementById('inst-periodo').value, director: document.getElementById('inst-director').value.toUpperCase()
-        }, { merge: true });
-        Swal.fire('¡Listo!', 'Institución actualizada', 'success');
+            nombre: document.getElementById('inst-nombre').value.toUpperCase(),
+            amie: document.getElementById('inst-amie').value,
+            periodo_lectivo: document.getElementById('inst-periodo').value
+        }, {merge:true});
+        Swal.fire('Guardado', '', 'success');
     };
 
-    // --- JORNADAS ---
-    async function cargarJornadas() {
+    // JORNADAS
+    window.cargarJor = async () => {
         const snap = await getDocs(collection(db, "jornadas"));
         const div = document.getElementById('lista-jornadas'); div.innerHTML = "";
         snap.forEach(d => {
-            const j = d.data();
-            // CORRECCIÓN: Usamos docSnap.id (el ID aleatorio de Firebase) para eliminar
             div.innerHTML += `
                 <div class="bg-slate-50 p-5 rounded-2xl flex justify-between items-center border border-slate-100">
-                    <div>
-                        <p class="font-black text-indigo-950 text-xs uppercase">${j.nombre}</p>
-                        <p class="text-[10px] text-slate-400 font-bold"><span class="font-black text-indigo-300">Horario:</span> ${j.horario}</p>
-                    </div>
-                    <button onclick="eliminarDoc('jornadas','${d.id}', cargarJornadas)" class="text-slate-300 hover:text-red-500 btn-action"><i class="fa-solid fa-trash-can"></i></button>
+                    <div><p class="font-black text-indigo-950 text-xs uppercase">${d.data().nombre}</p><p class="text-[10px] text-slate-400 font-bold">Horario: ${d.data().horario}</p></div>
+                    <button onclick="eliminarF('jornadas','${d.id}','cargarJor')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
                 </div>`;
         });
-    }
+    };
     window.agregarJornada = async () => {
         const n = document.getElementById('jor-nom').value.trim();
         const h = document.getElementById('jor-hor').value.trim();
         if(!n || !h) return;
-        // CORRECCIÓN: Usamos addDoc para generar ID aleatorio y guardamos el campo id en minúsculas
-        await addDoc(collection(db, "jornadas"), { 
-            nombre: n.toUpperCase(), 
-            horario: h, 
-            id: n.toLowerCase().replace(/ /g, "_"),
-            estado: true 
-        });
+        await addDoc(collection(db, "jornadas"), { nombre: n.toUpperCase(), horario: h, id: n.toLowerCase(), estado: true });
         document.getElementById('jor-nom').value = ""; document.getElementById('jor-hor').value = "";
-        cargarJornadas();
+        cargarJor();
     };
 
-    // --- MATERIAS ---
-    async function cargarMaterias() {
-        const q = query(collection(db, "materias"), orderBy("nombre", "asc"));
-        const snap = await getDocs(q);
+    // MATERIAS
+    window.cargarMat = async () => {
+        const snap = await getDocs(collection(db, "materias"));
         const tbody = document.getElementById('lista-materias'); tbody.innerHTML = "";
         snap.forEach(d => {
-            const m = d.data();
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-50">
-                    <td class="py-4 font-bold text-xs text-slate-700 uppercase">${m.nombre}</td>
-                    <td><p class="text-[10px] text-slate-400 font-bold"><span class="font-black text-indigo-300 uppercase">Área:</span> ${m.area}</p></td>
-                    <td class="text-right"><button onclick="eliminarDoc('materias','${d.id}', cargarMaterias)" class="text-slate-300 hover:text-red-500 btn-action px-4"><i class="fa-solid fa-trash-can"></i></button></td>
-                </tr>`;
+            tbody.innerHTML += `<tr class="hover:bg-slate-50"><td class="py-4 font-bold text-xs text-slate-700 uppercase">${d.data().nombre}</td><td class="text-[10px] text-slate-400 font-bold uppercase">Área: ${d.data().area}</td><td class="text-right"><button onclick="eliminarF('materias','${d.id}','cargarMat')" class="text-slate-300 hover:text-red-500 px-4"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
-    }
+    };
     window.agregarMateria = async () => {
         const n = document.getElementById('mat-nom').value.trim();
         const a = document.getElementById('mat-are').value.trim();
         if(!n || !a) return;
-        await addDoc(collection(db, "materias"), { 
-            nombre: n.toUpperCase(), 
-            area: a.toUpperCase(), 
-            id: n.toLowerCase().replace(/ /g, "_"),
-            estado: true 
-        });
+        await addDoc(collection(db, "materias"), { nombre: n.toUpperCase(), area: a.toUpperCase(), id: n.toLowerCase().replace(/ /g,"_"), estado: true });
         document.getElementById('mat-nom').value = ""; document.getElementById('mat-are').value = "";
-        cargarMaterias();
+        cargarMat();
     };
 
-    // --- PARALELOS ---
-    async function cargarParalelos() {
+    // PARALELOS
+    window.cargarPar = async () => {
         const snap = await getDocs(collection(db, "paralelos"));
         const div = document.getElementById('lista-paralelos'); div.innerHTML = "";
         snap.forEach(d => {
-            div.innerHTML += `
-                <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100">
-                    <span class="font-black text-indigo-900">${d.data().nombre}</span>
-                    <button onclick="eliminarDoc('paralelos','${d.id}', cargarParalelos)" class="text-slate-300 hover:text-red-500 btn-action"><i class="fa-solid fa-xmark"></i></button>
-                </div>`;
+            div.innerHTML += `<div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-100"><span class="font-black text-indigo-900">${d.data().nombre}</span><button onclick="eliminarF('paralelos','${d.id}','cargarPar')" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>`;
         });
-    }
+    };
     window.agregarParalelo = async () => {
         const n = document.getElementById('par-nom').value.trim().toUpperCase();
         if(!n) return;
-        await addDoc(collection(db, "paralelos"), { 
-            nombre: n, 
-            id: n.toLowerCase(),
-            estado: true 
-        });
+        await addDoc(collection(db, "paralelos"), { nombre: n, id: n.toLowerCase(), estado: true });
         document.getElementById('par-nom').value = "";
-        cargarParalelos();
+        cargarPar.call(); 
+        cargarPar();
     };
 
-    // --- GRADOS ---
-    async function cargarGrados() {
-        const q = query(collection(db, "grados"), orderBy("orden", "asc"));
-        const snap = await getDocs(q);
+    // GRADOS
+    window.cargarGra = async () => {
+        const snap = await getDocs(collection(db, "grados"));
         const tbody = document.getElementById('lista-grados'); tbody.innerHTML = "";
         snap.forEach(d => {
-            const g = d.data();
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-50">
-                    <td class="py-4 font-bold text-xs text-slate-700 uppercase">${g.nombre}</td>
-                    <td><p class="text-[9px] font-black text-indigo-400 bg-indigo-50 px-2 py-1 rounded-md uppercase">${g.subnivel} (Orden: ${g.orden})</p></td>
-                    <td class="text-right"><button onclick="eliminarDoc('grados','${d.id}', cargarGrados)" class="text-slate-300 hover:text-red-500 btn-action px-4"><i class="fa-solid fa-trash-can"></i></button></td>
-                </tr>`;
+            tbody.innerHTML += `<tr><td class="py-4 font-bold text-xs text-slate-700 uppercase">${d.data().nombre}</td><td class="text-[9px] font-black text-indigo-400 uppercase">${d.data().subnivel}</td><td class="text-right"><button onclick="eliminarF('grados','${d.id}','cargarGra')" class="text-slate-300 hover:text-red-500 px-4"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
         });
-    }
+    };
     window.agregarGrado = async () => {
         const n = document.getElementById('grado-nom').value.trim();
         const s = document.getElementById('grado-sub').value.trim();
-        const o = document.getElementById('grado-ord').value.trim();
+        const o = document.getElementById('grado-ord').value;
         if(!n || !s || !o) return;
-        await addDoc(collection(db, "grados"), { 
-            nombre: n.toUpperCase(), 
-            subnivel: s.toUpperCase(), 
-            orden: parseInt(o), 
-            id: n.toLowerCase().replace(/ /g, "_"),
-            estado: true 
-        });
-        document.getElementById('grado-nom').value = ""; document.getElementById('grado-sub').value = ""; document.getElementById('grado-ord').value = "";
-        cargarGrados();
+        await addDoc(collection(db, "grados"), { nombre: n.toUpperCase(), subnivel: s.toUpperCase(), orden: parseInt(o), id: n.toLowerCase().replace(/ /g,"_"), estado: true });
+        cargarGra();
     };
 
-    // FUNCIÓN GENÉRICA PARA ELIMINAR USANDO EL ID REAL DE FIREBASE
-    window.eliminarDoc = async (coleccion, idRealFirebase, callback) => {
-        const res = await Swal.fire({ title: '¿Eliminar registro?', text: "Esta acción no se puede deshacer.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
-        if(res.isConfirmed) { 
-            await deleteDoc(doc(db, coleccion, idRealFirebase)); 
-            Swal.fire('Eliminado', 'El registro ha sido borrado.', 'success');
-            callback(); 
+    // ELIMINACION UNIVERSAL
+    window.eliminarF = async (col, id, func) => {
+        const res = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí', confirmButtonColor: '#ef4444' });
+        if(res.isConfirmed){
+            await deleteDoc(doc(db, col, id));
+            window[func](); // Llama a la función de recarga por su nombre
         }
     };
 </script>
