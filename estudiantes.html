@@ -3,136 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Registro Estudiantil</title>
+    <title>Khipu Edu 360 - Gestión de Estudiantes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        /* Mejora de contraste: Fondo gris bajo */
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
-        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        /* Cuadros de texto en blanco puro */
-        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
-        .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
-        /* Títulos en azul X (Twitter) */
-        .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; width: 100%; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
+        .label-style { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
-                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Gestión  Estudiantil</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Ficha Pro</p>
+                <h1 class="text-2xl md:text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Estudiantes</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Registro y Actualización</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
-                <i class="fa-solid fa-house"></i>
+                <i class="fa-solid fa-arrow-left"></i>
             </button>
         </header>
 
-        <section class="glass-card p-10">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-black text-slate-800 uppercase italic underline decoration-sky-500 decoration-4 underline-offset-8">Ficha de Registro</h2>
-                <div id="status-main" class="text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-slate-100 text-slate-400 tracking-widest border border-slate-200">Escáner Inactivo</div>
-            </div>
-
-            <form id="form-estudiante" class="space-y-8">
-                <div class="bg-slate-50/80 p-8 rounded-[2.5rem] border border-slate-200">
-                    <h4 class="text-slate-500 font-black text-[10px] uppercase mb-8 tracking-[0.2em] flex items-center gap-2">
-                        <i class="fa-solid fa-user-tag text-sky-500"></i> 1. Datos Personales y Académicos
-                    </h4>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div class="relative">
-                            <label class="label-style">Cédula Alumno</label>
-                            <input type="text" id="in_cedula" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="13XXXXXXXX">
-                            <div id="load-cedula" class="hidden absolute right-4 top-[3.2rem] text-sky-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
-                        </div>
-                        <div>
-                            <label class="label-style">Nombres</label>
-                            <input type="text" id="in_nombres" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
-                        </div>
-                        <div>
-                            <label class="label-style">Apellidos</label>
-                            <input type="text" id="in_apellidos" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
-                        </div>
-
-                        <div>
-                            <label class="label-style">Grado / Año</label>
-                            <select id="in_grado" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
-                                <option value="">Cargando...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="label-style">Paralelo</label>
-                            <select id="in_paralelo" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
-                                <option value="">-</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="label-style text-pink-600">Condición NEE</label>
-                            <select id="in_nee" required class="w-full p-4 border-2 border-pink-100 bg-white rounded-2xl font-black text-pink-600 outline-none focus:border-pink-500 appearance-none">
-                                <option value="false">NO</option>
-                                <option value="true">SÍ (NEE)</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="label-style">Nacimiento</label>
-                            <input type="date" id="in_nacimiento" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
-                        </div>
-                        <div>
-                            <label class="label-style">Género</label>
-                            <select id="in_genero" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
-                                <option value="M">MASCULINO</option>
-                                <option value="F">FEMENINO</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="label-style">Sangre</label>
-                            <select id="in_sangre" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 appearance-none">
-                                <option value="A+">A+</option><option value="O+">O+</option><option value="B+">B+</option><option value="AB+">AB+</option>
-                                <option value="A-">A-</option><option value="O-">O-</option><option value="B-">B-</option><option value="AB-">AB-</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-sky-50/50 p-8 rounded-[2.5rem] border border-sky-100">
-                    <div class="flex justify-between items-center mb-8 border-b border-sky-100 pb-4">
-                        <h4 class="text-sky-600 font-black text-[10px] uppercase tracking-[0.2em]">2. Información del Representante</h4>
-                        <button type="button" id="btn-crear-repre" class="hidden text-[9px] font-black uppercase bg-slate-800 text-white px-4 py-2 rounded-xl hover:bg-black transition-all">
-                            <i class="fa-solid fa-plus mr-1 text-sky-400"></i> Registrar Nuevo
+        <div class="glass-card p-6 md:p-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="label-style">Número de Cédula (Buscar para actualizar)</label>
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" id="est-cedula" class="p-4 rounded-2xl input-style" placeholder="0000000000">
+                        <button onclick="buscarEstudiante()" class="bg-indigo-100 text-indigo-600 px-6 py-4 rounded-2xl font-black uppercase text-[10px] hover:bg-indigo-600 hover:text-white transition-all">
+                            <i class="fa-solid fa-magnifying-glass mr-2"></i> Buscar
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="relative">
-                            <label class="label-style">Cédula Representante</label>
-                            <input type="text" id="in_repre_id" maxlength="10" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="Buscar cédula...">
-                            <div id="load-repre" class="hidden absolute right-4 top-[3.2rem] text-sky-500"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
-                        </div>
-                        <div>
-                            <label class="label-style">Nombre Confirmado</label>
-                            <input type="text" id="in_repre_nombre" readonly class="w-full p-4 bg-white border-2 border-slate-100 rounded-2xl font-black text-slate-400 uppercase italic placeholder:text-slate-300" placeholder="Esperando escáner...">
-                        </div>
-                    </div>
                 </div>
 
-                <div class="flex justify-end gap-4 pt-6">
-                    <button type="button" onclick="location.reload()" class="px-8 py-4 font-black uppercase text-[10px] text-slate-400 hover:text-red-500 transition-all tracking-widest">Limpiar Todo</button>
-                    <button type="submit" id="btn-save" class="bg-sky-500 hover:bg-black text-white px-14 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-sky-200 transition-all active:scale-95">
-                        Guardar registro estudiante <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
-                    </button>
+                <div>
+                    <label class="label-style">Apellidos</label>
+                    <input type="text" id="est-apellidos" class="p-4 rounded-2xl input-style uppercase">
                 </div>
-            </form>
-        </section>
+                <div>
+                    <label class="label-style">Nombres</label>
+                    <input type="text" id="est-nombres" class="p-4 rounded-2xl input-style uppercase">
+                </div>
+
+                <div>
+                    <label class="label-style">Grado / Año</label>
+                    <select id="est-grado" class="p-4 rounded-2xl input-style">
+                        <option value="">Cargando grados...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-style">Paralelo</label>
+                    <select id="est-paralelo" class="p-4 rounded-2xl input-style">
+                        <option value="">Cargando paralelos...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label-style">Jornada</label>
+                    <select id="est-jornada" class="p-4 rounded-2xl input-style">
+                        <option value="">Cargando jornadas...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="label-style">Fecha de Nacimiento</label>
+                    <input type="date" id="est-fecha" class="p-4 rounded-2xl input-style">
+                </div>
+            </div>
+
+            <div class="mt-10 flex flex-col items-center gap-4">
+                <button onclick="guardarEstudiante()" id="btn-guardar" class="w-full md:w-auto bg-indigo-600 text-white px-12 py-4 rounded-2xl font-black uppercase text-xs hover:bg-black transition-all shadow-lg">
+                    <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Estudiante
+                </button>
+                <div id="link-matricula" class="hidden animate-bounce mt-4">
+                    <a href="matriculas.html" class="text-indigo-600 font-black uppercase text-[10px] tracking-widest border-b-2 border-indigo-600 pb-1">
+                        Ir a Matricular Estudiante <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, getDocs, collection, serverTimestamp, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -148,124 +106,114 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // --- ESCUDO DE SEGURIDAD (ADMIN Y DOCENTE) ---
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "index.html"; }
-        else {
-            const userDoc = await getDoc(doc(db, "usuario", user.uid));
-            if (userDoc.exists() && (userDoc.data().rol === 'admin' || userDoc.data().rol === 'docente')) {
-                document.body.style.opacity = "1";
-                loadCatalogos();
-            } else {
-                Swal.fire('Acceso Prohibido', 'No tienes permisos para gestionar estudiantes.', 'error')
-                .then(() => window.location.href = "dashboard.html");
-            }
+    let editandoID = null;
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) { 
+            document.body.style.opacity = "1"; 
+            cargarSelects(); 
+        } else { 
+            window.location.href = "index.html"; 
         }
     });
 
-    async function loadCatalogos() {
-        const [snapGrados, snapParalelos] = await Promise.all([
-            getDocs(collection(db, "grados")),
-            getDocs(collection(db, "paralelos"))
-        ]);
-        const selG = document.getElementById('in_grado');
-        const selP = document.getElementById('in_paralelo');
-        selG.innerHTML = '<option value="">Elegir Grado...</option>';
-        snapGrados.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
-        selP.innerHTML = '<option value="">-</option>';
-        snapParalelos.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.id}</option>`);
+    async function cargarSelects() {
+        try {
+            // 1. Cargar Grados Ordenados por el campo 'orden' (Imagen 2)
+            const qGrados = query(collection(db, "grados"), orderBy("orden", "asc"));
+            const snapGrados = await getDocs(qGrados);
+            const selGrado = document.getElementById('est-grado');
+            selGrado.innerHTML = '<option value="">Seleccione Grado</option>';
+            snapGrados.forEach(d => {
+                selGrado.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
+            });
+
+            // 2. Cargar Paralelos Ordenados por nombre (Imagen 4)
+            const qParalelos = query(collection(db, "paralelos"), orderBy("nombre", "asc"));
+            const snapParalelos = await getDocs(qParalelos);
+            const selPar = document.getElementById('est-paralelo');
+            selPar.innerHTML = '<option value="">Seleccione Paralelo</option>';
+            snapParalelos.forEach(d => {
+                selPar.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
+            });
+
+            // 3. Cargar Jornadas (Imagen 5)
+            const snapJornadas = await getDocs(collection(db, "jornadas"));
+            const selJor = document.getElementById('est-jornada');
+            selJor.innerHTML = '<option value="">Seleccione Jornada</option>';
+            snapJornadas.forEach(d => {
+                selJor.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
+            });
+
+        } catch (error) {
+            console.error("Error cargando selects:", error);
+        }
     }
 
-    // ESCÁNER ESTUDIANTE
-    document.getElementById('in_cedula').addEventListener('input', async (e) => {
-        const ced = e.target.value;
-        const status = document.getElementById('status-main');
-        if (ced.length === 10) {
-            document.getElementById('load-cedula').classList.remove('hidden');
-            const dSnap = await getDoc(doc(db, "estudiantes", ced));
-            if (dSnap.exists()) {
-                const data = dSnap.data();
-                status.innerText = "ESTUDIANTE REGISTRADO - MODO EDICIÓN";
-                status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-amber-100 text-amber-600 tracking-widest border border-amber-200";
-                
-                document.getElementById('in_nombres').value = data.nombres;
-                document.getElementById('in_apellidos').value = data.apellidos;
-                document.getElementById('in_grado').value = data.grado;
-                document.getElementById('in_paralelo').value = data.paralelo;
-                document.getElementById('in_genero').value = data.genero;
-                document.getElementById('in_sangre').value = data.tipo_sangre;
-                document.getElementById('in_repre_id').value = data.representante_id;
-                // Cargar NEE
-                document.getElementById('in_nee').value = data.nee ? "true" : "false";
-                
-                if(data.fecha_nacimiento) {
-                    const date = data.fecha_nacimiento.toDate().toISOString().split('T')[0];
-                    document.getElementById('in_nacimiento').value = date;
-                }
-                validarRepresentante(data.representante_id);
-            } else {
-                status.innerText = "NUEVO ESTUDIANTE";
-                status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
-            }
-            document.getElementById('load-cedula').classList.add('hidden');
-        }
-    });
+    window.buscarEstudiante = async () => {
+        const cedula = document.getElementById('est-cedula').value.trim();
+        if(!cedula) return Swal.fire('Atención', 'Ingresa una cédula para buscar', 'info');
 
-    document.getElementById('in_repre_id').addEventListener('input', (e) => {
-        if(e.target.value.length === 10) validarRepresentante(e.target.value);
-    });
+        const q = query(collection(db, "estudiantes"), where("cedula", "==", cedula));
+        const snap = await getDocs(q);
 
-    async function validarRepresentante(cedula) {
-        const load = document.getElementById('load-repre');
-        const display = document.getElementById('in_repre_nombre');
-        const btnAdd = document.getElementById('btn-crear-repre');
-        load.classList.remove('hidden');
-        const rSnap = await getDoc(doc(db, "representantes", cedula));
-        if (rSnap.exists()) {
-            display.value = rSnap.data().nombre_completo;
-            display.classList.replace('text-red-500', 'text-sky-600');
-            btnAdd.classList.add('hidden');
+        if(!snap.empty) {
+            const docEst = snap.docs[0];
+            const data = docEst.data();
+            editandoID = docEst.id;
+            
+            document.getElementById('est-apellidos').value = data.apellidos;
+            document.getElementById('est-nombres').value = data.nombres;
+            document.getElementById('est-grado').value = data.id_grado || "";
+            document.getElementById('est-paralelo').value = data.id_paralelo || "";
+            document.getElementById('est-jornada').value = data.id_jornada || "";
+            document.getElementById('est-fecha').value = data.fecha_nacimiento || "";
+            
+            Swal.fire('Estudiante Encontrado', 'Puedes actualizar sus datos.', 'success');
         } else {
-            display.value = "REPRESENTANTE NO ENCONTRADO";
-            display.classList.replace('text-sky-600', 'text-red-500');
-            btnAdd.classList.remove('hidden');
+            editandoID = null;
+            Swal.fire('Nuevo Registro', 'La cédula no existe, puedes registrar un nuevo estudiante.', 'info');
         }
-        load.classList.add('hidden');
-    }
+    };
 
-    document.getElementById('btn-crear-repre').onclick = () => window.location.href = 'representantes.html';
+    window.guardarEstudiante = async () => {
+        const cedula = document.getElementById('est-cedula').value.trim();
+        const apellidos = document.getElementById('est-apellidos').value.trim().toUpperCase();
+        const nombres = document.getElementById('est-nombres').value.trim().toUpperCase();
+        const id_grado = document.getElementById('est-grado').value;
+        const id_paralelo = document.getElementById('est-paralelo').value;
+        const id_jornada = document.getElementById('est-jornada').value;
+        const fecha = document.getElementById('est-fecha').value;
 
-    // GUARDAR
-    document.getElementById('form-estudiante').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const ced = document.getElementById('in_cedula').value;
-        const btn = document.getElementById('btn-save');
-        btn.disabled = true;
+        if(!cedula || !apellidos || !nombres || !id_grado || !id_paralelo || !id_jornada) {
+            return Swal.fire('Error', 'Todos los campos son obligatorios', 'error');
+        }
 
-        const payload = {
-            cedula: ced,
-            nombres: document.getElementById('in_nombres').value.toUpperCase(),
-            apellidos: document.getElementById('in_apellidos').value.toUpperCase(),
-            grado: document.getElementById('in_grado').value,
-            paralelo: document.getElementById('in_paralelo').value,
-            nee: document.getElementById('in_nee').value === "true", // Conversión a booleano
-            fecha_nacimiento: new Date(document.getElementById('in_nacimiento').value),
-            genero: document.getElementById('in_genero').value,
-            tipo_sangre: document.getElementById('in_sangre').value,
-            representante_id: document.getElementById('in_repre_id').value,
-            periodo_actual: "2026-2027",
+        const datos = {
+            cedula, apellidos, nombres, id_grado, id_paralelo, id_jornada, 
+            fecha_nacimiento: fecha,
             estado: true,
-            updated_at: serverTimestamp()
+            updatedAt: new Date()
         };
 
         try {
-            await setDoc(doc(db, "estudiantes", ced), payload);
-            Swal.fire({ title: '¡Sincronizado!', text: 'Ficha guardada con éxito.', icon: 'success' }).then(() => location.reload());
-        } catch (err) {
-            btn.disabled = false;
-            Swal.fire('Error', 'Fallo en la base de datos.', 'error');
+            // Si editandoID existe, usamos ese ID, si no, creamos un ID nuevo (o usamos la cédula como ID)
+            const finalID = editandoID ? editandoID : cedula; 
+            await setDoc(doc(db, "estudiantes", finalID), datos, { merge: true });
+
+            Swal.fire({
+                title: '¡Guardado!',
+                text: 'Los datos del estudiante se procesaron correctamente.',
+                icon: 'success',
+                confirmButtonColor: '#4f46e5'
+            });
+
+            document.getElementById('link-matricula').classList.remove('hidden');
+            
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo guardar: ' + error.message, 'error');
         }
-    });
+    };
 </script>
 </body>
 </html>
