@@ -18,7 +18,6 @@
         .dot { transition: all 0.3s ease-in-out; }
         input:checked ~ .dot { transform: translateX(1.5rem); background-color: #10b981; }
 
-        /* Ajuste para el botón + en móviles */
         @media (max-width: 640px) {
             .btn-plus-container { width: 100%; margin-top: 10px; }
             .btn-plus-container button { width: 100%; height: 50px; }
@@ -31,7 +30,7 @@
     <header class="flex justify-between items-center mb-10 bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div>
             <h1 class="text-3xl md:text-5xl font-black text-indigo-950 tracking-tighter italic uppercase leading-tight">Asignaciones</h1>
-            <p class="text-slate-400 text-[10px] md:text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Carga Horaria y Tutorías • Khipu Edu 360</p>
+            <p class="text-slate-400 text-[10px] md:text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Materias,Grados y Tutorías • Khipu Edu 360</p>
         </div>
         <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 md:w-16 md:h-16 rounded-3xl transition-all flex items-center justify-center shadow-sm">
             <i class="fa-solid fa-house text-xl md:text-2xl"></i>
@@ -51,32 +50,29 @@
                     
                     <div>
                         <label class="label-style">Docente Responsable</label>
-                        <select id="select-docente" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer uppercase text-sm">
-                            <option value="">SELECCIONAR...</option>
-                        </select>
+                        <select id="select-docente" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer uppercase text-sm"></select>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="label-style">Grado Destino</label>
-                            <select id="select-grado" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm">
-                                <option value="">CARGANDO...</option>
-                            </select>
+                            <select id="select-grado" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm"></select>
                         </div>
                         <div>
                             <label class="label-style">Paralelo</label>
-                            <select id="select-paralelo" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm">
-                                <option value="">-</option>
-                            </select>
+                            <select id="select-paralelo" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm"></select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="label-style">Jornada de la Carga</label>
+                        <select id="select-jornada" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm"></select>
                     </div>
 
                     <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-200">
                         <label class="label-style text-slate-500">Asignar Materias</label>
                         <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                            <select id="select-materia" class="flex-1 p-4 input-style rounded-2xl text-sm">
-                                <option value="">Elegir materia...</option>
-                            </select>
+                            <select id="select-materia" class="flex-1 p-4 input-style rounded-2xl text-sm"></select>
                             <div class="btn-plus-container">
                                 <button type="button" id="btn-add-materia" class="bg-indigo-600 text-white p-4 rounded-2xl hover:bg-black transition-all shadow-lg flex items-center justify-center">
                                     <i class="fa-solid fa-plus text-lg"></i>
@@ -125,14 +121,14 @@
                         <thead>
                             <tr class="text-[10px] font-black text-slate-400 uppercase text-left">
                                 <th class="pb-6 pl-4">Docente</th>
-                                <th class="pb-6 text-center">Curso</th>
+                                <th class="pb-6 text-center">Curso y Jornada</th>
                                 <th class="pb-6">Materias</th>
                                 <th class="pb-6 text-center">Periodo</th>
                                 <th class="pb-6 text-right pr-4">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-asignaciones" class="divide-y divide-slate-50">
-                            <tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Iniciando sistema...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Cargando sistema...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -160,7 +156,7 @@
     const auth = getAuth(app);
 
     let materiasSel = [];
-    const cache = { docente: {}, grado: {}, materia: {} };
+    const cache = { docente: {}, grado: {}, materia: {}, jornada: {} };
 
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
@@ -169,54 +165,37 @@
             if (userDoc.exists() && userDoc.data().rol === 'admin') {
                 document.body.style.opacity = "1";
                 await inicializar();
-            } else {
-                window.location.href = "dashboard.html";
-            }
+            } else { window.location.href = "dashboard.html"; }
         }
     });
 
     async function inicializar() {
-        const [sUsr, sGra, sPar, sMat, sPer] = await Promise.all([
+        const [sUsr, sGra, sPar, sMat, sPer, sJor] = await Promise.all([
             getDocs(query(collection(db, "usuario"), where("rol", "in", ["docente", "admin"]), orderBy("nombre", "asc"))),
             getDocs(query(collection(db, "grados"), orderBy("orden", "asc"))),
             getDocs(query(collection(db, "paralelos"), orderBy("nombre", "asc"))),
             getDocs(query(collection(db, "materias"), orderBy("nombre", "asc"))),
-            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo")))
+            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"))),
+            getDocs(query(collection(db, "jornadas"), orderBy("nombre", "asc")))
         ]);
 
-        // Cargar Periodo Actual
         if(!sPer.empty) document.getElementById('input-periodo').value = sPer.docs[0].data().nombre;
 
-        // Cargar Docentes
-        const selD = document.getElementById('select-docente');
-        selD.innerHTML = '<option value="">ELEGIR DOCENTE...</option>';
-        sUsr.forEach(d => {
-            cache.docente[d.id] = d.data().nombre;
-            selD.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
-        });
+        const fill = (snap, elId, mapKey, useValId = false) => {
+            const el = document.getElementById(elId);
+            el.innerHTML = `<option value="">SELECCIONAR...</option>`;
+            snap.forEach(d => {
+                const val = useValId ? d.data().nombre : d.id;
+                cache[mapKey][d.id] = d.data().nombre;
+                el.innerHTML += `<option value="${val}">${d.data().nombre}</option>`;
+            });
+        };
 
-        // Cargar Grados (Ordenados)
-        const selG = document.getElementById('select-grado');
-        selG.innerHTML = '<option value="">ELEGIR...</option>';
-        sGra.forEach(d => {
-            cache.grado[d.id] = d.data().nombre;
-            selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
-        });
-
-        // Cargar Paralelos (Por Nombre)
-        const selP = document.getElementById('select-paralelo');
-        selP.innerHTML = '<option value="">-</option>';
-        sPar.forEach(d => {
-            selP.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`;
-        });
-
-        // Cargar Materias
-        const selM = document.getElementById('select-materia');
-        selM.innerHTML = '<option value="">Elegir materia...</option>';
-        sMat.forEach(d => {
-            cache.materia[d.id] = d.data().nombre;
-            selM.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
-        });
+        fill(sUsr, 'select-docente', 'docente');
+        fill(sGra, 'select-grado', 'grado');
+        fill(sPar, 'select-paralelo', 'paralelo', true); // Usamos nombre "A" en lugar de ID aleatorio
+        fill(sMat, 'select-materia', 'materia');
+        fill(sJor, 'select-jornada', 'jornada', true); // Usamos nombre "MATUTINA"
 
         loadTable();
     }
@@ -235,7 +214,7 @@
         document.getElementById('no-materias').style.display = materiasSel.length ? 'none' : 'block';
         materiasSel.forEach(id => {
             const div = document.createElement('div');
-            div.className = "tag-materia";
+            div.className = "tag-materia shadow-sm";
             div.innerHTML = `${cache.materia[id] || id} <i class="fa-solid fa-xmark cursor-pointer opacity-50 hover:opacity-100" onclick="removeMateria('${id}')"></i>`;
             cont.appendChild(div);
         });
@@ -253,7 +232,7 @@
         document.getElementById('count-asig').innerText = `${snap.size} REGISTROS`;
 
         if (snap.empty) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Sin asignaciones.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Sin asignaciones registradas.</td></tr>`;
             return;
         }
 
@@ -264,19 +243,20 @@
             const mats = d.materia_id ? d.materia_id.map(m => cache.materia[m] || m).join(', ') : '---';
 
             tr.innerHTML = `
-                <td class="p-4 md:p-6">
-                    <div class="font-black text-indigo-950 text-sm md:text-lg uppercase">${cache.docente[d.docente_id] || d.docente_id}</div>
+                <td class="p-6">
+                    <div class="font-black text-indigo-950 text-lg uppercase tracking-tight">${cache.docente[d.docente_id] || d.docente_id}</div>
                     ${d.tutor ? '<span class="text-[8px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-lg uppercase mt-1 inline-block">Docente Tutor</span>' : ''}
                 </td>
-                <td class="p-4 text-center">
+                <td class="p-6 text-center">
                     <div class="font-bold text-slate-700 text-xs uppercase">${cache.grado[d.grado_id] || d.grado_id}</div>
-                    <div class="text-[10px] font-black text-sky-500 uppercase">"${d.paralelo_id}"</div>
+                    <div class="text-[10px] font-black text-sky-500 uppercase">PARALELO "${d.paralelo_id}"</div>
+                    <div class="text-[9px] font-bold text-slate-400 uppercase">(${d.jornada || 'N/A'})</div>
                 </td>
-                <td class="p-4"><div class="text-[10px] text-slate-400 font-bold uppercase truncate max-w-[150px]">${mats}</div></td>
-                <td class="p-4 text-center font-black text-indigo-950 text-xs">${d.periodo_id}</td>
-                <td class="p-4 text-right space-x-2">
-                    <button onclick="editAsig('${docSnap.id}')" class="text-sky-500 hover:text-black"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="deleteAsig('${docSnap.id}')" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                <td class="p-6"><div class="text-[10px] text-slate-400 font-bold uppercase truncate max-w-[180px] leading-relaxed">${mats}</div></td>
+                <td class="p-6 text-center font-black text-indigo-950 text-xs">${d.periodo_id}</td>
+                <td class="p-6 text-right space-x-2">
+                    <button onclick="editAsig('${docSnap.id}')" class="text-sky-500 hover:text-black transition-colors"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteAsig('${docSnap.id}')" class="text-slate-200 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -291,6 +271,7 @@
             document.getElementById('select-docente').value = data.docente_id;
             document.getElementById('select-grado').value = data.grado_id;
             document.getElementById('select-paralelo').value = data.paralelo_id;
+            document.getElementById('select-jornada').value = data.jornada || "";
             document.getElementById('check-tutor').checked = data.tutor;
             materiasSel = data.materia_id || [];
             renderTags();
@@ -309,41 +290,41 @@
         const btn = document.getElementById('btn-submit');
         const g_id = document.getElementById('select-grado').value;
         const p_id = document.getElementById('select-paralelo').value;
+        const jor = document.getElementById('select-jornada').value;
         const d_id = document.getElementById('select-docente').value;
         const esT = document.getElementById('check-tutor').checked;
         const per = document.getElementById('input-periodo').value;
 
-        if(!materiasSel.length) return Swal.fire('Atención', 'Selecciona al menos una materia.', 'warning');
+        if(!materiasSel.length) return Swal.fire('Atención', 'Seleccione al menos una materia.', 'warning');
         btn.disabled = true;
 
         try {
             if(esT) {
-                const qT = query(collection(db, "asignaciones"), where("grado_id", "==", g_id), where("paralelo_id", "==", p_id), where("tutor", "==", true));
+                const qT = query(collection(db, "asignaciones"), where("grado_id", "==", g_id), where("paralelo_id", "==", p_id), where("jornada", "==", jor), where("tutor", "==", true));
                 const sT = await getDocs(qT);
                 const existT = sT.docs.find(doc => doc.id !== document.getElementById('edit-id').value);
                 if(existT) {
-                    Swal.fire('Conflicto', 'Este curso ya tiene un tutor asignado.', 'error');
+                    Swal.fire('Conflicto', 'Este curso ya tiene un tutor asignado en esta jornada.', 'error');
                     btn.disabled = false; return;
                 }
             }
 
             const payload = {
-                docente_id: d_id, grado_id: g_id, paralelo_id: p_id,
+                docente_id: d_id, grado_id: g_id, paralelo_id: p_id, jornada: jor,
                 periodo_id: per, materia_id: materiasSel, tutor: esT,
                 updated_at: serverTimestamp()
             };
 
-            const finalID = document.getElementById('edit-id').value || `${d_id}_${g_id}_${p_id}`.replace(/\s+/g, '');
+            const finalID = document.getElementById('edit-id').value || `${d_id}_${g_id}_${p_id}_${jor}`.replace(/\s+/g, '');
             await setDoc(doc(db, "asignaciones", finalID), payload, { merge: true });
-            Swal.fire('¡Listo!', 'Asignación procesada con éxito.', 'success').then(() => location.reload());
+            Swal.fire('¡Éxito!', 'Asignación procesada correctamente.', 'success').then(() => location.reload());
         } catch (e) { 
-            Swal.fire('Error', e.message, 'error'); 
-            btn.disabled = false;
+            Swal.fire('Error', e.message, 'error'); btn.disabled = false;
         }
     };
 
     window.deleteAsig = async (id) => {
-        const res = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
+        const res = await Swal.fire({ title: '¿Eliminar?', text: "Esta acción no se puede deshacer.", icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
         if (res.isConfirmed) { await deleteDoc(doc(db, "asignaciones", id)); loadTable(); }
     };
 </script>
