@@ -11,8 +11,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; color: #1e293b; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-readonly { background-color: #f1f5f9; border-color: #e2e8f0; color: #64748b; cursor: not-allowed; font-weight: 600; }
         .label-style { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
         .badge-periodo { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
     </style>
@@ -30,19 +31,19 @@
             </button>
         </header>
 
-        <form id="form-matricula" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <form id="form-matricula" class="grid grid-cols-1 lg:grid-cols-12 gap-8 text-slate-700">
             
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-card p-8 text-center md:text-left">
                     <label class="label-style">Cédula del Estudiante</label>
                     <div class="relative">
                         <input type="text" id="in_cedula" maxlength="10" required 
-                            class="w-full p-5 input-style rounded-2xl font-black text-2xl text-indigo-600 tracking-widest outline-none text-center" placeholder="0000000000">
+                            class="w-full p-5 input-style rounded-2xl font-black text-2xl text-indigo-600 tracking-widest outline-none text-center" placeholder="23XXXXXXX">
                         <div id="loader-est" class="hidden absolute right-4 top-5 text-indigo-500">
                             <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
                         </div>
                     </div>
-                    <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic text-center">Validación de identidad necesaria.</p>
+                    <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic text-center">Búsqueda automática al completar.</p>
                 </div>
 
                 <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-indigo-200 shadow-2xl relative overflow-hidden">
@@ -59,15 +60,15 @@
             </div>
 
             <div class="lg:col-span-8 glass-card p-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-slate-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     
                     <div class="md:col-span-2">
-                        <label class="label-style">Nombres del Estudiante</label>
-                        <input type="text" id="res_nombre" readonly class="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl font-black text-slate-600 uppercase tracking-tight">
+                        <label class="label-style">Nombres del Estudiante (Lectura)</label>
+                        <input type="text" id="res_nombre" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
                     </div>
 
                     <div class="md:col-span-2 p-6 bg-blue-50 rounded-3xl border border-blue-100">
-                        <label class="label-style text-blue-700">Representante Legal</label>
+                        <label class="label-style text-blue-700">Representante Legal (Lectura)</label>
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white">
                                 <i class="fa-solid fa-user-group"></i>
@@ -78,36 +79,33 @@
                     </div>
 
                     <div>
-                        <label class="label-style">Grado Destino</label>
-                        <select id="id_grado" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
-                            <option value="">Cargando...</option>
-                        </select>
+                        <label class="label-style">Grado Asignado en Ficha</label>
+                        <input type="text" id="res_grado_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
+                        <input type="hidden" id="id_grado">
                     </div>
 
                     <div>
-                        <label class="label-style">Paralelo</label>
-                        <select id="res_paralelo" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
-                            <option value="">Seleccione...</option>
-                        </select>
+                        <label class="label-style">Paralelo Asignado en Ficha</label>
+                        <input type="text" id="res_paralelo_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
+                        <input type="hidden" id="id_paralelo">
                     </div>
 
                     <div>
-                        <label class="label-style">Jornada</label>
-                        <select id="res_jornada" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
-                            <option value="">Seleccione...</option>
-                        </select>
+                        <label class="label-style">Jornada Asignada en Ficha</label>
+                        <input type="text" id="res_jornada_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
+                        <input type="hidden" id="id_jornada_nombre">
                     </div>
 
                     <div id="box-docente" class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 transition-all">
-                        <label class="label-style">Docente Responsable (Tutoría)</label>
+                        <label class="label-style">Docente Tutor Responsable (Carga en tiempo real)</label>
                         <div class="flex items-center gap-4">
                             <div id="docente-icon" class="w-12 h-12 bg-slate-300 rounded-xl flex items-center justify-center text-white text-xl transition-colors">
                                 <i class="fa-solid fa-chalkboard-user"></i>
                             </div>
                             <div>
-                                <h4 id="res_docente_nombre" class="font-black text-slate-400 uppercase italic">Esperando selección de curso...</h4>
+                                <h4 id="res_docente_nombre" class="font-black text-slate-400 uppercase italic text-sm">Esperando validación de curso...</h4>
                                 <input type="hidden" id="id_docente">
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Asignación detectada en tiempo real</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Sincronizado con tabla Asignaciones</p>
                             </div>
                         </div>
                     </div>
@@ -141,6 +139,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    const cacheMaps = {
+        grados: {},
+        jornadas_nombre_a_id: {} // Crucial para el fix: Mapa de "MATUTINA" -> ID de Firebase
+    };
+
     onAuthStateChanged(auth, async (user) => {
         if (user) { 
             document.body.style.opacity = "1"; 
@@ -149,126 +152,170 @@
     });
 
     async function inicializarPagina() {
-        // Cargar Periodo Activo
-        const qP = query(collection(db, "periodos_lectivos"), where("estado", "in", ["activo", true]));
-        const snapP = await getDocs(qP);
-        if (!snapP.empty) {
-            const pData = snapP.docs[0].data();
-            document.getElementById('periodo_display').innerText = pData.nombre;
-            document.getElementById('in_periodo').value = pData.nombre;
+        try {
+            // 1. Cargar Periodo Activo
+            const qP = query(collection(db, "periodos_lectivos"), where("estado", "in", ["activo", true]));
+            const snapP = await getDocs(qP);
+            if (!snapP.empty) {
+                const pData = snapP.docs[0].data();
+                document.getElementById('periodo_display').innerText = pData.nombre;
+                document.getElementById('in_periodo').value = pData.nombre;
+            }
+
+            // 2. Pre-cargar Grados para el cache de lectura
+            const gSnap = await getDocs(collection(db, "grados"));
+            gSnap.forEach(d => cacheMaps.grados[d.id] = d.data().nombre);
+
+            // 3. Pre-cargar Jornadas (Crucial Fix para Img 5 e Img 7)
+            const jSnap = await getDocs(collection(db, "jornadas"));
+            jSnap.forEach(d => {
+                // Mapeamos el nombre ("MATUTINA") al ID del documento de Firebase (Img 7)
+                cacheMaps.jornadas_nombre_a_id[d.data().nombre.toUpperCase()] = d.id;
+            });
+
+        } catch (e) {
+            console.error("Error al inicializar página:", e);
         }
-
-        // Cargar Grados
-        const gSnap = await getDocs(query(collection(db, "grados"), orderBy("orden", "asc")));
-        const selG = document.getElementById('id_grado');
-        selG.innerHTML = '<option value="">Elegir Grado...</option>';
-        gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
-
-        // Cargar Paralelos
-        const pSnap = await getDocs(query(collection(db, "paralelos"), orderBy("nombre", "asc")));
-        const selP = document.getElementById('res_paralelo');
-        selP.innerHTML = '<option value="">Paralelo...</option>';
-        pSnap.forEach(d => selP.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`);
-
-        // Cargar Jornadas
-        const jSnap = await getDocs(query(collection(db, "jornadas"), orderBy("nombre", "asc")));
-        const selJ = document.getElementById('res_jornada');
-        selJ.innerHTML = '<option value="">Jornada...</option>';
-        jSnap.forEach(d => selJ.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`);
     }
 
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
-        const ced = e.target.value;
+        const ced = e.target.value.trim();
         if (ced.length === 10) {
             document.getElementById('loader-est').classList.remove('hidden');
-            const eSnap = await getDoc(doc(db, "estudiantes", ced));
             
-            if (eSnap.exists()) {
-                const est = eSnap.data();
-                document.getElementById('res_nombre').value = `${est.nombres} ${est.apellidos}`;
-                document.getElementById('id_grado').value = est.grado || "";
-                document.getElementById('res_paralelo').value = est.paralelo || "";
-                document.getElementById('res_jornada').value = est.jornada || "";
-                document.getElementById('id_repre').value = est.representante_id;
+            try {
+                // Buscar Estudiante
+                const eSnap = await getDoc(doc(db, "estudiantes", ced));
+                
+                if (eSnap.exists()) {
+                    const est = eSnap.data();
+                    
+                    // Llenar campos de lectura
+                    document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
+                    document.getElementById('res_grado_text').value = cacheMaps.grados[est.grado] || est.grado;
+                    document.getElementById('id_grado').value = est.grado || ""; // Guardamos el ID real para buscar tutor
+                    document.getElementById('res_paralelo_text').value = est.paralelo || "";
+                    document.getElementById('id_paralelo').value = est.paralelo || ""; // Usamos "A" para buscar tutor
+                    document.getElementById('res_jornada_text').value = est.jornada || "";
+                    // Guardamos el texto "MATUTINA" para buscar su ID en cache
+                    document.getElementById('id_jornada_nombre').value = est.jornada ? est.jornada.toUpperCase() : ""; 
+                    document.getElementById('id_repre').value = est.representante_id;
 
-                if(est.representante_id) {
-                    const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
-                    if(rSnap.exists()){
-                        document.getElementById('res_repre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
+                    // Buscar Representante
+                    if(est.representante_id) {
+                        const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
+                        if(rSnap.exists()){
+                            document.getElementById('res_repre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
+                        } else {
+                            document.getElementById('res_repre').value = "REPRESENTANTE NO ENCONTRADO EN BD";
+                        }
                     }
+
+                    // Ejecutar validación de Tutor
+                    validarAsignacionDinamica();
+
+                } else {
+                    Swal.fire('No encontrado', 'Cédula no registrada en la tabla estudiantes.', 'warning');
+                    document.getElementById('form-matricula').reset(); // Limpia si no existe
+                    document.getElementById('periodo_display').innerText = document.getElementById('in_periodo').value; // Mantiene periodo
                 }
-                validarAsignacionDinamica();
-            } else {
-                Swal.fire('No encontrado', 'Estudiante no registrado.', 'warning');
+            } catch (error) {
+                console.error("Error al buscar estudiante:", error);
             }
+            
             document.getElementById('loader-est').classList.add('hidden');
         }
     });
 
     async function validarAsignacionDinamica() {
-        const grado = document.getElementById('id_grado').value;
-        const paralelo = document.getElementById('res_paralelo').value;
-        const jornada = document.getElementById('res_jornada').value;
+        const grado_id = document.getElementById('id_grado').value; // ID de Firebase (ej: 7MO)
+        const paralelo_id = document.getElementById('id_paralelo').value; // Texto (ej: A)
+        const jornada_nombre = document.getElementById('id_jornada_nombre').value; // Texto (ej: MATUTINA)
+        
         const resDoc = document.getElementById('res_docente_nombre');
         const boxDoc = document.getElementById('box-docente');
         const btn = document.getElementById('btn-save');
 
-        if (grado && paralelo && jornada) {
-            const qAsig = query(collection(db, "asignaciones"), 
-                where("grado_id", "==", grado), 
-                where("paralelo_id", "==", paralelo),
-                where("jornada", "==", jornada),
-                where("tutor", "==", true));
-            
-            const asigSnap = await getDocs(qAsig);
+        // EL FIX MAESTRO:
+        // Convertimos el nombre "MATUTINA" (Img 4) al ID de Firebase (Img 7) para buscar en Asignaciones (Img 5)
+        const jornada_id = cacheMaps.jornadas_nombre_a_id[jornada_nombre];
 
-            if (!asigSnap.empty) {
-                const asig = asigSnap.docs[0].data();
-                const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
-                const nombreDoc = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
+        if (grado_id && paralelo_id && jornada_id) {
+            try {
+                // Consulta exacta a tabla asignaciones (Img 5)
+                const qAsig = query(collection(db, "asignaciones"), 
+                    where("grado_id", "==", grado_id), 
+                    where("paralelo_id", "==", paralelo_id),
+                    where("jornada", "==", jornada_id), // Buscamos por ID (ej: 2eG4f...)
+                    where("tutor", "==", true));
                 
-                document.getElementById('id_docente').value = asig.docente_id;
-                resDoc.innerText = nombreDoc;
-                boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100 transition-all";
-                resDoc.className = "font-black text-emerald-900 uppercase tracking-tight";
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                resDoc.innerText = "SIN TUTOR ASIGNADO EN ESTA JORNADA";
-                boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100 transition-all";
-                resDoc.className = "font-black text-red-600 uppercase tracking-tight";
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                const asigSnap = await getDocs(qAsig);
+
+                if (!asigSnap.empty) {
+                    const asig = asigSnap.docs[0].data();
+                    
+                    // Buscar nombre del docente tutor
+                    const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
+                    const nombreDoc = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO (Sin Nombre en BD)";
+                    
+                    document.getElementById('id_docente').value = asig.docente_id;
+                    resDoc.innerText = nombreDoc;
+                    
+                    // Estilo Verde (Éxito)
+                    boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100 transition-all";
+                    resDoc.className = "font-black text-emerald-900 uppercase tracking-tight text-lg";
+                    
+                    // Habilitar botón
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    // No hay tutor en Asignaciones (Img 5) para esa combinación Grado-Paralelo-JornadaID
+                    resDoc.innerText = `SIN TUTOR ASIGNADO EN ${jornada_nombre}`;
+                    
+                    // Estilo Rojo (Error)
+                    boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100 transition-all";
+                    resDoc.className = "font-black text-red-600 uppercase tracking-tight text-lg";
+                    
+                    // Deshabilitar botón
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } catch (error) {
+                console.error("Error al validar asignación:", error);
             }
         }
     }
 
-    document.getElementById('id_grado').addEventListener('change', validarAsignacionDinamica);
-    document.getElementById('res_paralelo').addEventListener('change', validarAsignacionDinamica);
-    document.getElementById('res_jornada').addEventListener('change', validarAsignacionDinamica);
-
     document.getElementById('form-matricula').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Procesando...';
+
         const pId = document.getElementById('in_periodo').value;
         const ced = document.getElementById('in_cedula').value;
 
         try {
+            // Guardar en tabla matriculas (Img 2)
             await setDoc(doc(db, "matriculas", `${ced}_${pId}`), {
                 estudiante_id: ced,
                 nombre_estudiante: document.getElementById('res_nombre').value,
                 representante_id: document.getElementById('id_repre').value,
                 nombre_representante: document.getElementById('res_repre').value,
-                grado_id: document.getElementById('id_grado').value,
-                paralelo_id: document.getElementById('res_paralelo').value,
-                jornada_id: document.getElementById('res_jornada').value,
+                grado_id: document.getElementById('id_grado').value, // ID (7MO)
+                paralelo_id: document.getElementById('id_paralelo').value, // Nombre (A)
+                jornada: document.getElementById('res_jornada_text').value, // Nombre (MATUTINA)
                 periodo_id: pId,
                 docente_id: document.getElementById('id_docente').value,
                 fecha_matricula: serverTimestamp(),
                 estado: "activa"
             });
-            Swal.fire('¡Éxito!', 'Matrícula generada correctamente.', 'success').then(() => location.reload());
+            Swal.fire('¡Matrícula Exitosa!', 'El estudiante ha sido registrado para el nuevo ciclo.', 'success').then(() => location.reload());
         } catch (err) {
-            Swal.fire('Error', 'No se pudo guardar la matrícula.', 'error');
+            console.error(err);
+            Swal.fire('Error Critico', 'No se pudo guardar la matrícula en la base de datos.', 'error');
+            btn.disabled = false;
+            btn.innerText = 'Confirmar Matrícula';
         }
     });
 </script>
