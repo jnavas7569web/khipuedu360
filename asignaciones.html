@@ -11,122 +11,128 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
-        .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
+        .input-style { background-color: #f1f5f9; border: 2px solid #e2e8f0; transition: all 0.3s ease; font-weight: 700; color: #1e293b; }
+        .input-style:focus { border-color: #1d9bf0; background-color: #fff; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
         .label-style { font-size: 11px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
         .tag-materia { background: #eff6ff; color: #1d4ed8; padding: 8px 14px; border-radius: 12px; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 8px; border: 1px solid #dbeafe; text-transform: uppercase; }
         .dot { transition: all 0.3s ease-in-out; }
-        input:checked ~ .dot { transform: translateX(100%); background-color: #10b981; }
+        input:checked ~ .dot { transform: translateX(1.5rem); background-color: #10b981; }
+
+        /* Ajuste para el botón + en móviles */
+        @media (max-width: 640px) {
+            .btn-plus-container { width: 100%; margin-top: 10px; }
+            .btn-plus-container button { width: 100%; height: 50px; }
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
 <div class="max-w-7xl mx-auto">
-    <header class="flex justify-between items-center mb-10 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+    <header class="flex justify-between items-center mb-10 bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div>
-            <h1 class="text-5xl font-black text-indigo-950 tracking-tighter italic uppercase">Asignaciones Académicas</h1>
-            <p class="text-slate-400 text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Carga Horaria y Tutorías por Áreas • Khipu Edu 360</p>
+            <h1 class="text-3xl md:text-5xl font-black text-indigo-950 tracking-tighter italic uppercase leading-tight">Asignaciones</h1>
+            <p class="text-slate-400 text-[10px] md:text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Carga Horaria y Tutorías • Khipu Edu 360</p>
         </div>
-        <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-16 h-16 rounded-3xl transition-all flex items-center justify-center shadow-sm">
-            <i class="fa-solid fa-house text-2xl"></i>
+        <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 md:w-16 md:h-16 rounded-3xl transition-all flex items-center justify-center shadow-sm">
+            <i class="fa-solid fa-house text-xl md:text-2xl"></i>
         </button>
     </header>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <aside class="lg:col-span-4">
-            <div class="glass-card p-10 sticky top-8">
-                <div class="flex justify-between items-center mb-10">
-                    <h2 id="form-title" class="text-2xl font-black text-slate-800 uppercase italic underline decoration-sky-500 decoration-4 underline-offset-8">Vincular Docente</h2>
-                    <span id="edit-badge" class="hidden bg-amber-100 text-amber-600 px-4 py-1 rounded-xl font-black text-[10px] uppercase border border-amber-200">Modo Edición</span>
+            <div class="glass-card p-6 md:p-10 sticky top-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 id="form-title" class="text-xl md:text-2xl font-black text-slate-800 uppercase italic underline decoration-sky-500 decoration-4 underline-offset-8">Vincular Docente</h2>
+                    <span id="edit-badge" class="hidden bg-amber-100 text-amber-600 px-3 py-1 rounded-xl font-black text-[9px] uppercase border border-amber-200">Editando</span>
                 </div>
 
-                <form id="form-asignacion" class="space-y-8">
+                <form id="form-asignacion" class="space-y-6">
                     <input type="hidden" id="edit-id">
                     
                     <div>
                         <label class="label-style">Docente Responsable</label>
-                        <select id="select-docente" required class="w-full p-5 input-style rounded-2xl font-black text-slate-700 uppercase appearance-none cursor-pointer">
-                            <option value="">Cargando docentes...</option>
+                        <select id="select-docente" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer uppercase text-sm">
+                            <option value="">SELECCIONAR...</option>
                         </select>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="label-style">Grado Destino</label>
-                            <select id="select-grado" required class="w-full p-5 input-style rounded-2xl font-bold text-slate-700 appearance-none cursor-pointer">
-                                <option value="">Cargando...</option>
+                            <select id="select-grado" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm">
+                                <option value="">CARGANDO...</option>
                             </select>
                         </div>
                         <div>
                             <label class="label-style">Paralelo</label>
-                            <select id="select-paralelo" required class="w-full p-5 input-style rounded-2xl font-bold text-slate-700 appearance-none cursor-pointer">
+                            <select id="select-paralelo" required class="w-full p-4 input-style rounded-2xl appearance-none cursor-pointer text-sm">
                                 <option value="">-</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-200">
-                        <label class="label-style text-slate-500">Asignar Materias (Cátedras)</label>
-                        <div class="flex gap-3 mb-6">
-                            <select id="select-materia" class="flex-1 p-4 input-style rounded-2xl font-bold text-slate-700 text-sm">
+                    <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-200">
+                        <label class="label-style text-slate-500">Asignar Materias</label>
+                        <div class="flex flex-col sm:flex-row gap-3 mb-6">
+                            <select id="select-materia" class="flex-1 p-4 input-style rounded-2xl text-sm">
                                 <option value="">Elegir materia...</option>
                             </select>
-                            <button type="button" id="btn-add-materia" class="bg-indigo-600 text-white px-6 rounded-2xl hover:bg-black transition-all shadow-lg active:scale-90">
-                                <i class="fa-solid fa-plus text-lg"></i>
-                            </button>
+                            <div class="btn-plus-container">
+                                <button type="button" id="btn-add-materia" class="bg-indigo-600 text-white p-4 rounded-2xl hover:bg-black transition-all shadow-lg flex items-center justify-center">
+                                    <i class="fa-solid fa-plus text-lg"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div id="materia-tags" class="flex flex-wrap gap-3">
-                            <p id="no-materias" class="text-[11px] font-bold text-slate-300 uppercase italic">Sin materias añadidas aún</p>
+                        <div id="materia-tags" class="flex flex-wrap gap-2">
+                            <p id="no-materias" class="text-[10px] font-bold text-slate-300 uppercase italic">Sin materias añadidas</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 items-center">
                         <div>
                             <label class="label-style">Periodo Lectivo</label>
-                            <select id="select-periodo" required class="w-full p-5 input-style rounded-2xl font-black text-indigo-600 appearance-none">
-                                <option value="">---</option>
-                            </select>
+                            <input type="text" id="input-periodo" class="w-full p-4 input-style rounded-2xl bg-slate-100 text-indigo-600 cursor-not-allowed text-center" readonly>
                         </div>
                         <div class="flex flex-col items-center">
                             <label class="label-style">¿Es Tutor?</label>
                             <label class="flex items-center cursor-pointer">
                                 <div class="relative">
                                     <input type="checkbox" id="check-tutor" class="sr-only">
-                                    <div class="block bg-slate-200 w-16 h-10 rounded-full"></div>
-                                    <div class="dot absolute left-1 top-1 bg-white w-8 h-8 rounded-full transition shadow-sm"></div>
+                                    <div class="block bg-slate-200 w-14 h-8 rounded-full"></div>
+                                    <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition shadow-sm"></div>
                                 </div>
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-submit" class="w-full bg-sky-500 hover:bg-black text-white py-6 rounded-3xl font-black uppercase text-[12px] tracking-[0.2em] shadow-2xl shadow-sky-100 transition-all active:scale-95">
-                        Confirmar Asignación <i class="fa-solid fa-circle-check ml-2 opacity-50"></i>
+                    <button type="submit" id="btn-submit" class="w-full bg-sky-500 hover:bg-black text-white py-5 rounded-3xl font-black uppercase text-[11px] tracking-[0.2em] shadow-xl transition-all active:scale-95">
+                        Confirmar Asignación <i class="fa-solid fa-circle-check ml-2"></i>
                     </button>
-                    <button type="button" id="btn-cancel" class="hidden w-full text-[11px] font-black uppercase text-slate-400 py-3 hover:text-red-500 transition-all underline decoration-2 underline-offset-4">Cancelar Edición Actual</button>
+                    <button type="button" id="btn-cancel" class="hidden w-full text-[10px] font-black uppercase text-slate-400 py-2 hover:text-red-500 transition-all underline underline-offset-4">Cancelar Edición</button>
                 </form>
             </div>
         </aside>
 
         <main class="lg:col-span-8">
-            <div class="glass-card p-10">
-                <div class="flex justify-between items-center mb-10 border-b border-slate-100 pb-8">
-                    <h2 class="text-3xl font-black text-slate-800 uppercase italic tracking-tighter">Registros Actuales</h2>
-                    <span id="count-asig" class="bg-indigo-600 text-white px-6 py-2 rounded-2xl font-black text-[12px] uppercase shadow-lg shadow-indigo-100">0 registros</span>
+            <div class="glass-card p-6 md:p-10">
+                <div class="flex justify-between items-center mb-10 border-b border-slate-50 pb-6">
+                    <h2 class="text-2xl font-black text-slate-800 uppercase italic tracking-tighter">Registros Actuales</h2>
+                    <span id="count-asig" class="bg-indigo-600 text-white px-4 py-1 rounded-xl font-black text-[10px] uppercase">0 REGISTROS</span>
                 </div>
                 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+                    <table class="w-full">
                         <thead>
-                            <tr class="text-[12px] font-black text-slate-400 uppercase border-b border-slate-100">
-                                <th class="pb-8 pl-4">Docente y Cargo</th>
-                                <th class="pb-8 text-center">Curso Asignado</th>
-                                <th class="pb-8">Materias</th>
-                                <th class="pb-8 text-center">Periodo</th>
-                                <th class="pb-8 text-right pr-4">Acciones</th>
+                            <tr class="text-[10px] font-black text-slate-400 uppercase text-left">
+                                <th class="pb-6 pl-4">Docente</th>
+                                <th class="pb-6 text-center">Curso</th>
+                                <th class="pb-6">Materias</th>
+                                <th class="pb-6 text-center">Periodo</th>
+                                <th class="pb-6 text-right pr-4">Acción</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-asignaciones" class="divide-y divide-slate-100">
-                            <tr><td colspan="5" class="p-24 text-center text-slate-300 italic font-bold">Conectando con el servidor...</td></tr>
+                        <tbody id="tabla-asignaciones" class="divide-y divide-slate-50">
+                            <tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Iniciando sistema...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -154,54 +160,62 @@
     const auth = getAuth(app);
 
     let materiasSel = [];
-    const maps = { docente: {}, grado: {}, materia: {}, periodo: {} };
+    const cache = { docente: {}, grado: {}, materia: {} };
 
-    // SEGURIDAD ADMIN
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
         else {
             const userDoc = await getDoc(doc(db, "usuario", user.uid));
             if (userDoc.exists() && userDoc.data().rol === 'admin') {
                 document.body.style.opacity = "1";
-                loadAll();
+                await inicializar();
             } else {
-                Swal.fire('Acceso Denegado', 'Solo administradores pueden gestionar esta sección.', 'error').then(() => window.location.href = "dashboard.html");
+                window.location.href = "dashboard.html";
             }
         }
     });
 
-    async function loadAll() {
+    async function inicializar() {
         const [sUsr, sGra, sPar, sMat, sPer] = await Promise.all([
-            getDocs(query(collection(db, "usuario"), where("rol", "in", ["docente", "admin"]), orderBy("nombre"))),
-            getDocs(collection(db, "grados")),
-            getDocs(collection(db, "paralelos")),
-            getDocs(collection(db, "materias")),
-            getDocs(collection(db, "periodos_lectivos"))
+            getDocs(query(collection(db, "usuario"), where("rol", "in", ["docente", "admin"]), orderBy("nombre", "asc"))),
+            getDocs(query(collection(db, "grados"), orderBy("orden", "asc"))),
+            getDocs(query(collection(db, "paralelos"), orderBy("nombre", "asc"))),
+            getDocs(query(collection(db, "materias"), orderBy("nombre", "asc"))),
+            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo")))
         ]);
 
-        const fill = (snap, elId, mapKey) => {
-            const el = document.getElementById(elId);
-            el.innerHTML = `<option value="">SELECCIONAR...</option>`;
-            snap.forEach(d => {
-                const n = d.data().nombre || d.id;
-                maps[mapKey][d.id] = n;
-                el.innerHTML += `<option value="${d.id}">${n}</option>`;
-            });
-        };
+        // Cargar Periodo Actual
+        if(!sPer.empty) document.getElementById('input-periodo').value = sPer.docs[0].data().nombre;
 
-        fill(sUsr, 'select-docente', 'docente');
-        fill(sGra, 'select-grado', 'grado');
-        fill(sMat, 'select-materia', 'materia');
-        
-        const sP = document.getElementById('select-paralelo');
-        sP.innerHTML = `<option value="">-</option>`;
-        sPar.forEach(p => sP.innerHTML += `<option value="${p.id}">${p.id}</option>`);
+        // Cargar Docentes
+        const selD = document.getElementById('select-docente');
+        selD.innerHTML = '<option value="">ELEGIR DOCENTE...</option>';
+        sUsr.forEach(d => {
+            cache.docente[d.id] = d.data().nombre;
+            selD.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
+        });
 
-        const sPe = document.getElementById('select-periodo');
-        sPe.innerHTML = '';
-        sPer.forEach(p => {
-            maps.periodo[p.id] = p.data().nombre;
-            sPe.innerHTML += `<option value="${p.id}" ${p.data().estado === 'activo' ? 'selected' : ''}>${p.data().nombre}</option>`;
+        // Cargar Grados (Ordenados)
+        const selG = document.getElementById('select-grado');
+        selG.innerHTML = '<option value="">ELEGIR...</option>';
+        sGra.forEach(d => {
+            cache.grado[d.id] = d.data().nombre;
+            selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
+        });
+
+        // Cargar Paralelos (Por Nombre)
+        const selP = document.getElementById('select-paralelo');
+        selP.innerHTML = '<option value="">-</option>';
+        sPar.forEach(d => {
+            selP.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`;
+        });
+
+        // Cargar Materias
+        const selM = document.getElementById('select-materia');
+        selM.innerHTML = '<option value="">Elegir materia...</option>';
+        sMat.forEach(d => {
+            cache.materia[d.id] = d.data().nombre;
+            selM.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
         });
 
         loadTable();
@@ -221,8 +235,8 @@
         document.getElementById('no-materias').style.display = materiasSel.length ? 'none' : 'block';
         materiasSel.forEach(id => {
             const div = document.createElement('div');
-            div.className = "tag-materia shadow-sm";
-            div.innerHTML = `${maps.materia[id] || id} <i class="fa-solid fa-circle-xmark cursor-pointer text-indigo-300 hover:text-red-500 transition-colors" onclick="removeMateria('${id}')"></i>`;
+            div.className = "tag-materia";
+            div.innerHTML = `${cache.materia[id] || id} <i class="fa-solid fa-xmark cursor-pointer opacity-50 hover:opacity-100" onclick="removeMateria('${id}')"></i>`;
             cont.appendChild(div);
         });
     }
@@ -236,33 +250,33 @@
         const tbody = document.getElementById('tabla-asignaciones');
         const snap = await getDocs(collection(db, "asignaciones"));
         tbody.innerHTML = "";
-        document.getElementById('count-asig').innerText = `${snap.size} registros`;
+        document.getElementById('count-asig').innerText = `${snap.size} REGISTROS`;
 
         if (snap.empty) {
-            tbody.innerHTML = `<tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Sin asignaciones registradas.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-20 text-center text-slate-300 italic font-bold">Sin asignaciones.</td></tr>`;
             return;
         }
 
         snap.forEach(docSnap => {
             const d = docSnap.data();
             const tr = document.createElement('tr');
-            tr.className = "hover:bg-slate-50 transition-all border-b border-slate-100";
-            const mats = d.materia_id ? d.materia_id.map(m => maps.materia[m] || m).join(', ') : 'SIN MATERIAS';
+            tr.className = "hover:bg-slate-50 transition-all border-b border-slate-50";
+            const mats = d.materia_id ? d.materia_id.map(m => cache.materia[m] || m).join(', ') : '---';
 
             tr.innerHTML = `
-                <td class="p-8">
-                    <div class="font-black text-indigo-950 text-xl uppercase tracking-tighter">${maps.docente[d.docente_id] || d.docente_id}</div>
-                    ${d.tutor ? '<span class="text-[10px] font-black bg-emerald-500 text-white px-4 py-1 rounded-xl uppercase shadow-md shadow-emerald-50 mt-2 inline-block">Docente Tutor</span>' : ''}
+                <td class="p-4 md:p-6">
+                    <div class="font-black text-indigo-950 text-sm md:text-lg uppercase">${cache.docente[d.docente_id] || d.docente_id}</div>
+                    ${d.tutor ? '<span class="text-[8px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-lg uppercase mt-1 inline-block">Docente Tutor</span>' : ''}
                 </td>
-                <td class="p-8 text-center">
-                    <div class="font-black text-slate-700 text-md uppercase">${maps.grado[d.grado_id] || d.grado_id}</div>
-                    <div class="text-[12px] font-black text-sky-500 uppercase">Paralelo "${d.paralelo_id}"</div>
+                <td class="p-4 text-center">
+                    <div class="font-bold text-slate-700 text-xs uppercase">${cache.grado[d.grado_id] || d.grado_id}</div>
+                    <div class="text-[10px] font-black text-sky-500 uppercase">"${d.paralelo_id}"</div>
                 </td>
-                <td class="p-8"><div class="text-[11px] font-bold text-slate-400 uppercase italic max-w-[250px] leading-relaxed">${mats}</div></td>
-                <td class="p-8 text-center font-black text-indigo-950 text-md">${maps.periodo[d.periodo_id] || d.periodo_id}</td>
-                <td class="p-8 text-right space-x-3">
-                    <button onclick="editAsig('${docSnap.id}')" class="text-sky-500 hover:text-black transition-all text-xl"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button onclick="deleteAsig('${docSnap.id}')" class="text-slate-300 hover:text-red-500 transition-all text-xl"><i class="fa-solid fa-trash-can"></i></button>
+                <td class="p-4"><div class="text-[10px] text-slate-400 font-bold uppercase truncate max-w-[150px]">${mats}</div></td>
+                <td class="p-4 text-center font-black text-indigo-950 text-xs">${d.periodo_id}</td>
+                <td class="p-4 text-right space-x-2">
+                    <button onclick="editAsig('${docSnap.id}')" class="text-sky-500 hover:text-black"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteAsig('${docSnap.id}')" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -277,12 +291,9 @@
             document.getElementById('select-docente').value = data.docente_id;
             document.getElementById('select-grado').value = data.grado_id;
             document.getElementById('select-paralelo').value = data.paralelo_id;
-            document.getElementById('select-periodo').value = data.periodo_id;
             document.getElementById('check-tutor').checked = data.tutor;
             materiasSel = data.materia_id || [];
             renderTags();
-
-            document.getElementById('form-title').innerText = "Editar Registro";
             document.getElementById('edit-badge').classList.remove('hidden');
             document.getElementById('btn-cancel').classList.remove('hidden');
             document.getElementById('btn-submit').innerText = "Guardar Cambios";
@@ -296,64 +307,45 @@
     document.getElementById('form-asignacion').onsubmit = async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-submit');
-        const grado_id = document.getElementById('select-grado').value;
-        const paralelo_id = document.getElementById('select-paralelo').value;
-        const docente_id = document.getElementById('select-docente').value;
-        const esTutor = document.getElementById('check-tutor').checked;
+        const g_id = document.getElementById('select-grado').value;
+        const p_id = document.getElementById('select-paralelo').value;
+        const d_id = document.getElementById('select-docente').value;
+        const esT = document.getElementById('check-tutor').checked;
+        const per = document.getElementById('input-periodo').value;
 
-        if(!materiasSel.length) return Swal.fire('Error', 'Debe añadir al menos una materia.', 'warning');
-
+        if(!materiasSel.length) return Swal.fire('Atención', 'Selecciona al menos una materia.', 'warning');
         btn.disabled = true;
 
         try {
-            // VALIDACIÓN: ¿Ya hay un tutor en este grado? (Si el registro actual dice que es tutor)
-            if (esTutor) {
-                const qTutor = query(collection(db, "asignaciones"), 
-                    where("grado_id", "==", grado_id), 
-                    where("paralelo_id", "==", paralelo_id),
-                    where("tutor", "==", true));
-                const snapT = await getDocs(qTutor);
-                
-                // Si encontramos un tutor que NO sea el que estamos editando
-                const otroTutor = snapT.docs.find(doc => doc.id !== document.getElementById('edit-id').value);
-                if (otroTutor) {
-                    Swal.fire('Conflicto de Tutoría', 'Este grado ya tiene un tutor asignado. Retire la tutoría al otro docente primero.', 'error');
-                    btn.disabled = false;
-                    return;
+            if(esT) {
+                const qT = query(collection(db, "asignaciones"), where("grado_id", "==", g_id), where("paralelo_id", "==", p_id), where("tutor", "==", true));
+                const sT = await getDocs(qT);
+                const existT = sT.docs.find(doc => doc.id !== document.getElementById('edit-id').value);
+                if(existT) {
+                    Swal.fire('Conflicto', 'Este curso ya tiene un tutor asignado.', 'error');
+                    btn.disabled = false; return;
                 }
             }
 
             const payload = {
-                docente_id,
-                grado_id,
-                paralelo_id,
-                periodo_id: document.getElementById('select-periodo').value,
-                materia_id: materiasSel,
-                tutor: esTutor,
+                docente_id: d_id, grado_id: g_id, paralelo_id: p_id,
+                periodo_id: per, materia_id: materiasSel, tutor: esT,
                 updated_at: serverTimestamp()
             };
 
-            // ID Dinámico: Permite que el docente tenga varios cursos
-            const finalID = document.getElementById('edit-id').value || `${docente_id}_${grado_id}_${paralelo_id}`;
+            const finalID = document.getElementById('edit-id').value || `${d_id}_${g_id}_${p_id}`.replace(/\s+/g, '');
             await setDoc(doc(db, "asignaciones", finalID), payload, { merge: true });
-
-            Swal.fire('¡Éxito!', 'La asignación se ha guardado correctamente.', 'success').then(() => location.reload());
+            Swal.fire('¡Listo!', 'Asignación procesada con éxito.', 'success').then(() => location.reload());
         } catch (e) { 
-            console.error(e);
-            Swal.fire('Error', 'Fallo al sincronizar con la nube.', 'error'); 
+            Swal.fire('Error', e.message, 'error'); 
             btn.disabled = false;
         }
     };
 
     window.deleteAsig = async (id) => {
-        const res = await Swal.fire({ title: '¿Eliminar registro?', text: "Se perderá la vinculación de este docente con este curso.", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' });
-        if (res.isConfirmed) {
-            await deleteDoc(doc(db, "asignaciones", id));
-            loadTable();
-        }
+        const res = await Swal.fire({ title: '¿Eliminar?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sí, borrar', confirmButtonColor: '#ef4444' });
+        if (res.isConfirmed) { await deleteDoc(doc(db, "asignaciones", id)); loadTable(); }
     };
-
-    loadAll();
 </script>
 </body>
 </html>
