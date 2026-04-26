@@ -14,7 +14,6 @@
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; color: #1e293b; text-transform: uppercase; }
         .input-readonly { background-color: #f1f5f9; border-color: #e2e8f0; color: #64748b; cursor: not-allowed; font-weight: 800; }
         .label-style { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
-        .badge-periodo { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -25,7 +24,7 @@
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Proceso de Matrícula</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Gestión Académica</p>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
                 <i class="fa-solid fa-house"></i>
             </button>
         </header>
@@ -43,15 +42,10 @@
                     </div>
                 </div>
 
-                <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-indigo-200 shadow-2xl relative overflow-hidden">
-                    <div class="relative z-10">
-                        <label class="label-style text-indigo-300">Periodo Lectivo Activo</label>
-                        <div id="periodo_display" class="text-4xl font-black tracking-tighter italic">---</div>
-                        <input type="hidden" id="in_periodo">
-                        <div class="mt-4 inline-block px-3 py-1 rounded-full badge-periodo text-[9px] font-bold uppercase tracking-widest text-white">
-                            Sincronizado <i class="fa-solid fa-cloud-check ml-1"></i>
-                        </div>
-                    </div>
+                <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-2xl relative overflow-hidden">
+                    <label class="label-style text-indigo-300">Periodo Lectivo Activo</label>
+                    <div id="periodo_display" class="text-4xl font-black tracking-tighter italic">---</div>
+                    <input type="hidden" id="in_periodo">
                 </div>
             </div>
 
@@ -74,12 +68,12 @@
                     <div>
                         <label class="label-style">Paralelo</label>
                         <input type="text" id="res_paralelo_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
-                        <input type="hidden" id="id_paralelo_nombre">
+                        <input type="hidden" id="val_paralelo_nombre">
                     </div>
                     <div class="md:col-span-2">
                         <label class="label-style">Jornada</label>
                         <input type="text" id="res_jornada_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
-                        <input type="hidden" id="id_jornada_id">
+                        <input type="hidden" id="id_jornada_real">
                     </div>
 
                     <div id="box-docente" class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 transition-all">
@@ -135,8 +129,9 @@
         const qP = query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"));
         const snapP = await getDocs(qP);
         if(!snapP.empty) {
-            document.getElementById('periodo_display').innerText = snapP.docs[0].data().nombre;
-            document.getElementById('in_periodo').value = snapP.docs[0].data().nombre;
+            const p = snapP.docs[0].data().nombre;
+            document.getElementById('periodo_display').innerText = p;
+            document.getElementById('in_periodo').value = p;
         }
 
         const [gS, pS, jS] = await Promise.all([
@@ -154,31 +149,33 @@
         const ced = e.target.value.trim();
         if (ced.length === 10) {
             document.getElementById('loader-est').classList.remove('hidden');
-            const eSnap = await getDoc(doc(db, "estudiantes", ced));
-            if (eSnap.exists()) {
-                const est = eSnap.data();
-                document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
-                
-                // Grado
-                document.getElementById('id_grado').value = est.grado;
-                document.getElementById('res_grado_text').value = maps.grados[est.grado] || est.grado;
+            try {
+                const eSnap = await getDoc(doc(db, "estudiantes", ced));
+                if (eSnap.exists()) {
+                    const est = eSnap.data();
+                    document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
+                    
+                    // Llenar campos y traducir IDs a Nombres
+                    const gNombre = maps.grados[est.grado] || est.grado;
+                    const pNombre = maps.paralelos[est.paralelo] || est.paralelo;
+                    const jNombre = maps.jornadas[est.jornada] || est.jornada;
 
-                // Paralelo: Traducir ID a nombre ("A")
-                const parNombre = maps.paralelos[est.paralelo] || est.paralelo;
-                document.getElementById('res_paralelo_text').value = parNombre;
-                document.getElementById('id_paralelo_nombre').value = parNombre;
+                    document.getElementById('id_grado').value = est.grado;
+                    document.getElementById('res_grado_text').value = gNombre;
 
-                // Jornada: Detectar si es ID o nombre
-                const jorID = est.jornada;
-                const jorNombre = maps.jornadas[jorID] || jorID;
-                document.getElementById('res_jornada_text').value = jorNombre;
-                document.getElementById('id_jornada_id').value = jorID;
+                    document.getElementById('val_paralelo_nombre').value = pNombre;
+                    document.getElementById('res_paralelo_text').value = pNombre;
 
-                const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
-                if(rSnap.exists()) document.getElementById('res_repre').value = rSnap.data().nombre_completo;
+                    document.getElementById('id_jornada_real').value = est.jornada;
+                    document.getElementById('res_jornada_text').value = jNombre;
 
-                validarTutor(est.grado, parNombre, jorID);
-            }
+                    const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
+                    if(rSnap.exists()) document.getElementById('res_repre').value = rSnap.data().nombre_completo;
+
+                    // VALIDAR TUTOR USANDO: Grado(ID), Paralelo(Nombre), Jornada(ID)
+                    validarTutor(est.grado, pNombre, est.jornada);
+                }
+            } catch (err) { console.error(err); }
             document.getElementById('loader-est').classList.add('hidden');
         }
     });
@@ -188,10 +185,10 @@
         const boxDoc = document.getElementById('box-docente');
         const btn = document.getElementById('btn-save');
 
-        // Búsqueda exacta en Asignaciones (Img 2c4255)
+        // Búsqueda exacta coincidiendo con la estructura de image_2c4255.png
         const q = query(collection(db, "asignaciones"), 
             where("grado_id", "==", gradoId), 
-            where("paralelo_id", "==", paraleloNombre), 
+            where("paralelo_id", "==", paraleloNombre), // Aquí buscamos por "A"
             where("jornada", "==", jornadaId), 
             where("tutor", "==", true));
             
@@ -200,12 +197,12 @@
             const asig = snap.docs[0].data();
             const uS = await getDoc(doc(db, "usuario", asig.docente_id));
             resDoc.innerText = uS.exists() ? uS.data().nombre : "DOCENTE ASIGNADO";
-            boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100";
+            boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-200";
             resDoc.className = "font-black text-emerald-900 uppercase text-lg";
             btn.disabled = false; btn.classList.remove('opacity-50');
             document.getElementById('id_docente').value = asig.docente_id;
         } else {
-            resDoc.innerText = "CURSO SIN TUTORÍA ASIGNADA";
+            resDoc.innerText = "CURSO SIN TUTOR ASIGNADO";
             boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100";
             resDoc.className = "font-black text-red-600 uppercase text-lg";
             btn.disabled = true; btn.classList.add('opacity-50');
@@ -218,16 +215,17 @@
         const ced = document.getElementById('in_cedula').value;
         await setDoc(doc(db, "matriculas", `${ced}_${pId}`), {
             estudiante_id: ced,
-            nombre_estudiante: document.getElementById('res_nombre').value.toUpperCase(),
+            nombre_estudiante: document.getElementById('res_nombre').value,
+            representante_id: document.getElementById('id_repre').value || "",
             grado_id: document.getElementById('id_grado').value,
-            paralelo_id: document.getElementById('id_paralelo_nombre').value,
+            paralelo_id: document.getElementById('val_paralelo_nombre').value,
             jornada: document.getElementById('res_jornada_text').value,
             periodo_id: pId,
             docente_id: document.getElementById('id_docente').value,
             fecha_matricula: serverTimestamp(),
             estado: "ACTIVA"
         });
-        Swal.fire('¡Éxito!', 'MATRÍCULA GENERADA.', 'success').then(() => location.reload());
+        Swal.fire('¡Matrícula Éxitosa!', 'Se ha registrado el estudiante.', 'success').then(() => location.reload());
     };
 </script>
 </body>
