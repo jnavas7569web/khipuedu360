@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; font-size: 16px; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; font-size: 1.1rem; }
+        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
         .nee-badge { background: #fee2e2; color: #ef4444; font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 900; letter-spacing: 0.5px; }
     </style>
@@ -39,13 +39,13 @@
 
         <div class="glass-card p-10 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
             <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Grado Seleccionado</label>
+                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Grado / Curso</label>
                 <select id="sel_grado" class="w-full p-5 input-style rounded-2xl outline-none appearance-none cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
             <div>
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Paralelo / Jornada</label>
+                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Paralelo y Jornada</label>
                 <select id="sel_paralelo" class="w-full p-5 input-style rounded-2xl outline-none appearance-none cursor-pointer">
                     <option value="">Esperando grado...</option>
                 </select>
@@ -69,18 +69,18 @@
                 </table>
             </div>
 
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl mb-10">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-xl mb-10 text-slate-700">
                 <div class="flex items-center gap-5">
                     <div class="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 shadow-sm">
                         <i class="fa-solid fa-user-tie text-3xl"></i>
                     </div>
                     <div>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-tighter">Responsable del Aula</p>
-                        <h4 id="nombre-tutor" class="text-xl font-black text-slate-800 uppercase italic">Buscando...</h4>
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-tighter">Responsable del Registro</p>
+                        <h4 id="nombre-tutor" class="text-xl font-black uppercase italic">Buscando...</h4>
                     </div>
                 </div>
                 <button id="btn-guardar" class="w-full md:w-auto bg-emerald-500 hover:bg-black text-white px-16 py-6 rounded-2xl font-black uppercase text-[13px] tracking-[0.2em] shadow-2xl shadow-emerald-100 transition-all active:scale-95">
-                    Sincronizar y Guardar <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
+                    Sincronizar Asistencia <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
                 </button>
             </div>
         </div>
@@ -88,7 +88,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -104,103 +104,118 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    onAuthStateChanged(auth, (user) => {
+    const cacheMaps = { grados: {}, paralelos: {}, jornadas: {} };
+    let misAsignaciones = [];
+
+    onAuthStateChanged(auth, async (user) => {
         if (!user) window.location.href = "index.html";
         else {
             document.body.style.opacity = "1";
             const local = new Date();
             local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
             document.getElementById('fecha_asistencia').value = local.toJSON().slice(0,10);
-            cargarFiltros();
+            await cargarDiccionarios();
+            await cargarFiltros();
         }
     });
 
+    async function cargarDiccionarios() {
+        const [gS, pS, jS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas"))
+        ]);
+        gS.forEach(d => cacheMaps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
+    }
+
     async function cargarFiltros() {
         const selG = document.getElementById('sel_grado');
-        const selP = document.getElementById('sel_paralelo');
         const userUID = auth.currentUser.uid;
 
         try {
-            const userDoc = await getDoc(doc(db, "usuario", userUID));
-            const userData = userDoc.data();
+            const userSnap = await getDoc(doc(db, "usuario", userUID));
+            const userData = userSnap.data();
             const isAdmin = userData.rol === "admin";
+            document.getElementById('nombre-tutor').innerText = userData.nombre.toUpperCase();
 
+            // Cargar Asignaciones
+            let qAsig;
             if (isAdmin) {
-                // CARGA ADMIN: Todo el catálogo
-                const [gSnap, pSnap] = await Promise.all([
-                    getDocs(collection(db, "grados")),
-                    getDocs(collection(db, "paralelos"))
-                ]);
-                selG.innerHTML = '<option value="">Elegir Grado (Admin)</option>';
-                gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
-                selP.innerHTML = '<option value="">Elegir Paralelo</option>';
-                pSnap.forEach(d => {
-                    const nom = d.data().nombre || d.id;
-                    selP.innerHTML += `<option value="${nom}">${nom}</option>`;
-                });
+                qAsig = query(collection(db, "asignaciones"));
             } else {
-                // CARGA DOCENTE: Solo sus asignaciones
-                const qAsig = query(collection(db, "asignaciones"), where("docente_id", "==", userUID));
-                const asigSnap = await getDocs(qAsig);
-                
-                let misGradosIds = [];
-                let misParalelos = [];
-                asigSnap.forEach(asig => {
-                    misGradosIds.push(asig.data().grado_id);
-                    misParalelos.push(asig.data().paralelo_id);
-                });
-
-                selG.innerHTML = '<option value="">Mis Grados</option>';
-                const gSnap = await getDocs(collection(db, "grados"));
-                gSnap.forEach(d => {
-                    if(misGradosIds.includes(d.id)) selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`;
-                });
-
-                selP.innerHTML = '<option value="">Mis Paralelos</option>';
-                [...new Set(misParalelos)].forEach(p => {
-                    selP.innerHTML += `<option value="${p}">${p}</option>`;
-                });
+                qAsig = query(collection(db, "asignaciones"), where("docente_id", "==", userUID));
             }
+            
+            const snapAsig = await getDocs(qAsig);
+            selG.innerHTML = '<option value="">SELECCIONAR GRADO</option>';
+            
+            let gradosVistos = new Set();
+            snapAsig.forEach(doc => {
+                const data = doc.data();
+                misAsignaciones.push(data);
+                if(!gradosVistos.has(data.grado_id)) {
+                    gradosVistos.add(data.grado_id);
+                    selG.innerHTML += `<option value="${data.grado_id}">${cacheMaps.grados[data.grado_id] || data.grado_id}</option>`;
+                }
+            });
+
         } catch (e) { console.error(e); }
     }
 
+    // Al cambiar grado, cargar paralelos y jornadas vinculadas
+    document.getElementById('sel_grado').addEventListener('change', (e) => {
+        const selP = document.getElementById('sel_paralelo');
+        const gradoId = e.target.value;
+        selP.innerHTML = '<option value="">SELECCIONAR SECCIÓN</option>';
+        
+        misAsignaciones.filter(a => a.grado_id === gradoId).forEach(asig => {
+            const label = `${asig.paralelo_id} (${asig.jornada})`;
+            // Guardamos el valor como JSON para pasar ambos datos
+            const val = JSON.stringify({paralelo: asig.paralelo_id, jornada: asig.jornada});
+            selP.innerHTML += `<option value='${val}'>${label.toUpperCase()}</option>`;
+        });
+    });
+
     document.getElementById('btn-generar').addEventListener('click', async () => {
         const grado = document.getElementById('sel_grado').value;
-        const paralelo = document.getElementById('sel_paralelo').value;
+        const pValRaw = document.getElementById('sel_paralelo').value;
         const fecha = document.getElementById('fecha_asistencia').value;
 
-        if (!grado || !paralelo || !fecha) return Swal.fire('Incompleto', 'Seleccione Grado, Paralelo y Fecha.', 'info');
+        if (!grado || !pValRaw || !fecha) return Swal.fire('Atención', 'Complete los filtros.', 'info');
 
-        // 1. Tutor (Búsqueda exacta)
-        const qTutor = query(collection(db, "asignaciones"), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo), where("tutor", "==", true));
-        const tutorSnap = await getDocs(qTutor);
-        document.getElementById('nombre-tutor').innerText = tutorSnap.empty ? "Sin tutor asignado" : "Buscando...";
-        if (!tutorSnap.empty) {
-            const docRef = await getDoc(doc(db, "usuario", tutorSnap.docs[0].data().docente_id));
-            document.getElementById('nombre-tutor').innerText = docRef.exists() ? docRef.data().nombre : "Docente no identificado";
-        }
+        const pVal = JSON.parse(pValRaw);
+        const paralelo = pVal.paralelo;
+        const jornada = pVal.jornada;
 
-        // 2. Alerta de duplicidad
-        const qA = query(collection(db, "asistencias"), where("fecha", "==", fecha), where("grado_id", "==", grado), where("paralelo_id", "==", paralelo));
+        // 1. Verificar duplicidad (Foto 2b649f)
+        const qA = query(collection(db, "asistencias"), 
+            where("fecha", "==", fecha), 
+            where("grado_id", "==", grado), 
+            where("paralelo_id", "==", paralelo));
+            
         const aSnap = await getDocs(qA);
         let registrosPrevios = {};
         if (!aSnap.empty) {
-            const pDoc = await getDoc(doc(db, "usuario", aSnap.docs[0].data().registrado_por));
             document.getElementById('info-alerta').classList.remove('hidden');
-            document.getElementById('txt-alerta').innerText = `Asistencia registrada hoy por: ${pDoc.exists() ? pDoc.data().nombre : 'otro docente'}`;
+            document.getElementById('txt-alerta').innerText = `EXISTE UN REGISTRO PREVIO PARA ESTE DÍA.`;
             aSnap.forEach(d => registrosPrevios[d.data().estudiante_id] = d.data());
         } else {
             document.getElementById('info-alerta').classList.add('hidden');
         }
 
-        // 3. Nómina Estudiantes (Comparación exacta de Paralelo)
+        // 2. Generar Nómina
         const estSnap = await getDocs(collection(db, "estudiantes"));
         let estudiantes = [];
         estSnap.forEach(d => {
             const est = d.data();
-            // Comparamos Grado ID y Paralelo Nombre exacto
-            if (est.grado === grado && est.paralelo === paralelo) {
-                if (est.estado === true || est.estado === undefined || est.estado === "activo") {
+            // Comparamos el ID del Grado, el nombre del Paralelo y la Jornada (Foto 2bcd77)
+            const estJornadaNombre = cacheMaps.jornadas[est.jornada] || est.jornada;
+            const estParaleloNombre = cacheMaps.paralelos[est.paralelo] || est.paralelo;
+
+            if (est.grado === grado && estParaleloNombre === paralelo && estJornadaNombre === jornada) {
+                if (est.estado === true || est.estado === "activo") {
                     estudiantes.push({id: d.id, ...est});
                 }
             }
@@ -211,35 +226,33 @@
         tbody.innerHTML = '';
 
         if(estudiantes.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-bold italic text-xl uppercase">No hay alumnos en ' + paralelo + '.</td></tr>';
-            document.getElementById('container-nomina').classList.remove('hidden');
-            return;
+            tbody.innerHTML = '<tr><td colspan="3" class="p-20 text-center text-slate-300 font-bold italic uppercase">No se encontraron alumnos en este curso/jornada.</td></tr>';
+        } else {
+            estudiantes.forEach(est => {
+                const pre = registrosPrevios[est.id] || { estado: 'presente', observacion: '' };
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-all">
+                        <td class="p-8">
+                            <div class="font-black text-slate-800 uppercase text-lg tracking-tight">${est.apellidos} ${est.nombres}</div>
+                            <div class="text-[10px] text-slate-400 font-bold tracking-widest mt-1">CÉDULA: ${est.id} ${est.nee ? '<span class="nee-badge ml-3">NEE</span>' : ''}</div>
+                        </td>
+                        <td class="p-8 text-center">
+                            <select class="status-select w-full max-w-[200px] p-4 bg-white border-2 border-slate-100 rounded-2xl font-black text-indigo-600 outline-none shadow-sm focus:border-indigo-400" data-id="${est.id}">
+                                <option value="presente" ${pre.estado==='presente'?'selected':''}>✅ PRESENTE</option>
+                                <option value="ausente" ${pre.estado==='ausente'?'selected':''}>❌ AUSENTE</option>
+                                <option value="atraso" ${pre.estado==='atraso'?'selected':''}>⏳ ATRASO</option>
+                                <option value="justificado" ${pre.estado==='justificado'?'selected':''}>📝 JUSTIFICADO</option>
+                            </select>
+                        </td>
+                        <td class="p-8 text-right">
+                            <button onclick="document.getElementById('obs_${est.id}').classList.toggle('hidden')" class="${pre.observacion?'text-indigo-600':'text-slate-300'} p-3 hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-comment-dots text-3xl"></i>
+                            </button>
+                            <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Nota..." class="${pre.observacion?'':'hidden'} w-full mt-3 p-3 text-xs font-bold border-b-2 border-indigo-200 outline-none bg-indigo-50/30 rounded-xl uppercase">
+                        </td>
+                    </tr>`;
+            });
         }
-
-        estudiantes.forEach(est => {
-            const pre = registrosPrevios[est.id] || { estado: 'presente', observacion: '' };
-            tbody.innerHTML += `
-                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-all">
-                    <td class="p-8">
-                        <div class="font-black text-slate-800 uppercase text-lg tracking-tight">${est.apellidos} ${est.nombres}</div>
-                        <div class="text-[10px] text-slate-400 font-bold tracking-widest mt-1">ID: ${est.id} ${est.nee ? '<span class="nee-badge ml-3">NEE</span>' : ''}</div>
-                    </td>
-                    <td class="p-8 text-center">
-                        <select class="status-select w-full max-w-[200px] p-4 bg-white border-2 border-slate-100 rounded-2xl font-black text-indigo-600 outline-none shadow-sm focus:border-indigo-400" data-id="${est.id}">
-                            <option value="presente" ${pre.estado==='presente'?'selected':''}>✅ PRESENTE</option>
-                            <option value="ausente" ${pre.estado==='ausente'?'selected':''}>❌ AUSENTE</option>
-                            <option value="atraso" ${pre.estado==='atraso'?'selected':''}>⏳ ATRASO</option>
-                            <option value="justificado" ${pre.estado==='justificado'?'selected':''}>📝 JUSTIFICADO</option>
-                        </select>
-                    </td>
-                    <td class="p-8 text-right">
-                        <button onclick="document.getElementById('obs_${est.id}').classList.toggle('hidden')" class="${pre.observacion?'text-indigo-600':'text-slate-300'} p-3 hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-comment-dots text-3xl"></i>
-                        </button>
-                        <input type="text" id="obs_${est.id}" value="${pre.observacion}" placeholder="Nota..." class="${pre.observacion?'':'hidden'} w-full mt-3 p-3 text-xs font-bold border-b-2 border-indigo-200 outline-none bg-indigo-50/30 rounded-xl">
-                    </td>
-                </tr>`;
-        });
         document.getElementById('container-nomina').classList.remove('hidden');
     });
 
@@ -247,27 +260,31 @@
         const sel = document.querySelectorAll('.status-select');
         const fecha = document.getElementById('fecha_asistencia').value;
         const grado = document.getElementById('sel_grado').value;
-        const paralelo = document.getElementById('sel_paralelo').value;
+        const pVal = JSON.parse(document.getElementById('sel_paralelo').value);
         const btn = document.getElementById('btn-guardar');
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> GUARDANDO...';
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> SINCRONIZANDO...';
 
         try {
             for (let s of sel) {
                 const eid = s.dataset.id;
+                // Generamos ID único: cedula + fecha (Foto 2b649f)
                 await setDoc(doc(db, "asistencias", `${eid}_${fecha}`), {
-                    estudiante_id: eid, fecha, estado: s.value,
-                    observacion: document.getElementById(`obs_${eid}`).value.toUpperCase(),
-                    grado_id: grado, paralelo_id: paralelo,
-                    registrado_por: auth.currentUser.uid, timestamp: serverTimestamp()
+                    estudiante_id: eid, 
+                    fecha: fecha, 
+                    estado: s.value,
+                    observacion: document.getElementById(`obs_${eid}`).value.toUpperCase().trim(),
+                    grado_id: grado, 
+                    paralelo_id: pVal.paralelo,
+                    registrado_por: auth.currentUser.uid, 
+                    timestamp: serverTimestamp()
                 }, { merge: true });
             }
-            Swal.fire('¡Éxito!', 'Asistencia sincronizada correctamente.', 'success').then(() => location.reload());
+            Swal.fire({title: 'Sincronizado', text: 'Asistencia guardada en la nube.', icon: 'success', customClass: {popup: 'rounded-[2rem]'}}).then(() => location.reload());
         } catch(e) { 
-            Swal.fire('Error', 'No se pudo guardar la lista.', 'error'); 
+            Swal.fire('Error', 'Falla de conexión.', 'error'); 
             btn.disabled = false;
-            btn.innerText = "Sincronizar y Guardar";
         }
     });
 </script>
