@@ -13,10 +13,13 @@
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; width: 100%; }
         .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
-        .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
-        .tag { background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 12px; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 8px; border: 1px solid #c7d2fe; }
         
-        /* Ajuste responsivo para el botón Vincular */
+        /* ESTÁNDAR VISUAL: Todo a mayúsculas excepto el correo */
+        input[type="text"]:not(#in_correo) { text-transform: uppercase; }
+        
+        .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
+        .tag { background: #e0e7ff; color: #4338ca; padding: 6px 12px; border-radius: 12px; font-weight: 800; font-size: 11px; display: flex; align-items: center; gap: 8px; border: 1px solid #c7d2fe; text-transform: uppercase; }
+        
         @media (max-width: 640px) {
             .vincular-container { flex-direction: column; }
             .vincular-btn { width: 100%; justify-content: center; }
@@ -51,11 +54,11 @@
                         </div>
                         <div>
                             <label class="label-style">Nombres</label>
-                            <input type="text" id="in_nombres" required class="p-4 input-style rounded-2xl font-bold uppercase">
+                            <input type="text" id="in_nombres" required class="p-4 input-style rounded-2xl font-bold">
                         </div>
                         <div>
                             <label class="label-style">Apellidos</label>
-                            <input type="text" id="in_apellidos" required class="p-4 input-style rounded-2xl font-bold uppercase">
+                            <input type="text" id="in_apellidos" required class="p-4 input-style rounded-2xl font-bold">
                         </div>
                     </div>
 
@@ -76,7 +79,7 @@
                         </div>
                         <div>
                             <label class="label-style">Ocupación / Trabajo</label>
-                            <input type="text" id="in_ocupacion" class="p-4 input-style rounded-2xl font-bold uppercase" placeholder="Ej: Cajera">
+                            <input type="text" id="in_ocupacion" class="p-4 input-style rounded-2xl font-bold" placeholder="EJ: CAJERA">
                         </div>
                     </div>
                 </div>
@@ -85,7 +88,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="md:col-span-2">
                             <label class="label-style">Dirección de Domicilio</label>
-                            <input type="text" id="in_direccion" required class="p-4 input-style rounded-2xl font-bold uppercase" placeholder="Calle, Sector, Referencia">
+                            <input type="text" id="in_direccion" required class="p-4 input-style rounded-2xl font-bold" placeholder="CALLE, SECTOR, REFERENCIA">
                         </div>
                         <div>
                             <label class="label-style">Parentesco</label>
@@ -165,6 +168,17 @@
         }
     });
 
+    // --- ESTÁNDAR DE DATOS: Convertir inputs a mayúsculas al terminar de escribir ---
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            if(this.id !== 'in_correo') {
+                this.value = this.value.toUpperCase().trim();
+            } else {
+                this.value = this.value.toLowerCase().trim();
+            }
+        });
+    });
+
     let estudiantesVinculados = [];
     const contenedorHijos = document.getElementById('lista-hijos');
 
@@ -201,20 +215,21 @@
 
         const btn = document.getElementById('btn-save');
         btn.disabled = true;
-        const cedulaRepre = document.getElementById('in_cedula').value;
+        const cedulaRepre = document.getElementById('in_cedula').value.trim();
 
+        // PAYLOAD FORZADO A MAYÚSCULAS
         const payload = {
             cedula: cedulaRepre,
-            nombres: document.getElementById('in_nombres').value.toUpperCase(),
-            apellidos: document.getElementById('in_apellidos').value.toUpperCase(),
-            nombre_completo: `${document.getElementById('in_nombres').value} ${document.getElementById('in_apellidos').value}`.toUpperCase(),
+            nombres: document.getElementById('in_nombres').value.toUpperCase().trim(),
+            apellidos: document.getElementById('in_apellidos').value.toUpperCase().trim(),
+            nombre_completo: `${document.getElementById('in_nombres').value} ${document.getElementById('in_apellidos').value}`.toUpperCase().trim(),
             nacimiento: new Date(document.getElementById('in_nacimiento').value),
             estado_civil: document.getElementById('in_estado_civil').value,
-            ocupacion: document.getElementById('in_ocupacion').value.toUpperCase(),
-            direccion: document.getElementById('in_direccion').value.toUpperCase(),
+            ocupacion: document.getElementById('in_ocupacion').value.toUpperCase().trim(),
+            direccion: document.getElementById('in_direccion').value.toUpperCase().trim(),
             parentesco: document.getElementById('in_parentesco').value,
-            telefono: document.getElementById('in_telefono').value,
-            correo: document.getElementById('in_correo').value,
+            telefono: document.getElementById('in_telefono').value.trim(),
+            correo: document.getElementById('in_correo').value.toLowerCase().trim(), // Correo siempre minúscula
             estudiantes_ids: estudiantesVinculados,
             activo: true,
             updated_at: serverTimestamp()
@@ -223,7 +238,6 @@
         try {
             await setDoc(doc(db, "representantes", cedulaRepre), payload);
             
-            // MODAL FINAL CON OPCIONES
             Swal.fire({
                 title: '<span class="text-indigo-900 font-black uppercase italic">¡Guardado con éxito!</span>',
                 text: '¿Qué acción desea realizar ahora?',
@@ -233,15 +247,15 @@
                 confirmButtonText: '<i class="fa-solid fa-user-graduate mr-1"></i> Añadir Alumno',
                 denyButtonText: '<i class="fa-solid fa-users mr-1"></i> Otro Representante',
                 cancelButtonText: 'Ir al Inicio',
-                confirmButtonColor: '#6366f1', // Indigo para estudiante
-                denyButtonColor: '#1e293b',   // Dark para otro repre
-                cancelButtonColor: '#94a3b8', // Gris para dash
+                confirmButtonColor: '#6366f1',
+                denyButtonColor: '#1e293b',
+                cancelButtonColor: '#94a3b8',
                 customClass: { popup: 'rounded-[2rem]' }
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = "estudiantes.html";
                 } else if (result.isDenied) {
-                    location.reload(); // Limpia el formulario y se queda allí
+                    location.reload();
                 } else {
                     window.location.href = "dashboard.html";
                 }
@@ -254,7 +268,7 @@
     });
 
     document.getElementById('in_cedula').addEventListener('blur', async (e) => {
-        const ced = e.target.value;
+        const ced = e.target.value.trim();
         if(ced.length === 10) {
             const docSnap = await getDoc(doc(db, "representantes", ced));
             if(docSnap.exists()) {
@@ -268,7 +282,6 @@
                 document.getElementById('in_estado_civil').value = data.estado_civil || "SOLTERO/A";
                 document.getElementById('in_ocupacion').value = data.ocupacion || "";
                 if(data.nacimiento) {
-                    // Manejo de fecha Firestore a Input Date
                     const fecha = data.nacimiento.toDate ? data.nacimiento.toDate() : new Date(data.nacimiento);
                     document.getElementById('in_nacimiento').value = fecha.toISOString().split('T')[0];
                 }
