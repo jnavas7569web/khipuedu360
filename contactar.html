@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khipu Edu 360 - Contacto Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; }
-        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .badge-curso { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; }
+        .input-style:focus { border-color: #6366f1; background-color: #fff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); outline: none; }
+        .badge-curso { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 10px; text-transform: uppercase; }
         
         @media (max-width: 640px) {
             .search-container { flex-direction: column; gap: 10px; }
@@ -26,7 +27,7 @@
     <div class="max-w-4xl mx-auto">
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
             <div>
-                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Contactos</h1>
+                <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase leading-tight">Contactos</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Localizador de Representantes</p>
             </div>
             <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
@@ -44,12 +45,12 @@
                     <div class="absolute left-5 top-5 text-slate-300 text-xl"><i class="fa-solid fa-magnifying-glass"></i></div>
                 </div>
                 <button onclick="buscarEstudiante()" class="search-button md:absolute right-3 top-3 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase hover:bg-black transition-all shadow-lg active:scale-95">
-                    Buscar
+                    BUSCAR
                 </button>
             </div>
         </section>
 
-        <div id="contenedor-resultados" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="contenedor-resultados" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-700">
             <div class="md:col-span-2 text-center py-20 opacity-20">
                 <i class="fa-solid fa-search text-7xl mb-4"></i>
                 <p class="font-black uppercase text-xs">Ingrese un nombre para identificar al curso y representante</p>
@@ -60,6 +61,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -72,51 +74,61 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cacheMaps = { grados: {}, paralelos: {} };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) { 
+            document.body.style.opacity = "1"; 
+            await cargarDiccionarios();
+        } else { 
+            window.location.href = "index.html"; 
+        }
+    });
+
+    async function cargarDiccionarios() {
+        const [gS, pS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos"))
+        ]);
+        gS.forEach(d => cacheMaps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre.toUpperCase());
+    }
 
     window.buscarEstudiante = async () => {
         const busqueda = document.getElementById('input-busqueda').value.trim().toUpperCase();
-        if(busqueda.length < 3) return alert("Escriba al menos 3 letras.");
+        if(busqueda.length < 3) return Swal.fire('Atención', 'Escriba al menos 3 letras.', 'info');
 
         const contenedor = document.getElementById('contenedor-resultados');
-        contenedor.innerHTML = '<div class="md:col-span-2 text-center py-20 font-black text-indigo-900 animate-pulse uppercase">Escaneando nóminas...</div>';
+        contenedor.innerHTML = '<div class="md:col-span-2 text-center py-20 font-black text-indigo-900 animate-pulse uppercase">ESCANEANDO NÓMINAS...</div>';
 
         try {
-            // 1. Cargamos estudiantes y matrículas por separado para evitar errores de índice
-            const [snapEstu, snapMatr] = await Promise.all([
-                getDocs(collection(db, "estudiantes")),
-                getDocs(collection(db, "matriculas"))
-            ]);
-
+            const snapEstu = await getDocs(collection(db, "estudiantes"));
             let alumnosEncontrados = [];
-            let matriculasMap = {};
-
-            // Mapeamos las matrículas para búsqueda rápida por ID de estudiante
-            snapMatr.forEach(docM => {
-                const m = docM.data();
-                matriculasMap[m.estudiante_id] = m;
-            });
 
             snapEstu.forEach(docE => {
                 const d = docE.data();
-                const nombreCompleto = `${d.nombres} ${d.apellidos}`.toUpperCase();
+                const nombreCompleto = `${d.apellidos} ${d.nombres}`.toUpperCase();
                 if (nombreCompleto.includes(busqueda)) {
                     alumnosEncontrados.push({ id: docE.id, ...d });
                 }
             });
 
             if (alumnosEncontrados.length === 0) {
-                contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-slate-400 font-bold uppercase text-xs">No hay coincidencias.</div>`;
+                contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-slate-400 font-bold uppercase text-xs">No hay coincidencias en la nómina.</div>`;
                 return;
             }
 
             contenedor.innerHTML = "";
 
             for (const alumno of alumnosEncontrados) {
-                // Buscamos la matrícula en nuestro mapa local (sin usar query de Firebase)
-                const m = matriculasMap[alumno.cedula || alumno.id];
-                const infoCurso = m ? `${m.grado_id || ''} "${m.paralelo_id || ''}"`.toUpperCase() : "SIN MATRÍCULA";
+                // Traducir IDs a Nombres usando el cache
+                const gradoNom = cacheMaps.grados[alumno.grado] || alumno.grado;
+                const paraleloNom = cacheMaps.paralelos[alumno.paralelo] || alumno.paralelo;
+                const infoCurso = `${gradoNom} "${paraleloNom}"`.toUpperCase();
 
-                // Buscamos al representante
+                // Buscar al representante directamente por su ID de cédula
                 const docR = await getDoc(doc(db, "representantes", alumno.representante_id));
                 
                 if(docR.exists()) {
@@ -127,10 +139,10 @@
                                 <div class="flex justify-between items-start mb-4">
                                     <div class="flex flex-col gap-1">
                                         <span class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">ESTUDIANTE:</span>
-                                        <span class="font-black text-slate-800 text-sm">${alumno.nombres} ${alumno.apellidos}</span>
+                                        <span class="font-black text-slate-800 text-sm uppercase">${alumno.apellidos} ${alumno.nombres}</span>
                                         <span class="badge-curso w-fit">${infoCurso}</span>
                                     </div>
-                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-black text-[8px] uppercase tracking-tighter">${r.parentesco || 'REPRE.'}</span>
+                                    <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-black text-[8px] uppercase tracking-tighter">${r.parentesco || 'REPRESENTANTE'}</span>
                                 </div>
                                 
                                 <div class="mt-4 pt-4 border-t border-slate-50">
@@ -140,12 +152,12 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-3 mt-6">
-                                <a href="tel:${r.telefono}" class="bg-slate-800 text-white p-3 rounded-2xl text-center hover:bg-black transition-all text-xs font-bold">
+                                <a href="tel:${r.telefono}" class="bg-slate-800 text-white p-3 rounded-2xl text-center hover:bg-black transition-all text-[10px] font-black uppercase">
                                     <i class="fa-solid fa-phone mr-2"></i> LLAMAR
                                 </a>
-                                <a href="https://wa.me/593${r.telefono.replace(/^0/, '')}?text=Estimado(a)%20${r.nombres || r.nombre_completo},%20le%20saludo%20de%20la%20Escuela%20Gran%20Colombia.%20Me%20comunico%20por%20su%20hijo(a)%20${alumno.nombres}%20de%20${infoCurso}." 
-                                   target="_blank" class="bg-emerald-500 text-white p-3 rounded-2xl text-center hover:bg-emerald-600 transition-all text-xs font-bold">
-                                    <i class="fa-brands fa-whatsapp mr-2"></i> WHATSAPP
+                                <a href="https://wa.me/593${r.telefono.replace(/^0/, '')}?text=Saludos%20Estimado(a)%20${r.nombre_completo},%20le%20escribe%20el%20Docente%20de%20la%20Escuela%20Gran%20Colombia.%20Me%20comunico%20por%20temas%20académicos%20de%20su%20representado(a)%20${alumno.nombres}%20${alumno.apellidos}%20de%20${gradoNom}%20${paraleloNom}." 
+                                   target="_blank" class="bg-emerald-500 text-white p-3 rounded-2xl text-center hover:bg-emerald-600 transition-all text-[10px] font-black uppercase">
+                                    <i class="fa-brands fa-whatsapp mr-2 text-lg"></i> WHATSAPP
                                 </a>
                             </div>
                         </div>
@@ -154,8 +166,8 @@
                 }
             }
         } catch (err) {
-            console.error("Detalle del error:", err);
-            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error al recuperar datos. Intente de nuevo.</div>`;
+            console.error(err);
+            contenedor.innerHTML = `<div class="md:col-span-2 text-center py-20 text-red-500 font-bold uppercase text-xs">Error de conexión con la base de datos.</div>`;
         }
     };
 </script>
