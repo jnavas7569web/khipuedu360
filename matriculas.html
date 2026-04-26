@@ -25,7 +25,7 @@
                 <h1 class="text-3xl font-black text-indigo-950 tracking-tighter italic uppercase">Proceso de Matrícula</h1>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-1">Khipu Edu 360 • Gestión Académica</p>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+            <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center shadow-sm">
                 <i class="fa-solid fa-house"></i>
             </button>
         </header>
@@ -42,7 +42,7 @@
                             <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
                         </div>
                     </div>
-                    <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic">Validación de identidad necesaria.</p>
+                    <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic text-center">Validación de identidad necesaria.</p>
                 </div>
 
                 <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-indigo-200 shadow-2xl relative overflow-hidden">
@@ -59,7 +59,7 @@
             </div>
 
             <div class="lg:col-span-8 glass-card p-10">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-slate-700">
                     
                     <div class="md:col-span-2">
                         <label class="label-style">Nombres del Estudiante</label>
@@ -79,15 +79,22 @@
 
                     <div>
                         <label class="label-style">Grado Destino</label>
-                        <select id="id_grado" required class="w-full p-4 input-style rounded-2xl outline-none appearance-none">
-                            <option value="">Cargando grados...</option>
+                        <select id="id_grado" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
+                            <option value="">Cargando...</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="label-style">Paralelo Destino</label>
-                        <select id="res_paralelo" required class="w-full p-4 input-style rounded-2xl outline-none appearance-none">
-                            <option value="">Seleccione Paralelo</option>
+                        <label class="label-style">Paralelo</label>
+                        <select id="res_paralelo" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
+                            <option value="">Seleccione...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="label-style">Jornada</label>
+                        <select id="res_jornada" required class="w-full p-4 input-style rounded-2xl outline-none bg-white">
+                            <option value="">Seleccione...</option>
                         </select>
                     </div>
 
@@ -108,7 +115,7 @@
 
                 <div class="flex justify-end mt-12 gap-4 items-center">
                     <button type="button" onclick="location.reload()" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-500 transition-all">Limpiar Formulario</button>
-                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed hover:bg-black text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl transition-all active:scale-95">
+                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl transition-all">
                         Confirmar Matrícula <i class="fa-solid fa-file-circle-check ml-2"></i>
                     </button>
                 </div>
@@ -118,7 +125,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
@@ -135,43 +142,39 @@
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "index.html"; }
-        else {
-            const userDoc = await getDoc(doc(db, "usuario", user.uid));
-            const uData = userDoc.data();
-            if (uData && (uData.rol === 'admin' || uData.rol === 'docente')) {
-                document.body.style.opacity = "1";
-                inicializarPagina();
-            } else {
-                window.location.href = "dashboard.html";
-            }
-        }
+        if (user) { 
+            document.body.style.opacity = "1"; 
+            inicializarPagina(); 
+        } else { window.location.href = "index.html"; }
     });
 
     async function inicializarPagina() {
-        await cargarListas();
-        await detectarPeriodoActivo();
-    }
+        // Cargar Periodo Activo
+        const qP = query(collection(db, "periodos_lectivos"), where("estado", "in", ["activo", true]));
+        const snapP = await getDocs(qP);
+        if (!snapP.empty) {
+            const pData = snapP.docs[0].data();
+            document.getElementById('periodo_display').innerText = pData.nombre;
+            document.getElementById('in_periodo').value = pData.nombre;
+        }
 
-    async function cargarListas() {
-        const gSnap = await getDocs(collection(db, "grados"));
+        // Cargar Grados
+        const gSnap = await getDocs(query(collection(db, "grados"), orderBy("orden", "asc")));
         const selG = document.getElementById('id_grado');
-        selG.innerHTML = '<option value="">Elegir Grado</option>';
+        selG.innerHTML = '<option value="">Elegir Grado...</option>';
         gSnap.forEach(d => selG.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
 
-        const pSnap = await getDocs(collection(db, "paralelos"));
+        // Cargar Paralelos
+        const pSnap = await getDocs(query(collection(db, "paralelos"), orderBy("nombre", "asc")));
         const selP = document.getElementById('res_paralelo');
-        selP.innerHTML = '<option value="">Seleccione Paralelo</option>';
-        pSnap.forEach(d => selP.innerHTML += `<option value="${d.id}">${d.data().nombre || d.id}</option>`);
-    }
+        selP.innerHTML = '<option value="">Paralelo...</option>';
+        pSnap.forEach(d => selP.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`);
 
-    async function detectarPeriodoActivo() {
-        const q = query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-            document.getElementById('periodo_display').innerText = snap.docs[0].data().nombre;
-            document.getElementById('in_periodo').value = snap.docs[0].id;
-        }
+        // Cargar Jornadas
+        const jSnap = await getDocs(query(collection(db, "jornadas"), orderBy("nombre", "asc")));
+        const selJ = document.getElementById('res_jornada');
+        selJ.innerHTML = '<option value="">Jornada...</option>';
+        jSnap.forEach(d => selJ.innerHTML += `<option value="${d.data().nombre}">${d.data().nombre}</option>`);
     }
 
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
@@ -179,26 +182,24 @@
         if (ced.length === 10) {
             document.getElementById('loader-est').classList.remove('hidden');
             const eSnap = await getDoc(doc(db, "estudiantes", ced));
+            
             if (eSnap.exists()) {
                 const est = eSnap.data();
                 document.getElementById('res_nombre').value = `${est.nombres} ${est.apellidos}`;
-                document.getElementById('id_grado').value = est.grado;
-                document.getElementById('res_paralelo').value = est.paralelo;
+                document.getElementById('id_grado').value = est.grado || "";
+                document.getElementById('res_paralelo').value = est.paralelo || "";
+                document.getElementById('res_jornada').value = est.jornada || "";
                 document.getElementById('id_repre').value = est.representante_id;
 
                 if(est.representante_id) {
                     const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
                     if(rSnap.exists()){
-                        const rData = rSnap.data();
-                        // CORRECCIÓN: Usar campo nombre_completo que trae Nombres + Apellidos
-                        document.getElementById('res_repre').value = rData.nombre_completo || `${rData.nombres} ${rData.apellidos}`;
-                    } else {
-                        document.getElementById('res_repre').value = "REPRESENTANTE NO ENCONTRADO";
+                        document.getElementById('res_repre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
                     }
                 }
                 validarAsignacionDinamica();
             } else {
-                Swal.fire('Error', 'Estudiante no registrado.', 'error');
+                Swal.fire('No encontrado', 'Estudiante no registrado.', 'warning');
             }
             document.getElementById('loader-est').classList.add('hidden');
         }
@@ -207,28 +208,33 @@
     async function validarAsignacionDinamica() {
         const grado = document.getElementById('id_grado').value;
         const paralelo = document.getElementById('res_paralelo').value;
+        const jornada = document.getElementById('res_jornada').value;
         const resDoc = document.getElementById('res_docente_nombre');
         const boxDoc = document.getElementById('box-docente');
         const btn = document.getElementById('btn-save');
 
-        if (grado && paralelo) {
+        if (grado && paralelo && jornada) {
             const qAsig = query(collection(db, "asignaciones"), 
                 where("grado_id", "==", grado), 
-                where("paralelo_id", "==", paralelo));
+                where("paralelo_id", "==", paralelo),
+                where("jornada", "==", jornada),
+                where("tutor", "==", true));
             
             const asigSnap = await getDocs(qAsig);
 
             if (!asigSnap.empty) {
                 const asig = asigSnap.docs[0].data();
                 const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
+                const nombreDoc = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
+                
                 document.getElementById('id_docente').value = asig.docente_id;
-                resDoc.innerText = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
+                resDoc.innerText = nombreDoc;
                 boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100 transition-all";
                 resDoc.className = "font-black text-emerald-900 uppercase tracking-tight";
                 btn.disabled = false;
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
             } else {
-                resDoc.innerText = "SIN ASIGNACIÓN EN ESTE CURSO";
+                resDoc.innerText = "SIN TUTOR ASIGNADO EN ESTA JORNADA";
                 boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100 transition-all";
                 resDoc.className = "font-black text-red-600 uppercase tracking-tight";
                 btn.disabled = true;
@@ -239,13 +245,10 @@
 
     document.getElementById('id_grado').addEventListener('change', validarAsignacionDinamica);
     document.getElementById('res_paralelo').addEventListener('change', validarAsignacionDinamica);
+    document.getElementById('res_jornada').addEventListener('change', validarAsignacionDinamica);
 
     document.getElementById('form-matricula').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btn-save');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESANDO...';
-
         const pId = document.getElementById('in_periodo').value;
         const ced = document.getElementById('in_cedula').value;
 
@@ -257,16 +260,15 @@
                 nombre_representante: document.getElementById('res_repre').value,
                 grado_id: document.getElementById('id_grado').value,
                 paralelo_id: document.getElementById('res_paralelo').value,
+                jornada_id: document.getElementById('res_jornada').value,
                 periodo_id: pId,
                 docente_id: document.getElementById('id_docente').value,
                 fecha_matricula: serverTimestamp(),
                 estado: "activa"
             });
-            Swal.fire('¡Éxito!', 'Matrícula procesada correctamente.', 'success').then(() => location.reload());
+            Swal.fire('¡Éxito!', 'Matrícula generada correctamente.', 'success').then(() => location.reload());
         } catch (err) {
-            Swal.fire('Error Critico', 'No se pudo sincronizar la matrícula.', 'error');
-            btn.disabled = false;
-            btn.innerText = 'Confirmar Matrícula';
+            Swal.fire('Error', 'No se pudo guardar la matrícula.', 'error');
         }
     });
 </script>
