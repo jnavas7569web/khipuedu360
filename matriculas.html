@@ -11,9 +11,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; color: #1e293b; }
+        .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; color: #1e293b; text-transform: uppercase; }
         .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        .input-readonly { background-color: #f1f5f9; border-color: #e2e8f0; color: #64748b; cursor: not-allowed; font-weight: 600; }
+        .input-readonly { background-color: #f1f5f9; border-color: #e2e8f0; color: #64748b; cursor: not-allowed; font-weight: 800; }
         .label-style { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
         .badge-periodo { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
     </style>
@@ -51,7 +51,7 @@
                         <label class="label-style text-indigo-300">Periodo Lectivo Activo</label>
                         <div id="periodo_display" class="text-4xl font-black tracking-tighter italic">---</div>
                         <input type="hidden" id="in_periodo">
-                        <div class="mt-4 inline-block px-3 py-1 rounded-full badge-periodo text-[9px] font-bold uppercase tracking-widest">
+                        <div class="mt-4 inline-block px-3 py-1 rounded-full badge-periodo text-[9px] font-bold uppercase tracking-widest text-white">
                             Sincronizado <i class="fa-solid fa-cloud-check ml-1"></i>
                         </div>
                     </div>
@@ -141,6 +141,7 @@
 
     const cacheMaps = {
         grados: {},
+        paralelos: {}, // Para limpiar el ID de image_2d1f59.png
         jornadas_nombre_a_id: {} 
     };
 
@@ -153,7 +154,6 @@
 
     async function inicializarPagina() {
         try {
-            // 1. Cargar Periodo Activo
             const qP = query(collection(db, "periodos_lectivos"), where("estado", "in", ["activo", true]));
             const snapP = await getDocs(qP);
             if (!snapP.empty) {
@@ -162,20 +162,19 @@
                 document.getElementById('in_periodo').value = pData.nombre;
             }
 
-            // 2. Cache Grados
             const gSnap = await getDocs(collection(db, "grados"));
             gSnap.forEach(d => cacheMaps.grados[d.id] = d.data().nombre);
 
-            // 3. Cache Jornadas (FORZAR MINÚSCULAS)
+            const pSnap = await getDocs(collection(db, "paralelos"));
+            pSnap.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre);
+
             const jSnap = await getDocs(collection(db, "jornadas"));
             jSnap.forEach(d => {
                 const nombreLimpio = d.data().nombre.toLowerCase().trim();
                 cacheMaps.jornadas_nombre_a_id[nombreLimpio] = d.id;
             });
 
-        } catch (e) {
-            console.error("Error inicialización:", e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
@@ -187,12 +186,20 @@
                 if (eSnap.exists()) {
                     const est = eSnap.data();
                     document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
+                    
+                    // Lógica para limpiar Grado
                     document.getElementById('res_grado_text').value = cacheMaps.grados[est.grado] || est.grado;
                     document.getElementById('id_grado').value = est.grado || "";
-                    document.getElementById('res_paralelo_text').value = est.paralelo || "";
-                    document.getElementById('id_paralelo').value = est.paralelo || "";
+                    
+                    // FIX MAESTRO PARA PARALELO (Solución Imagen image_2d1f59.png)
+                    const paraleloReal = cacheMaps.paralelos[est.paralelo] || est.paralelo;
+                    document.getElementById('res_paralelo_text').value = paraleloReal;
+                    document.getElementById('id_paralelo').value = paraleloReal;
+
+                    // Lógica para Jornada
                     document.getElementById('res_jornada_text').value = est.jornada || "";
                     document.getElementById('id_jornada_nombre').value = est.jornada || "";
+                    
                     document.getElementById('id_repre').value = est.representante_id;
 
                     if(est.representante_id) {
@@ -201,10 +208,9 @@
                             document.getElementById('res_repre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
                         }
                     }
-                    // Ejecutar validación de Tutor después de cargar todo
                     validarAsignacionDinamica();
                 } else {
-                    Swal.fire('No encontrado', 'Cédula no registrada.', 'warning');
+                    Swal.fire('Atención', 'Cédula no encontrada en el registro de estudiantes.', 'warning');
                 }
             } catch (error) { console.error(error); }
             document.getElementById('loader-est').classList.add('hidden');
@@ -221,7 +227,6 @@
         const boxDoc = document.getElementById('box-docente');
         const btn = document.getElementById('btn-save');
 
-        // Obtener el ID de la jornada desde el mapa (usando minúsculas)
         const jornada_id = cacheMaps.jornadas_nombre_a_id[jornada_nombre];
 
         if (grado_id && paralelo_id && jornada_id) {
@@ -268,22 +273,22 @@
         try {
             await setDoc(doc(db, "matriculas", `${ced}_${pId}`), {
                 estudiante_id: ced,
-                nombre_estudiante: document.getElementById('res_nombre').value,
+                nombre_estudiante: document.getElementById('res_nombre').value.toUpperCase(),
                 representante_id: document.getElementById('id_repre').value,
-                nombre_representante: document.getElementById('res_repre').value,
+                nombre_representante: document.getElementById('res_repre').value.toUpperCase(),
                 grado_id: document.getElementById('id_grado').value,
-                paralelo_id: document.getElementById('id_paralelo').value,
-                jornada: document.getElementById('res_jornada_text').value,
+                paralelo_id: document.getElementById('id_paralelo').value.toUpperCase(),
+                jornada: document.getElementById('res_jornada_text').value.toUpperCase(),
                 periodo_id: pId,
                 docente_id: document.getElementById('id_docente').value,
                 fecha_matricula: serverTimestamp(),
-                estado: "activa"
+                estado: "ACTIVA"
             });
-            Swal.fire('¡Éxito!', 'Matrícula guardada.', 'success').then(() => location.reload());
+            Swal.fire({ title: '¡ÉXITO!', text: 'MATRÍCULA PROCESADA CORRECTAMENTE.', icon: 'success' }).then(() => location.reload());
         } catch (err) {
-            Swal.fire('Error', 'No se pudo guardar.', 'error');
+            Swal.fire('ERROR', 'NO SE PUDO GUARDAR.', 'error');
             btn.disabled = false;
-            btn.innerText = 'Confirmar Matrícula';
+            btn.innerText = 'CONFIRMAR MATRÍCULA';
         }
     });
 </script>
