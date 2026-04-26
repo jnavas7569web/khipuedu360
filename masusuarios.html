@@ -11,8 +11,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
-        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
+        .input-style { background-color: #ffffff; border: 2px solid #e2e8f0; transition: all 0.3s ease; width: 100%; }
         .input-style:focus { border-color: #1d9bf0; outline: none; box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); }
+        
+        /* ESTÁNDAR VISUAL: Nombre y Título en MAYÚSCULAS */
+        #in_nombre, #in_titulo { text-transform: uppercase; }
+        
         .label-style { font-size: 10px; font-weight: 900; color: #1d9bf0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; margin-left: 0.25rem; }
     </style>
 </head>
@@ -45,7 +49,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="label-style">Nombre Completo</label>
-                            <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase">
+                            <input type="text" id="in_nombre" required class="w-full p-4 input-style rounded-2xl font-bold text-slate-700">
                         </div>
                     </div>
 
@@ -60,7 +64,7 @@
                         </div>
                         <div>
                             <label class="label-style">Título / Especialidad</label>
-                            <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700 uppercase" placeholder="Ej: INGENIERO">
+                            <input type="text" id="in_titulo" class="w-full p-4 input-style rounded-2xl font-bold text-slate-700" placeholder="EJ: INGENIERO">
                         </div>
                     </div>
                 </div>
@@ -116,9 +120,8 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let usuarioEncontrado = null; // Guardará el objeto completo de Firestore
+    let usuarioEncontrado = null;
 
-    // ESCUDO ADMIN
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; }
         else {
@@ -126,14 +129,17 @@
             if (userSnap.exists() && userSnap.data().rol === "admin") {
                 document.body.style.opacity = "1";
             } else {
-                Swal.fire('Acceso Denegado', 'Área exclusiva de administración.', 'error').then(() => window.location.href = "dashboard.html");
+                window.location.href = "dashboard.html";
             }
         }
     });
 
-    // BUSCADOR POR CÉDULA
+    // --- ESTÁNDAR DE DATOS: Mayúsculas al perder el foco ---
+    document.getElementById('in_nombre').addEventListener('blur', function() { this.value = this.value.toUpperCase().trim(); });
+    document.getElementById('in_titulo').addEventListener('blur', function() { this.value = this.value.toUpperCase().trim(); });
+
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
-        const ced = e.target.value;
+        const ced = e.target.value.trim();
         if (ced.length === 10) {
             document.getElementById('load-icon').classList.remove('hidden');
             const q = query(collection(db, "usuario"), where("cedula", "==", ced));
@@ -151,36 +157,29 @@
                 if(usuarioEncontrado.nacimiento) document.getElementById('in_nacimiento').value = usuarioEncontrado.nacimiento.toDate().toISOString().split('T')[0];
                 
                 document.getElementById('in_pass').required = false;
-                document.getElementById('in_pass').placeholder = "Sin cambios (Clave protegida)";
+                document.getElementById('in_pass').placeholder = "Sin cambios";
                 
                 const status = document.getElementById('status-user');
                 const btnSuspender = document.getElementById('btn-suspender');
                 
                 btnSuspender.classList.remove('hidden');
                 if(usuarioEncontrado.estado === 'activo') {
-                    status.innerText = "USUARIO ACTIVO - MODO EDICIÓN";
+                    status.innerText = "USUARIO ACTIVO";
                     status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-emerald-100 text-emerald-600 tracking-widest border border-emerald-200";
-                    btnSuspender.innerHTML = `<i class="fa-solid fa-user-slash mr-2"></i> Suspender Acceso`;
-                    btnSuspender.className = btnSuspender.className.replace('text-emerald-500', 'text-red-500');
                 } else {
-                    status.innerText = "USUARIO SUSPENDIDO (INACTIVO)";
+                    status.innerText = "USUARIO SUSPENDIDO";
                     status.className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-red-100 text-red-600 tracking-widest border border-red-200";
-                    btnSuspender.innerHTML = `<i class="fa-solid fa-user-check mr-2"></i> Reactivar Usuario`;
-                    btnSuspender.className = btnSuspender.className.replace('text-red-500', 'text-emerald-500');
                 }
-                document.getElementById('btn-save').innerText = "Actualizar Perfil";
+                document.getElementById('btn-save').innerText = "ACTUALIZAR PERFIL";
             } else {
                 usuarioEncontrado = null;
                 document.getElementById('in_pass').required = true;
-                document.getElementById('btn-suspender').classList.add('hidden');
-                document.getElementById('status-user').innerText = "NUEVO REGISTRO";
-                document.getElementById('status-user').className = "text-[9px] font-black uppercase px-4 py-2 rounded-xl bg-blue-100 text-blue-600 tracking-widest border border-blue-200";
+                document.getElementById('btn-save').innerText = "REGISTRAR ACCESO";
             }
             document.getElementById('load-icon').classList.add('hidden');
         }
     });
 
-    // GUARDAR O ACTUALIZAR
     document.getElementById('form-usuario').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('btn-save');
@@ -189,13 +188,12 @@
 
         const email = document.getElementById('in_correo').value.trim();
         const password = document.getElementById('in_pass').value;
-        const cedula = document.getElementById('in_cedula').value;
+        const cedula = document.getElementById('in_cedula').value.trim();
 
         try {
             let uid_final = usuarioEncontrado ? usuarioEncontrado.uid : null;
 
             if (!uid_final) {
-                // Registro nuevo en Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 uid_final = userCredential.user.uid;
             }
@@ -203,50 +201,39 @@
             const payload = {
                 uid: uid_final,
                 cedula: cedula,
-                nombre: document.getElementById('in_nombre').value.trim().toUpperCase(),
+                nombre: document.getElementById('in_nombre').value.toUpperCase().trim(),
                 correo: email,
-                telefono: document.getElementById('in_telefono').value,
+                telefono: document.getElementById('in_telefono').value.trim(),
                 nacimiento: new Date(document.getElementById('in_nacimiento').value),
-                titulo: document.getElementById('in_titulo').value.trim().toUpperCase(),
+                titulo: document.getElementById('in_titulo').value.toUpperCase().trim(),
                 rol: document.getElementById('in_rol').value,
                 estado: usuarioEncontrado ? usuarioEncontrado.estado : "activo",
                 updated_at: serverTimestamp()
             };
 
             await setDoc(doc(db, "usuario", uid_final), payload, { merge: true });
-
-            Swal.fire({ title: '¡Sincronizado!', text: 'El usuario ha sido procesado correctamente.', icon: 'success' })
-            .then(() => location.reload());
+            Swal.fire({ title: '¡ÉXITO!', text: 'Perfil sincronizado correctamente.', icon: 'success' }).then(() => location.reload());
 
         } catch (error) {
-            let msg = "No se pudo crear. Si el correo ya existe en Auth, bórrelo en la consola de Firebase.";
-            if(error.code === 'auth/email-already-in-use') msg = "Este correo ya está en uso por otro usuario en el autenticador.";
-            Swal.fire('Error de Registro', msg, 'error');
+            Swal.fire('ERROR', error.message, 'error');
             btn.disabled = false;
-            btn.innerText = "Registrar Acceso";
         }
     });
 
-    // SUSPENDER O REACTIVAR (BAJA LÓGICA)
     document.getElementById('btn-suspender').onclick = async () => {
         if (!usuarioEncontrado) return;
-        
         const nuevoEstado = usuarioEncontrado.estado === 'activo' ? 'inactivo' : 'activo';
-        const tituloAccion = nuevoEstado === 'inactivo' ? '¿Suspender Acceso?' : '¿Reactivar Usuario?';
-        
         const result = await Swal.fire({
-            title: tituloAccion,
-            text: nuevoEstado === 'inactivo' ? "El usuario no podrá entrar al sistema hasta que lo reactives." : "El usuario recuperará el acceso inmediatamente.",
+            title: '¿CAMBIAR ESTADO?',
+            text: `El usuario será marcado como ${nuevoEstado.toUpperCase()}.`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: nuevoEstado === 'inactivo' ? '#ef4444' : '#10b981',
-            confirmButtonText: 'Sí, confirmar'
+            confirmButtonText: 'SÍ, CONFIRMAR'
         });
 
         if (result.isConfirmed) {
             await updateDoc(doc(db, "usuario", usuarioEncontrado.docId), { estado: nuevoEstado });
-            Swal.fire('Estado Actualizado', `Usuario marcado como ${nuevoEstado.toUpperCase()}.`, 'success')
-            .then(() => location.reload());
+            location.reload();
         }
     };
 </script>
