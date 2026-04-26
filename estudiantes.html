@@ -11,10 +11,26 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .input-style { background-color: #f1f5f9; border: 2px solid transparent; transition: all 0.3s ease; font-weight: 700; width: 100%; }
-        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; }
-        .label-style { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
-        .section-title { border-left: 4px solid #6366f1; padding-left: 10px; font-size: 12px; font-weight: 900; color: #1e293b; text-transform: uppercase; margin-bottom: 20px; }
+        
+        /* Estilo de Alto Contraste para Inputs */
+        .input-style { 
+            background-color: #f1f5f9; 
+            border: 2px solid #e2e8f0; 
+            transition: all 0.3s ease; 
+            font-weight: 700; 
+            width: 100%; 
+            font-size: 1rem; /* Texto más grande */
+            color: #1e293b;
+        }
+        .input-style:focus { 
+            border-color: #1d9bf0; 
+            background-color: #fff; 
+            outline: none; 
+            box-shadow: 0 0 0 4px rgba(29, 155, 240, 0.1); 
+        }
+        
+        .label-style { font-size: 11px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.6rem; display: block; margin-left: 0.5rem; }
+        .section-title { border-left: 5px solid #1d9bf0; padding-left: 12px; font-size: 14px; font-weight: 900; color: #0f172a; text-transform: uppercase; margin-bottom: 25px; margin-top: 10px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -30,7 +46,7 @@
             </button>
         </header>
 
-        <div class="glass-card p-6 md:p-10">
+        <div class="glass-card p-6 md:p-12">
             <form id="form-estudiante">
                 <div class="section-title">1. Datos Personales y Académicos</div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -38,18 +54,18 @@
                         <label class="label-style">Cédula del Alumno</label>
                         <div class="flex gap-2">
                             <input type="text" id="est-cedula" maxlength="10" required class="p-4 rounded-2xl input-style" placeholder="13XXXXXXXX">
-                            <button type="button" onclick="buscarEstudiante()" class="bg-indigo-50 text-indigo-600 px-4 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all">
+                            <button type="button" onclick="buscarEstudiante()" class="bg-sky-100 text-sky-600 px-5 rounded-2xl hover:bg-sky-600 hover:text-white transition-all">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </button>
                         </div>
                     </div>
                     <div>
                         <label class="label-style">Apellidos</label>
-                        <input type="text" id="est-apellidos" required class="p-4 rounded-2xl input-style uppercase">
+                        <input type="text" id="est-apellidos" required class="p-4 rounded-2xl input-style uppercase" placeholder="Ej: PARRAGA">
                     </div>
                     <div>
                         <label class="label-style">Nombres</label>
-                        <input type="text" id="est-nombres" required class="p-4 rounded-2xl input-style uppercase">
+                        <input type="text" id="est-nombres" required class="p-4 rounded-2xl input-style uppercase" placeholder="Ej: JURY">
                     </div>
 
                     <div>
@@ -77,8 +93,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="label-style">Periodo Lectivo</label>
-                        <input type="text" id="est-periodo" class="p-4 rounded-2xl input-style bg-slate-50 text-indigo-600" readonly>
+                        <label class="label-style">Periodo Lectivo Actual</label>
+                        <input type="text" id="est-periodo" class="p-4 rounded-2xl input-style bg-slate-200 text-slate-500 cursor-not-allowed" readonly placeholder="Sincronizando...">
                     </div>
                 </div>
 
@@ -86,7 +102,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                     <div>
                         <label class="label-style">Tipo de Sangre</label>
-                        <select id="est-sangre" required class="p-4 rounded-2xl input-style font-bold bg-white">
+                        <select id="est-sangre" required class="p-4 rounded-2xl input-style font-bold bg-white text-rose-600">
                             <option value="A+">A+</option><option value="A-">A-</option>
                             <option value="B+">B+</option><option value="B-">B-</option>
                             <option value="AB+">AB+</option><option value="AB-">AB-</option>
@@ -96,31 +112,31 @@
                     <div>
                         <label class="label-style">Condición NEE (Necesidad Educativa)</label>
                         <select id="est-nee" required class="p-4 rounded-2xl input-style font-bold bg-white">
-                            <option value="false">NO</option>
+                            <option value="false">NO (ESTÁNDAR)</option>
                             <option value="true">SÍ (REQUIERE APOYO)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="section-title">3. Información del Representante</div>
-                <div class="bg-slate-50 p-6 rounded-[2rem] border border-dashed border-slate-300">
-                    <div class="flex flex-col md:flex-row items-center gap-4">
+                <div class="bg-slate-50 p-8 rounded-[2.5rem] border-2 border-dashed border-slate-200">
+                    <div class="flex flex-col md:flex-row items-center gap-6">
                         <div class="w-full md:w-1/3">
                             <label class="label-style">Cédula Representante</label>
-                            <input type="text" id="est-repre-id" maxlength="10" required class="p-4 rounded-2xl input-style" oninput="identificarRepresentante()">
+                            <input type="text" id="est-repre-id" maxlength="10" required class="p-4 rounded-2xl input-style" oninput="identificarRepresentante()" placeholder="Buscar...">
                         </div>
                         <div class="flex-1 text-center md:text-left">
-                            <p id="repre-nombre" class="font-black text-indigo-900 uppercase text-sm">Esperando cédula...</p>
-                            <button type="button" id="btn-add-repre" onclick="window.location.href='representantes.html'" class="hidden mt-2 text-rose-500 font-black text-[10px] uppercase hover:underline">
-                                <i class="fa-solid fa-user-plus mr-1"></i> No encontrado. ¿Registrar nuevo?
+                            <p id="repre-nombre" class="font-black text-indigo-900 uppercase text-lg">Esperando cédula...</p>
+                            <button type="button" id="btn-add-repre" onclick="window.location.href='representantes.html'" class="hidden mt-2 bg-rose-50 text-rose-600 px-4 py-2 rounded-xl font-black text-[10px] uppercase border border-rose-100 hover:bg-rose-600 hover:text-white transition-all">
+                                <i class="fa-solid fa-user-plus mr-1"></i> No registrado. ¿Crear Ficha?
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-10">
-                    <button type="submit" class="w-full bg-indigo-600 text-white p-5 rounded-3xl font-black uppercase text-xs hover:bg-black transition-all shadow-xl active:scale-95">
-                        <i class="fa-solid fa-floppy-disk mr-2"></i> Procesar Ficha de Registro
+                <div class="mt-12">
+                    <button type="submit" class="w-full bg-indigo-600 text-white p-6 rounded-[2rem] font-black uppercase text-sm hover:bg-black transition-all shadow-2xl active:scale-95">
+                        <i class="fa-solid fa-cloud-arrow-up mr-2 text-lg"></i> Procesar y Guardar Registro Estudiantil
                     </button>
                 </div>
             </form>
@@ -151,15 +167,22 @@
     });
 
     async function inicializarForm() {
-        // 1. Cargar Selects Ordenados
         cargarSelect('grados', 'est-grado', 'orden');
         cargarSelect('paralelos', 'est-paralelo', 'nombre');
         cargarSelect('jornadas', 'est-jornada', 'nombre');
 
-        // 2. Cargar Periodo Actual
-        const qP = query(collection(db, "periodos_lectivos"), where("estado", "==", true));
-        const snapP = await getDocs(qP);
-        if(!snapP.empty) document.getElementById('est-periodo').value = snapP.docs[0].data().nombre;
+        // LÓGICA DE PERIODO ACTIVO (Imagen 38f0b9)
+        try {
+            const qP = query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"));
+            const snapP = await getDocs(qP);
+            if(!snapP.empty) {
+                document.getElementById('est-periodo').value = snapP.docs[0].data().nombre;
+            } else {
+                document.getElementById('est-periodo').value = "SIN PERIODO ACTIVO";
+            }
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async function cargarSelect(col, elementId, orderField) {
@@ -175,25 +198,25 @@
     window.buscarEstudiante = async () => {
         const ced = document.getElementById('est-cedula').value.trim();
         if(ced.length < 10) return;
-        const docRef = doc(db, "estudiantes", ced);
-        const snap = await getDoc(docRef);
-        if(snap.exists()) {
-            const d = snap.data();
+        const q = query(collection(db, "estudiantes"), where("cedula", "==", ced));
+        const snap = await getDocs(q);
+        if(!snap.empty) {
+            const d = snap.docs[0].data();
             document.getElementById('est-apellidos').value = d.apellidos;
             document.getElementById('est-nombres').value = d.nombres;
             document.getElementById('est-grado').value = d.grado;
             document.getElementById('est-paralelo').value = d.paralelo;
             document.getElementById('est-jornada').value = d.jornada;
-            document.getElementById('est-genero').value = d.genero;
-            document.getElementById('est-sangre').value = d.tipo_sangre;
-            document.getElementById('est-nee').value = d.nee.toString();
+            document.getElementById('est-genero').value = d.genero || "M";
+            document.getElementById('est-sangre').value = d.tipo_sangre || "A+";
+            document.getElementById('est-nee').value = d.nee ? "true" : "false";
             document.getElementById('est-repre-id').value = d.representante_id;
             if(d.fecha_nacimiento) {
                 const date = d.fecha_nacimiento.toDate ? d.fecha_nacimiento.toDate() : new Date(d.fecha_nacimiento);
                 document.getElementById('est-fecha').value = date.toISOString().split('T')[0];
             }
             identificarRepresentante();
-            Swal.fire('Ficha Cargada', 'Puedes actualizar los datos del alumno.', 'info');
+            Swal.fire({ title: 'Ficha Cargada', text: 'Los datos del alumno se han recuperado.', icon: 'success', customClass: { popup: 'rounded-[2rem]' } });
         }
     };
 
@@ -209,10 +232,13 @@
                 lbl.classList.replace('text-rose-500', 'text-indigo-900');
                 btn.classList.add('hidden');
             } else {
-                lbl.innerText = "No registrado";
+                lbl.innerText = "Representante no encontrado";
                 lbl.classList.replace('text-indigo-900', 'text-rose-500');
                 btn.classList.remove('hidden');
             }
+        } else {
+            lbl.innerText = "Esperando cédula...";
+            btn.classList.add('hidden');
         }
     };
 
@@ -242,25 +268,25 @@
             await setDoc(doc(db, "estudiantes", ced), payload, { merge: true });
             
             Swal.fire({
-                title: '<span class="text-indigo-900 font-black uppercase">¡Registro Exitoso!</span>',
-                text: 'El alumno ha sido sincronizado en el sistema.',
+                title: '<span class="text-indigo-900 font-black uppercase tracking-tighter">¡Registro Sincronizado!</span>',
+                text: '¿Qué acción desea realizar ahora?',
                 icon: 'success',
                 showCancelButton: true,
                 showDenyButton: true,
-                confirmButtonText: '<i class="fa-solid fa-house"></i> Dashboard',
-                denyButtonText: '<i class="fa-solid fa-plus"></i> Otro Estudiante',
-                cancelButtonText: '<i class="fa-solid fa-user-plus"></i> Ir a Repres.',
+                confirmButtonText: '<i class="fa-solid fa-house mr-1"></i> Dashboard',
+                denyButtonText: '<i class="fa-solid fa-user-plus mr-1"></i> Otro Alumno',
+                cancelButtonText: '<i class="fa-solid fa-users mr-1"></i> Ir a Repres.',
                 confirmButtonColor: '#4f46e5',
                 denyButtonColor: '#10b981',
                 cancelButtonColor: '#f59e0b',
-                customClass: { popup: 'rounded-[2.5rem]' }
+                customClass: { popup: 'rounded-[3rem]' }
             }).then((result) => {
                 if (result.isConfirmed) window.location.href = "dashboard.html";
                 else if (result.isDenied) location.reload();
                 else if (result.dismiss === Swal.DismissReason.cancel) window.location.href = "representantes.html";
             });
         } catch (error) {
-            Swal.fire('Error', 'No se pudo guardar: ' + error.message, 'error');
+            Swal.fire('Error', error.message, 'error');
         }
     });
 </script>
