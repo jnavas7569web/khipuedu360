@@ -13,6 +13,7 @@
         body { background-color: var(--gris-fondo); font-family: 'Inter', sans-serif; font-size: 13px; opacity: 0; transition: opacity 0.5s ease; }
         
         .header-reporte { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%); color: white; }
+        .logo-img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 1rem; padding: 5px; }
         
         .badge { padding: 3px 8px; border-radius: 6px; font-weight: 900; text-transform: uppercase; font-size: 9px; border: 1.5px solid; display: inline-block; }
         .badge-presente { background: #dcfce7; color: #166534; border-color: #166534; }
@@ -26,36 +27,42 @@
             .no-print { display: none !important; }
             body { background: white; padding: 0; opacity: 1 !important; }
             .print-card { box-shadow: none !important; border: none !important; width: 100% !important; border-radius: 0 !important; }
-            /* Encabezado compacto para impresión */
             .header-reporte { 
-                background: #f1f5f9 !important; 
+                background: #fff !important; 
                 color: #1e1b4b !important; 
-                padding: 15px !important; 
-                border-bottom: 2px solid #1e1b4b !important;
+                padding: 10px !important; 
+                border-bottom: 3px solid #1e1b4b !important;
                 -webkit-print-color-adjust: exact; 
             }
-            .header-reporte h1 { font-size: 20px !important; margin-bottom: 5px !important; color: #1e1b4b !important; }
-            .header-reporte p { font-size: 12px !important; margin-top: 0 !important; color: #475569 !important; border: none !important; padding: 0 !important; }
-            td, th { padding: 6px 10px !important; font-size: 11px !important; border-bottom: 1px solid #e2e8f0 !important; }
-            .badge { border-width: 1px !important; }
+            .header-reporte h1 { font-size: 18px !important; color: #1e1b4b !important; }
+            .header-reporte p { color: #475569 !important; border: none !important; }
+            .logo-img { border: 1px solid #ddd !important; }
+            td, th { padding: 6px 10px !important; font-size: 10px !important; border-bottom: 1px solid #e2e8f0 !important; }
         }
     </style>
 </head>
 <body class="p-2 md:p-6">
 
-<div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border print-card">
-    <div class="header-reporte p-8 text-center">
-        <h1 class="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">Reporte de Asistencia</h1>
-        <p id="info-filtros" class="text-indigo-100 text-xs md:text-sm font-bold mt-2 uppercase tracking-widest border-t border-white/20 pt-3 inline-block px-6">
-            Seleccione parámetros para consultar
-        </p>
+<div class="max-w-6xl mx-auto bg-white rounded-[2rem] shadow-2xl overflow-hidden border print-card text-slate-700">
+    <div class="header-reporte p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-6 text-center md:text-left">
+            <img id="inst-logo" src="" class="logo-img shadow-lg" alt="Logo">
+            <div>
+                <h1 id="inst-nombre" class="text-xl md:text-3xl font-black tracking-tighter uppercase italic">Cargando Institución...</h1>
+                <p class="text-indigo-200 text-[10px] font-bold tracking-[0.3em] uppercase">AMIE: <span id="inst-amie">---</span></p>
+            </div>
+        </div>
+        <div class="text-center md:text-right border-l-0 md:border-l border-white/20 pl-0 md:pl-8">
+            <h2 class="text-lg font-black uppercase italic">Reporte de Asistencia</h2>
+            <p id="info-filtros" class="text-indigo-100 text-[10px] font-bold mt-1 uppercase tracking-widest">SISTEMA KHIPU EDU 360</p>
+        </div>
     </div>
 
     <div class="p-6 bg-gray-50 border-b no-print">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
-                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Curso / Jornada:</label>
-                <select id="select-curso" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs outline-none focus:border-indigo-500 transition-all">
+                <label class="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Seleccionar Curso / Sección:</label>
+                <select id="select-curso" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs outline-none focus:border-indigo-500 transition-all uppercase">
                     <option value="">Cargando opciones...</option>
                 </select>
             </div>
@@ -68,7 +75,7 @@
                 <input type="date" id="f-hasta" class="w-full p-3 bg-white border-2 border-gray-200 rounded-xl font-black text-gray-700 text-xs">
             </div>
             <button id="btn-procesar" class="bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg transition-all active:scale-95">
-                <i class="fa-solid fa-sync mr-2"></i> Generar Reporte
+                <i class="fa-solid fa-magnifying-glass mr-2"></i> Generar Reporte
             </button>
         </div>
     </div>
@@ -78,33 +85,33 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr id="cabecera-dinamica" class="text-indigo-900 font-black uppercase text-[10px] tracking-widest border-b-2 border-indigo-100">
-                        <th class="px-4 py-3">Información General</th>
+                        <th class="px-4 py-3">Estudiante</th>
                     </tr>
                 </thead>
-                <tbody id="tabla-pro" class="divide-y divide-gray-100 text-gray-700">
-                    <tr><td class="text-center py-20 text-gray-300 italic text-lg font-bold uppercase">Use los filtros superiores.</td></tr>
+                <tbody id="tabla-pro" class="divide-y divide-gray-100">
+                    <tr><td class="text-center py-20 text-gray-300 italic text-lg font-bold uppercase">Configure los parámetros superiores.</td></tr>
                 </tbody>
             </table>
         </div>
 
-        <div id="footer-reporte" class="mt-8 hidden flex justify-between items-end border-t pt-6 border-gray-100">
-            <div>
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Docente Responsable / Tutor</p>
-                <h4 id="nombre-tutor" class="text-lg font-black text-indigo-900 uppercase italic">---</h4>
-                <div class="w-48 border-t border-indigo-900 mt-8 opacity-30"></div>
+        <div id="footer-reporte" class="mt-8 hidden flex flex-col md:flex-row justify-between items-end border-t pt-6 border-gray-100 gap-8">
+            <div class="text-center md:text-left w-full md:w-auto">
+                <div class="w-48 border-t-2 border-indigo-900 mx-auto md:mx-0 mb-2"></div>
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Docente Tutor / Responsable</p>
+                <h4 id="nombre-tutor" class="text-md font-black text-indigo-900 uppercase italic">Buscando...</h4>
             </div>
-            <div class="text-right">
-                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Estudiantes Matriculados</p>
-                <h4 id="total-est" class="text-2xl font-black text-indigo-900 italic">0</h4>
+            <div class="text-right w-full md:w-auto">
+                <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total Alumnos</p>
+                <h4 id="total-est" class="text-3xl font-black text-indigo-900 italic">0</h4>
             </div>
         </div>
 
-        <div class="mt-8 flex justify-between items-center no-print">
-            <a href="dashboard.html" class="text-gray-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Dashboard
+        <div class="mt-12 flex justify-between items-center no-print">
+            <a href="dashboard.html" class="text-gray-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest transition-colors">
+                <i class="fa-solid fa-house mr-2"></i> Volver al Inicio
             </a>
-            <button onclick="window.print()" class="bg-slate-900 hover:bg-indigo-600 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase shadow-xl transition-all">
-                <i class="fa-solid fa-print mr-2"></i> Imprimir Reporte (A4)
+            <button onclick="window.print()" class="bg-indigo-950 hover:bg-black text-white px-10 py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-2xl transition-all active:scale-95">
+                <i class="fa-solid fa-print mr-3"></i> Imprimir Reporte (A4)
             </button>
         </div>
     </div>
@@ -112,8 +119,8 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -125,8 +132,10 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cacheMaps = { grados: {}, paralelos: {}, jornadas: {} };
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -134,9 +143,32 @@
             const hoy = new Date().toISOString().split('T')[0];
             document.getElementById('f-desde').value = hoy;
             document.getElementById('f-hasta').value = hoy;
-            cargarOpciones(user.uid);
+            await cargarInfoInstitucion();
+            await cargarDiccionarios();
+            await cargarOpciones(user.uid);
         } else { window.location.href = "index.html"; }
     });
+
+    async function cargarInfoInstitucion() {
+        const d = await getDoc(doc(db, "institucion", "datos_generales"));
+        if(d.exists()) {
+            const data = d.data();
+            document.getElementById('inst-nombre').innerText = data.nombre.toUpperCase();
+            document.getElementById('inst-amie').innerText = data.amie.toUpperCase();
+            document.getElementById('inst-logo').src = data.logo_url;
+        }
+    }
+
+    async function cargarDiccionarios() {
+        const [gS, pS, jS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas"))
+        ]);
+        gS.forEach(d => cacheMaps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
+    }
 
     async function cargarOpciones(uid) {
         const userDoc = await getDoc(doc(db, "usuario", uid));
@@ -144,97 +176,94 @@
         const select = document.getElementById('select-curso');
         
         const qAsig = isAdmin ? 
-            query(collection(db, "asignaciones"), where("tutor", "==", true)) :
-            query(collection(db, "asignaciones"), where("docente_id", "==", uid), where("tutor", "==", true));
+            query(collection(db, "asignaciones")) :
+            query(collection(db, "asignaciones"), where("docente_id", "==", uid));
 
         const snapAsig = await getDocs(qAsig);
-        select.innerHTML = '<option value="">Seleccione Curso...</option>';
+        select.innerHTML = '<option value="">ELEGIR CURSO / SECCIÓN</option>';
 
-        for (const d of snapAsig.docs) {
-            const data = d.data();
-            const gDoc = await getDoc(doc(db, "grados", data.grado_id));
-            const nombreGrado = gDoc.exists() ? gDoc.data().nombre : data.grado_id;
-            select.innerHTML += `<option value="${data.grado_id}|${data.paralelo_id}">${nombreGrado} - ${data.paralelo_id}</option>`;
-        }
+        snapAsig.forEach(docSnap => {
+            const data = docSnap.data();
+            const gradoNom = cacheMaps.grados[data.grado_id] || data.grado_id;
+            // Guardamos ID_GRADO|NOMBRE_PARALELO|NOMBRE_JORNADA (Para cruzar con estudiantes)
+            const val = `${data.grado_id}|${data.paralelo_id}|${data.jornada}`;
+            select.innerHTML += `<option value="${val}">${gradoNom} - ${data.paralelo_id} (${data.jornada})</option>`;
+        });
     }
 
     document.getElementById('btn-procesar').addEventListener('click', async () => {
         const cursoVal = document.getElementById('select-curso').value;
         const dStr = document.getElementById('f-desde').value;
         const hStr = document.getElementById('f-hasta').value;
+        if(!cursoVal) return Swal.fire('Atención', 'Seleccione un curso.', 'info');
 
-        if(!cursoVal || !dStr || !hStr) return Swal.fire('Error', 'Faltan parámetros', 'warning');
-
-        const [grado_id, paralelo_id] = cursoVal.split('|');
+        const [gID, pNom, jNom] = cursoVal.split('|');
         const esMismoDia = (dStr === hStr);
         const btn = document.getElementById('btn-procesar');
-
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> PROCESANDO...';
 
         try {
-            // 1. CARGA DE ESTUDIANTES (Filtro en Cliente)
+            // 1. CARGA ESTUDIANTES QUE COINCIDAN (Foto 2bcdd3 y 2bcd77)
             const snapE = await getDocs(collection(db, "estudiantes"));
             let estudiantes = [];
             snapE.forEach(d => {
                 const e = d.data();
-                if(e.grado === grado_id && e.paralelo === paralelo_id) {
+                const estParalelo = cacheMaps.paralelos[e.paralelo] || e.paralelo;
+                const estJornada = cacheMaps.jornadas[e.jornada] || e.jornada;
+                
+                if(e.grado === gID && estParalelo === pNom && estJornada === jNom) {
                     estudiantes.push({ id: d.id, ...e });
                 }
             });
             estudiantes.sort((a, b) => a.apellidos.localeCompare(b.apellidos));
 
-            // 2. CARGA DE ASISTENCIAS (Solo por fecha para evitar errores de índice)
+            // 2. CARGA ASISTENCIAS EN EL RANGO
             const qA = query(collection(db, "asistencias"), where("fecha", ">=", dStr), where("fecha", "<=", hStr));
             const snapA = await getDocs(qA);
             const todasAsis = snapA.docs.map(d => d.data());
 
-            // 3. TUTOR
-            const qT = query(collection(db, "asignaciones"), where("grado_id", "==", grado_id), where("paralelo_id", "==", paralelo_id), where("tutor", "==", true));
+            // 3. BUSCAR TUTOR (Foto 2bcdf7)
+            const qT = query(collection(db, "asignaciones"), 
+                             where("grado_id", "==", gID), 
+                             where("paralelo_id", "==", pNom), 
+                             where("jornada", "==", jNom),
+                             where("tutor", "==", true));
             const snapT = await getDocs(qT);
             if (!snapT.empty) {
                 const uDoc = await getDoc(doc(db, "usuario", snapT.docs[0].data().docente_id));
-                document.getElementById('nombre-tutor').innerText = uDoc.exists() ? uDoc.data().nombre : "No identificado";
+                document.getElementById('nombre-tutor').innerText = uDoc.exists() ? uDoc.data().nombre : "SIN TUTOR ASIGNADO";
             }
 
-            // RENDERIZADO
+            // RENDERIZAR TABLA
             const tbody = document.getElementById('tabla-pro');
             const cab = document.getElementById('cabecera-dinamica');
             tbody.innerHTML = "";
             
-            if(estudiantes.length === 0) {
-                tbody.innerHTML = '<tr><td class="text-center py-20 text-red-400 font-bold uppercase">No hay alumnos registrados.</td></tr>';
-                return;
-            }
-
-            const cabBase = `<th class="px-4 py-3 text-center w-12 text-indigo-300">#</th><th class="px-4 py-3">Apellidos y Nombres</th><th class="px-4 py-3 text-center w-12">NEE</th>`;
-            cab.innerHTML = esMismoDia ? cabBase + `<th class="px-4 py-3 text-right">Asistencia</th>` : 
+            const cabBase = `<th class="px-4 py-3 text-center w-12 text-indigo-300">#</th><th class="px-4 py-3">Estudiante</th><th class="px-4 py-3 text-center">NEE</th>`;
+            cab.innerHTML = esMismoDia ? cabBase + `<th class="px-4 py-3 text-right">Estado</th>` : 
                                          cabBase + `<th class="px-4 py-3 text-center text-green-600">P</th><th class="px-4 py-3 text-center text-red-600">F</th><th class="px-4 py-3 text-center text-orange-500">A</th><th class="px-4 py-3 text-center text-blue-500">J</th>`;
 
             let num = 1;
             estudiantes.forEach(est => {
-                const susAsis = todasAsis.filter(a => a.estudiante_id === est.id && a.grado_id === grado_id);
+                const susAsis = todasAsis.filter(a => a.estudiante_id === est.id);
                 let c = { presente: 0, ausente: 0, atraso: 0, justificado: 0 };
                 let ultimo = "---";
 
-                susAsis.forEach(a => {
-                    if(c.hasOwnProperty(a.estado)) c[a.estado]++;
-                    ultimo = a.estado;
-                });
+                susAsis.forEach(a => { if(c.hasOwnProperty(a.estado)) c[a.estado]++; ultimo = a.estado; });
 
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-50 hover:bg-indigo-50/20";
-                const base = `<td class="px-4 py-3 text-center font-black text-gray-300">${num++}</td>
-                              <td class="px-4 py-3 font-black uppercase text-indigo-950 text-[11px]">${est.apellidos} ${est.nombres}</td>
-                              <td class="px-4 py-3 text-center font-bold text-[10px] text-gray-400">${est.nee ? 'SÍ' : 'NO'}</td>`;
+                tr.className = "border-b border-gray-50 hover:bg-slate-50";
+                const base = `<td class="px-4 py-3 text-center text-gray-300 font-bold">${num++}</td>
+                              <td class="px-4 py-3 font-bold uppercase text-[11px]">${est.apellidos} ${est.nombres}</td>
+                              <td class="px-4 py-3 text-center font-bold text-gray-400">${est.nee ? 'SÍ' : 'NO'}</td>`;
 
                 if(esMismoDia) {
                     tr.innerHTML = base + `<td class="px-4 py-3 text-right"><span class="badge badge-${ultimo}">${traducir(ultimo)}</span></td>`;
                 } else {
-                    tr.innerHTML = base + `<td class="px-4 py-3 text-center font-black text-green-600 text-xs">${c.presente}</td>
-                                           <td class="px-4 py-3 text-center font-black text-red-600 text-xs">${c.ausente}</td>
-                                           <td class="px-4 py-3 text-center font-black text-orange-500 text-xs">${c.atraso}</td>
-                                           <td class="px-4 py-3 text-center font-black text-blue-500 text-xs">${c.justificado}</td>`;
+                    tr.innerHTML = base + `<td class="px-4 py-3 text-center font-black text-green-600">${c.presente}</td>
+                                           <td class="px-4 py-3 text-center font-black text-red-600">${c.ausente}</td>
+                                           <td class="px-4 py-3 text-center font-black text-orange-500">${c.atraso}</td>
+                                           <td class="px-4 py-3 text-center font-black text-blue-500">${c.justificado}</td>`;
                 }
                 tbody.appendChild(tr);
             });
@@ -242,15 +271,10 @@
             document.getElementById('footer-reporte').classList.remove('hidden');
             document.getElementById('total-est').innerText = estudiantes.length;
             const cursoLabel = document.getElementById('select-curso').options[document.getElementById('select-curso').selectedIndex].text;
-            document.getElementById('info-filtros').innerText = `${cursoLabel} | Periodo: ${dStr} - ${hStr}`;
+            document.getElementById('info-filtros').innerText = `${cursoLabel} | Rango: ${dStr} al ${hStr}`;
 
-        } catch (e) {
-            console.error(e);
-            Swal.fire('Error', 'Fallo de conexión.', 'error');
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-sync mr-2"></i> Generar Reporte';
-        }
+        } catch (e) { console.error(e); Swal.fire('Error', 'Falla de conexión.', 'error'); }
+        finally { btn.disabled = false; }
     });
 
     function traducir(v) {
