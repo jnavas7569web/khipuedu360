@@ -12,7 +12,6 @@
         body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .input-style { background-color: #f8fafc; border: 2px solid #f1f5f9; transition: all 0.3s ease; font-weight: 700; color: #1e293b; text-transform: uppercase; }
-        .input-style:focus { border-color: #6366f1; background-color: #fff; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
         .input-readonly { background-color: #f1f5f9; border-color: #e2e8f0; color: #64748b; cursor: not-allowed; font-weight: 800; }
         .label-style { font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; display: block; }
         .badge-periodo { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
@@ -32,18 +31,16 @@
         </header>
 
         <form id="form-matricula" class="grid grid-cols-1 lg:grid-cols-12 gap-8 text-slate-700">
-            
             <div class="lg:col-span-4 space-y-6">
                 <div class="glass-card p-8 text-center md:text-left">
                     <label class="label-style">Cédula del Estudiante</label>
                     <div class="relative">
                         <input type="text" id="in_cedula" maxlength="10" required 
-                            class="w-full p-5 input-style rounded-2xl font-black text-2xl text-indigo-600 tracking-widest outline-none text-center" placeholder="0000000000">
+                            class="w-full p-5 input-style rounded-2xl font-black text-2xl text-indigo-600 tracking-widest outline-none text-center" placeholder="23XXXXXXX">
                         <div id="loader-est" class="hidden absolute right-4 top-5 text-indigo-500">
                             <i class="fa-solid fa-circle-notch fa-spin text-xl"></i>
                         </div>
                     </div>
-                    <p id="msg-estudiante" class="text-[10px] mt-4 font-bold text-slate-400 uppercase leading-tight italic text-center">Validación automática al detectar 10 dígitos.</p>
                 </div>
 
                 <div class="glass-card p-8 bg-indigo-900 text-white border-none shadow-indigo-200 shadow-2xl relative overflow-hidden">
@@ -55,65 +52,53 @@
                             Sincronizado <i class="fa-solid fa-cloud-check ml-1"></i>
                         </div>
                     </div>
-                    <i class="fa-solid fa-calendar-check absolute -right-4 -bottom-4 text-8xl text-white/5"></i>
                 </div>
             </div>
 
             <div class="lg:col-span-8 glass-card p-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    
                     <div class="md:col-span-2">
                         <label class="label-style">Nombres del Estudiante</label>
-                        <input type="text" id="res_nombre" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
+                        <input type="text" id="res_nombre" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
                     </div>
-
                     <div class="md:col-span-2 p-6 bg-blue-50 rounded-3xl border border-blue-100">
                         <label class="label-style text-blue-700">Representante Legal</label>
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white">
-                                <i class="fa-solid fa-user-group"></i>
-                            </div>
-                            <input type="text" id="res_repre" readonly class="w-full bg-transparent border-none font-black text-blue-900 uppercase p-0 focus:ring-0" value="---">
-                            <input type="hidden" id="id_repre">
-                        </div>
+                        <input type="text" id="res_repre" readonly class="w-full bg-transparent border-none font-black text-blue-900 uppercase p-0 focus:ring-0" value="---">
                     </div>
 
                     <div>
                         <label class="label-style">Grado Asignado</label>
-                        <input type="text" id="res_grado_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
+                        <input type="text" id="res_grado_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
                         <input type="hidden" id="id_grado">
                     </div>
-
                     <div>
                         <label class="label-style">Paralelo</label>
-                        <input type="text" id="res_paralelo_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
-                        <input type="hidden" id="id_paralelo">
+                        <input type="text" id="res_paralelo_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
+                        <input type="hidden" id="id_paralelo_nombre">
                     </div>
-
                     <div class="md:col-span-2">
                         <label class="label-style">Jornada</label>
-                        <input type="text" id="res_jornada_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl uppercase">
-                        <input type="hidden" id="id_jornada_nombre">
+                        <input type="text" id="res_jornada_text" readonly class="w-full p-4 input-style input-readonly rounded-2xl">
+                        <input type="hidden" id="id_jornada_id">
                     </div>
 
                     <div id="box-docente" class="md:col-span-2 p-6 bg-slate-50 rounded-3xl border border-slate-200 transition-all">
                         <label class="label-style">Docente Tutor Responsable</label>
                         <div class="flex items-center gap-4">
-                            <div id="docente-icon" class="w-12 h-12 bg-slate-300 rounded-xl flex items-center justify-center text-white text-xl transition-colors">
+                            <div id="docente-icon" class="w-12 h-12 bg-slate-300 rounded-xl flex items-center justify-center text-white text-xl">
                                 <i class="fa-solid fa-chalkboard-user"></i>
                             </div>
                             <div>
-                                <h4 id="res_docente_nombre" class="font-black text-slate-400 uppercase italic text-sm">Esperando validación de curso...</h4>
+                                <h4 id="res_docente_nombre" class="font-black text-slate-400 uppercase italic text-lg">Cargando validación...</h4>
                                 <input type="hidden" id="id_docente">
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Detección por Grado, Paralelo y Jornada</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex justify-end mt-12 gap-4 items-center">
-                    <button type="button" onclick="location.reload()" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-500 transition-all">Limpiar Formulario</button>
-                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 cursor-not-allowed text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl transition-all">
+                    <button type="button" onclick="location.reload()" class="text-[10px] font-black uppercase text-slate-400 hover:text-red-500">Limpiar</button>
+                    <button type="submit" id="btn-save" disabled class="bg-indigo-600 opacity-50 text-white px-12 py-5 rounded-2xl font-black uppercase text-[11px] tracking-[0.2em] shadow-2xl">
                         Confirmar Matrícula <i class="fa-solid fa-file-circle-check ml-2"></i>
                     </button>
                 </div>
@@ -139,158 +124,111 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const cacheMaps = {
-        grados: {},
-        paralelos: {}, // Para limpiar el ID de image_2d1f59.png
-        jornadas_nombre_a_id: {} 
-    };
+    const maps = { grados: {}, paralelos: {}, jornadas: {} };
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) { 
-            document.body.style.opacity = "1"; 
-            inicializarPagina(); 
-        } else { window.location.href = "index.html"; }
+        if (user) { document.body.style.opacity = "1"; inicializar(); }
+        else { window.location.href = "index.html"; }
     });
 
-    async function inicializarPagina() {
-        try {
-            const qP = query(collection(db, "periodos_lectivos"), where("estado", "in", ["activo", true]));
-            const snapP = await getDocs(qP);
-            if (!snapP.empty) {
-                const pData = snapP.docs[0].data();
-                document.getElementById('periodo_display').innerText = pData.nombre;
-                document.getElementById('in_periodo').value = pData.nombre;
-            }
+    async function inicializar() {
+        const qP = query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"));
+        const snapP = await getDocs(qP);
+        if(!snapP.empty) {
+            document.getElementById('periodo_display').innerText = snapP.docs[0].data().nombre;
+            document.getElementById('in_periodo').value = snapP.docs[0].data().nombre;
+        }
 
-            const gSnap = await getDocs(collection(db, "grados"));
-            gSnap.forEach(d => cacheMaps.grados[d.id] = d.data().nombre);
-
-            const pSnap = await getDocs(collection(db, "paralelos"));
-            pSnap.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre);
-
-            const jSnap = await getDocs(collection(db, "jornadas"));
-            jSnap.forEach(d => {
-                const nombreLimpio = d.data().nombre.toLowerCase().trim();
-                cacheMaps.jornadas_nombre_a_id[nombreLimpio] = d.id;
-            });
-
-        } catch (e) { console.error(e); }
+        const [gS, pS, jS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas"))
+        ]);
+        
+        gS.forEach(d => maps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => maps.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => maps.jornadas[d.id] = d.data().nombre.toUpperCase());
     }
 
     document.getElementById('in_cedula').addEventListener('input', async (e) => {
         const ced = e.target.value.trim();
         if (ced.length === 10) {
             document.getElementById('loader-est').classList.remove('hidden');
-            try {
-                const eSnap = await getDoc(doc(db, "estudiantes", ced));
-                if (eSnap.exists()) {
-                    const est = eSnap.data();
-                    document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
-                    
-                    // Lógica para limpiar Grado
-                    document.getElementById('res_grado_text').value = cacheMaps.grados[est.grado] || est.grado;
-                    document.getElementById('id_grado').value = est.grado || "";
-                    
-                    // FIX MAESTRO PARA PARALELO (Solución Imagen image_2d1f59.png)
-                    const paraleloReal = cacheMaps.paralelos[est.paralelo] || est.paralelo;
-                    document.getElementById('res_paralelo_text').value = paraleloReal;
-                    document.getElementById('id_paralelo').value = paraleloReal;
+            const eSnap = await getDoc(doc(db, "estudiantes", ced));
+            if (eSnap.exists()) {
+                const est = eSnap.data();
+                document.getElementById('res_nombre').value = `${est.apellidos} ${est.nombres}`;
+                
+                // Grado
+                document.getElementById('id_grado').value = est.grado;
+                document.getElementById('res_grado_text').value = maps.grados[est.grado] || est.grado;
 
-                    // Lógica para Jornada
-                    document.getElementById('res_jornada_text').value = est.jornada || "";
-                    document.getElementById('id_jornada_nombre').value = est.jornada || "";
-                    
-                    document.getElementById('id_repre').value = est.representante_id;
+                // Paralelo: Traducir ID a nombre ("A")
+                const parNombre = maps.paralelos[est.paralelo] || est.paralelo;
+                document.getElementById('res_paralelo_text').value = parNombre;
+                document.getElementById('id_paralelo_nombre').value = parNombre;
 
-                    if(est.representante_id) {
-                        const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
-                        if(rSnap.exists()){
-                            document.getElementById('res_repre').value = rSnap.data().nombre_completo || rSnap.data().nombres;
-                        }
-                    }
-                    validarAsignacionDinamica();
-                } else {
-                    Swal.fire('Atención', 'Cédula no encontrada en el registro de estudiantes.', 'warning');
-                }
-            } catch (error) { console.error(error); }
+                // Jornada: Detectar si es ID o nombre
+                const jorID = est.jornada;
+                const jorNombre = maps.jornadas[jorID] || jorID;
+                document.getElementById('res_jornada_text').value = jorNombre;
+                document.getElementById('id_jornada_id').value = jorID;
+
+                const rSnap = await getDoc(doc(db, "representantes", est.representante_id));
+                if(rSnap.exists()) document.getElementById('res_repre').value = rSnap.data().nombre_completo;
+
+                validarTutor(est.grado, parNombre, jorID);
+            }
             document.getElementById('loader-est').classList.add('hidden');
         }
     });
 
-    async function validarAsignacionDinamica() {
-        const grado_id = document.getElementById('id_grado').value;
-        const paralelo_id = document.getElementById('id_paralelo').value;
-        const jornada_nombre_raw = document.getElementById('id_jornada_nombre').value || "";
-        const jornada_nombre = jornada_nombre_raw.toLowerCase().trim();
-        
+    async function validarTutor(gradoId, paraleloNombre, jornadaId) {
         const resDoc = document.getElementById('res_docente_nombre');
         const boxDoc = document.getElementById('box-docente');
         const btn = document.getElementById('btn-save');
 
-        const jornada_id = cacheMaps.jornadas_nombre_a_id[jornada_nombre];
-
-        if (grado_id && paralelo_id && jornada_id) {
-            try {
-                const qAsig = query(collection(db, "asignaciones"), 
-                    where("grado_id", "==", grado_id), 
-                    where("paralelo_id", "==", paralelo_id),
-                    where("jornada", "==", jornada_id), 
-                    where("tutor", "==", true));
-                
-                const asigSnap = await getDocs(qAsig);
-
-                if (!asigSnap.empty) {
-                    const asig = asigSnap.docs[0].data();
-                    const dSnap = await getDoc(doc(db, "usuario", asig.docente_id));
-                    const nombreDoc = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
-                    
-                    document.getElementById('id_docente').value = asig.docente_id;
-                    resDoc.innerText = nombreDoc;
-                    boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100 transition-all";
-                    resDoc.className = "font-black text-emerald-900 uppercase tracking-tight text-lg";
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                } else {
-                    resDoc.innerText = `SIN TUTOR ASIGNADO EN ${jornada_nombre_raw.toUpperCase()}`;
-                    boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100 transition-all";
-                    resDoc.className = "font-black text-red-600 uppercase tracking-tight text-lg";
-                    btn.disabled = true;
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-            } catch (error) { console.error("Error validación:", error); }
+        // Búsqueda exacta en Asignaciones (Img 2c4255)
+        const q = query(collection(db, "asignaciones"), 
+            where("grado_id", "==", gradoId), 
+            where("paralelo_id", "==", paraleloNombre), 
+            where("jornada", "==", jornadaId), 
+            where("tutor", "==", true));
+            
+        const snap = await getDocs(q);
+        if(!snap.empty) {
+            const asig = snap.docs[0].data();
+            const uS = await getDoc(doc(db, "usuario", asig.docente_id));
+            resDoc.innerText = uS.exists() ? uS.data().nombre : "DOCENTE ASIGNADO";
+            boxDoc.className = "md:col-span-2 p-6 bg-emerald-50 rounded-3xl border border-emerald-100";
+            resDoc.className = "font-black text-emerald-900 uppercase text-lg";
+            btn.disabled = false; btn.classList.remove('opacity-50');
+            document.getElementById('id_docente').value = asig.docente_id;
+        } else {
+            resDoc.innerText = "CURSO SIN TUTORÍA ASIGNADA";
+            boxDoc.className = "md:col-span-2 p-6 bg-red-50 rounded-3xl border border-red-100";
+            resDoc.className = "font-black text-red-600 uppercase text-lg";
+            btn.disabled = true; btn.classList.add('opacity-50');
         }
     }
 
-    document.getElementById('form-matricula').addEventListener('submit', async (e) => {
+    document.getElementById('form-matricula').onsubmit = async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('btn-save');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> PROCESANDO...';
-
         const pId = document.getElementById('in_periodo').value;
         const ced = document.getElementById('in_cedula').value;
-
-        try {
-            await setDoc(doc(db, "matriculas", `${ced}_${pId}`), {
-                estudiante_id: ced,
-                nombre_estudiante: document.getElementById('res_nombre').value.toUpperCase(),
-                representante_id: document.getElementById('id_repre').value,
-                nombre_representante: document.getElementById('res_repre').value.toUpperCase(),
-                grado_id: document.getElementById('id_grado').value,
-                paralelo_id: document.getElementById('id_paralelo').value.toUpperCase(),
-                jornada: document.getElementById('res_jornada_text').value.toUpperCase(),
-                periodo_id: pId,
-                docente_id: document.getElementById('id_docente').value,
-                fecha_matricula: serverTimestamp(),
-                estado: "ACTIVA"
-            });
-            Swal.fire({ title: '¡ÉXITO!', text: 'MATRÍCULA PROCESADA CORRECTAMENTE.', icon: 'success' }).then(() => location.reload());
-        } catch (err) {
-            Swal.fire('ERROR', 'NO SE PUDO GUARDAR.', 'error');
-            btn.disabled = false;
-            btn.innerText = 'CONFIRMAR MATRÍCULA';
-        }
-    });
+        await setDoc(doc(db, "matriculas", `${ced}_${pId}`), {
+            estudiante_id: ced,
+            nombre_estudiante: document.getElementById('res_nombre').value.toUpperCase(),
+            grado_id: document.getElementById('id_grado').value,
+            paralelo_id: document.getElementById('id_paralelo_nombre').value,
+            jornada: document.getElementById('res_jornada_text').value,
+            periodo_id: pId,
+            docente_id: document.getElementById('id_docente').value,
+            fecha_matricula: serverTimestamp(),
+            estado: "ACTIVA"
+        });
+        Swal.fire('¡Éxito!', 'MATRÍCULA GENERADA.', 'success').then(() => location.reload());
+    };
 </script>
 </body>
 </html>
