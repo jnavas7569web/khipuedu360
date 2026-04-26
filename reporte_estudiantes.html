@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Reporte de Estudiantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; opacity: 0; transition: opacity 0.5s ease; }
+        .header-oficial { background: #1e1b4b; color: white; border-radius: 0 0 3rem 3rem; }
+        .logo-img { width: 70px; height: 70px; object-fit: contain; background: white; border-radius: 1rem; padding: 5px; }
+        
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            .no-print { display: none !important; }
+            body { background: white; opacity: 1 !important; }
+            .header-oficial { background: white !important; color: black !important; border-bottom: 3px solid black !important; border-radius: 0; padding: 0 !important; }
+            .logo-img { border: 1px solid #ddd !important; }
+            table { width: 100% !important; border: 1px solid #000 !important; }
+            th { background: #f1f5f9 !important; color: black !important; -webkit-print-color-adjust: exact; }
+            td, th { border: 1px solid #e2e8f0 !important; padding: 4px 8px !important; font-size: 10px !important; }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6">
+
+    <div class="max-w-7xl mx-auto bg-white min-h-screen shadow-2xl rounded-[3rem] overflow-hidden border">
+        
+        <div class="header-oficial p-8 no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-6">
+                    <img id="inst-logo" src="" class="logo-img" alt="Logo">
+                    <div>
+                        <h1 id="inst-nombre" class="text-2xl font-black uppercase italic tracking-tighter">Cargando...</h1>
+                        <p class="text-indigo-300 text-[10px] font-bold tracking-[0.3em]">AMIE: <span id="inst-amie">---</span></p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="window.location.href='dashboard.html'" class="bg-white/10 hover:bg-white/20 text-white w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                    <button onclick="window.print()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase shadow-lg">
+                        <i class="fa-solid fa-print mr-2"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 bg-slate-50 border-b no-print">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Seleccionar Curso</label>
+                    <select id="select-curso" class="w-full p-4 bg-white border-2 border-slate-200 rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500">
+                        <option value="">Cargando opciones...</option>
+                    </select>
+                </div>
+                <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] shadow-xl transition-all">
+                    Generar Nómina Detallada
+                </button>
+            </div>
+        </div>
+
+        <div id="reporte-contenido" class="p-6 md:p-10">
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-black uppercase underline decoration-indigo-500 underline-offset-8">Nómina General de Estudiantes</h2>
+                <div id="info-curso-reporte" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-black uppercase text-slate-500">
+                    <div class="bg-slate-50 p-2 rounded-lg">Grado: <span id="rep-grado" class="text-indigo-600">-</span></div>
+                    <div class="bg-slate-50 p-2 rounded-lg">Paralelo: <span id="rep-paralelo" class="text-indigo-600">-</span></div>
+                    <div class="bg-slate-50 p-2 rounded-lg">Jornada: <span id="rep-jornada" class="text-indigo-600">-</span></div>
+                    <div class="bg-slate-50 p-2 rounded-lg">Periodo: <span id="rep-periodo" class="text-indigo-600">-</span></div>
+                </div>
+            </div>
+
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-slate-800 text-white text-[9px] uppercase tracking-widest">
+                        <th class="p-3 text-center border">N°</th>
+                        <th class="p-3 text-left border">Nómina del Estudiante</th>
+                        <th class="p-3 text-center border">Cédula</th>
+                        <th class="p-3 text-center border">Edad</th>
+                        <th class="p-3 text-center border">NEE</th>
+                        <th class="p-3 text-left border">Representante</th>
+                        <th class="p-3 text-center border">Cédula Rep.</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body" class="text-[11px] font-medium text-slate-700">
+                    <tr><td colspan="7" class="text-center py-20 text-slate-300 italic uppercase font-bold">Seleccione un curso para mostrar los datos</td></tr>
+                </tbody>
+            </table>
+
+            <div id="resumen-reporte" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl border">
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Total Estudiantes</p>
+                        <h4 id="stat-total" class="text-xl font-black text-indigo-900">0</h4>
+                    </div>
+                    <div class="bg-rose-50 p-4 rounded-2xl border border-rose-100">
+                        <p class="text-[9px] font-black text-rose-400 uppercase">Estudiantes NEE</p>
+                        <h4 id="stat-nee" class="text-xl font-black text-rose-700">0</h4>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                        <p class="text-[9px] font-black text-blue-400 uppercase">Hombres (M)</p>
+                        <h4 id="stat-m" class="text-xl font-black text-blue-700">0</h4>
+                    </div>
+                    <div class="bg-pink-50 p-4 rounded-2xl border border-pink-100">
+                        <p class="text-[9px] font-black text-pink-400 uppercase">Mujeres (F)</p>
+                        <h4 id="stat-f" class="text-xl font-black text-pink-700">0</h4>
+                    </div>
+                </div>
+
+                <div class="flex flex-col justify-end items-center md:items-end text-center md:text-right">
+                    <div class="w-64 border-t-2 border-slate-900 pt-2">
+                        <p id="rep-tutor" class="font-black uppercase text-sm">---</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Docente Tutor / Responsable</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cacheMaps = { grados: {}, paralelos: {}, jornadas: {}, representantes: {} };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            await cargarInstitucion();
+            await cargarDiccionarios();
+            await cargarOpcionesFiltro(user.uid);
+        } else { window.location.href = "index.html"; }
+    });
+
+    async function cargarInstitucion() {
+        const d = await getDoc(doc(db, "institucion", "datos_generales"));
+        if(d.exists()){
+            document.getElementById('inst-nombre').innerText = d.data().nombre;
+            document.getElementById('inst-amie').innerText = d.data().amie;
+            document.getElementById('inst-logo').src = d.data().logo_url;
+        }
+    }
+
+    async function cargarDiccionarios() {
+        const [gS, pS, jS, rS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas")),
+            getDocs(collection(db, "representantes"))
+        ]);
+        gS.forEach(d => cacheMaps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
+        rS.forEach(d => cacheMaps.representantes[d.id] = d.data());
+    }
+
+    async function cargarOpcionesFiltro(uid) {
+        const uSnap = await getDoc(doc(db, "usuario", uid));
+        const isAdmin = uSnap.data().rol === 'admin';
+        const select = document.getElementById('select-curso');
+
+        const q = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", uid), where("tutor", "==", true));
+        const snap = await getDocs(q);
+
+        select.innerHTML = '<option value="">-- SELECCIONE UN CURSO --</option>';
+        snap.forEach(d => {
+            const data = d.data();
+            const val = `${data.grado_id}|${data.paralelo_id}|${data.jornada}`;
+            select.innerHTML += `<option value="${val}">${cacheMaps.grados[data.grado_id]} - ${data.paralelo_id} (${data.jornada})</option>`;
+        });
+    }
+
+    document.getElementById('btn-generar').addEventListener('click', async () => {
+        const val = document.getElementById('select-curso').value;
+        if(!val) return;
+
+        const [gID, pNom, jNom] = val.split('|');
+        const tbody = document.getElementById('tabla-body');
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 animate-pulse">PROCESANDO MATRIZ...</td></tr>';
+
+        // 1. Cargar Estudiantes
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        let lista = [];
+        let stats = { total: 0, nee: 0, m: 0, f: 0 };
+
+        snapE.forEach(d => {
+            const e = d.data();
+            const estParalelo = cacheMaps.paralelos[e.paralelo] || e.paralelo;
+            const estJornada = cacheMaps.jornadas[e.jornada] || e.jornada;
+
+            if(e.grado === gID && estParalelo === pNom && estJornada === jNom) {
+                lista.push({ id: d.id, ...e });
+                stats.total++;
+                if(e.nee) stats.nee++;
+                if(e.genero === 'M') stats.m++;
+                if(e.genero === 'F') stats.f++;
+            }
+        });
+
+        lista.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
+
+        // 2. Buscar Tutor
+        const qT = query(collection(db, "asignaciones"), where("grado_id", "==", gID), where("paralelo_id", "==", pNom), where("jornada", "==", jNom), where("tutor", "==", true));
+        const snapT = await getDocs(qT);
+        if(!snapT.empty) {
+            const uDoc = await getDoc(doc(db, "usuario", snapT.docs[0].data().docente_id));
+            document.getElementById('rep-tutor').innerText = uDoc.exists() ? uDoc.data().nombre : "SIN ASIGNAR";
+            document.getElementById('rep-periodo').innerText = snapT.docs[0].data().periodo_id;
+        }
+
+        // 3. Renderizar
+        tbody.innerHTML = "";
+        let num = 1;
+        lista.forEach(est => {
+            const repre = cacheMaps.representantes[est.representante_id] || { nombre_completo: 'NO ASIGNADO', cedula: '---' };
+            const edad = calcularEdad(est.fecha_nacimiento);
+            
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 border-b">
+                    <td class="p-3 text-center border-x font-bold">${num++}</td>
+                    <td class="p-3 border-x font-black uppercase text-indigo-950">${est.apellidos} ${est.nombres}</td>
+                    <td class="p-3 text-center border-x font-mono">${est.cedula || est.id}</td>
+                    <td class="p-3 text-center border-x font-bold">${edad} AÑOS</td>
+                    <td class="p-3 text-center border-x font-black ${est.nee?'text-red-500':'text-slate-300'}">${est.nee ? 'SÍ' : 'NO'}</td>
+                    <td class="p-3 border-x uppercase text-[10px] font-bold text-slate-600">${repre.nombre_completo || repre.nombres}</td>
+                    <td class="p-3 text-center border-x font-mono text-[10px]">${repre.cedula}</td>
+                </tr>`;
+        });
+
+        // Actualizar UI
+        document.getElementById('rep-grado').innerText = cacheMaps.grados[gID];
+        document.getElementById('rep-paralelo').innerText = pNom;
+        document.getElementById('rep-jornada').innerText = jNom;
+        document.getElementById('stat-total').innerText = stats.total;
+        document.getElementById('stat-nee').innerText = stats.nee;
+        document.getElementById('stat-m').innerText = stats.m;
+        document.getElementById('stat-f').innerText = stats.f;
+    });
+
+    function calcularEdad(fecha) {
+        if(!fecha) return "--";
+        const hoy = new Date();
+        const cumple = fecha.toDate ? fecha.toDate() : new Date(fecha);
+        let edad = hoy.getFullYear() - cumple.getFullYear();
+        const m = hoy.getMonth() - cumple.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) edad--;
+        return edad;
+    }
+</script>
+</body>
+</html>
