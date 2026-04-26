@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Asignaciones Pro</title>
+    <title>Khipu Edu 360 - Asignaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -31,7 +31,7 @@
     <header class="flex justify-between items-center mb-10 bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
         <div>
             <h1 class="text-3xl md:text-5xl font-black text-indigo-950 tracking-tighter italic uppercase leading-tight">Asignaciones</h1>
-            <p class="text-slate-400 text-[10px] md:text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Carga Horaria y Tutorías • Estándar Mayúsculas</p>
+            <p class="text-slate-400 text-[10px] md:text-[13px] font-bold uppercase tracking-[0.3em] mt-2">Carga Horaria y Tutorías</p>
         </div>
         <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 md:w-16 md:h-16 rounded-3xl transition-all flex items-center justify-center shadow-sm">
             <i class="fa-solid fa-house text-xl md:text-2xl"></i>
@@ -282,7 +282,7 @@
 
             const docId = `${docente}_${grado}_${paralelo}_${jornada}`.replace(/\s+/g, '');
             await setDoc(doc(db, "asignaciones", docId), payload);
-            Swal.fire('Éxito', 'Asignación guardada en MAYÚSCULAS.', 'success').then(() => location.reload());
+            Swal.fire('Éxito', 'Asignación guardada.', 'success').then(() => location.reload());
         } catch (e) { btn.disabled = false; }
     };
 
