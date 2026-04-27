@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Reporte de Calificaciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; font-size: 13px; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .header-oficial { background: #1e1b4b; color: white; }
+        .logo-img { width: 80px; height: 80px; object-fit: contain; background: white; border-radius: 1rem; padding: 5px; }
+        
+        @media print {
+            @page { size: A4 portrait; margin: 10mm; }
+            .no-print { display: none !important; }
+            body { background: white; opacity: 1 !important; }
+            .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+            .header-oficial { background: white !important; color: black !important; border-bottom: 3px solid black !important; padding: 0 !important; }
+            .logo-img { border: 1px solid #ddd !important; }
+            td, th { padding: 4px 8px !important; font-size: 10px !important; border: 1px solid #e2e8f0 !important; }
+            .chart-container { max-width: 300px !important; margin: 0 auto; }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6">
+
+<div class="max-w-6xl mx-auto glass-card overflow-hidden print-card">
+    <div class="header-oficial p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-6 text-center md:text-left">
+            <img id="inst-logo" src="" class="logo-img shadow-lg" alt="Logo">
+            <div>
+                <h1 id="inst-nombre" class="text-xl md:text-2xl font-black tracking-tighter uppercase italic">Cargando Institución...</h1>
+                <p class="text-indigo-200 text-[10px] font-bold tracking-[0.3em] uppercase">AMIE: <span id="inst-amie">---</span></p>
+                <p class="text-white text-[11px] font-black mt-1">REPORTE OFICIAL DE CALIFICACIONES</p>
+            </div>
+        </div>
+        <div class="text-center md:text-right">
+            <div class="bg-white/10 px-4 py-2 rounded-xl mb-2">
+                <p class="text-[10px] font-bold text-indigo-100 uppercase">Periodo Lectivo</p>
+                <h3 id="rep-periodo" class="font-black italic">2026-2027</h3>
+            </div>
+            <p class="text-[9px] text-white/50 font-bold uppercase">Impreso: <span id="fecha-actual">--/--/----</span></p>
+        </div>
+    </div>
+
+    <div class="p-6 bg-slate-50 border-b no-print">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Materia / Curso:</label>
+                <select id="select-materia" class="w-full p-3 bg-white border-2 border-slate-200 rounded-xl font-black text-xs outline-none focus:border-indigo-500 uppercase"></select>
+            </div>
+            <div class="md:col-span-2"></div>
+            <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg transition-all active:scale-95">
+                Generar Análisis<i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="p-4 md:p-10">
+        <div class="text-center mb-8">
+            <h2 id="titulo-reporte" class="text-xl font-black uppercase text-slate-800">Seleccione los parámetros para procesar</h2>
+            <div class="flex justify-center gap-4 mt-2 text-[10px] font-black text-slate-400 uppercase">
+                <span id="rep-grado">-</span> | <span id="rep-seccion">-</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto mb-10">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest">
+                        <th class="p-3 text-center border border-slate-700">N°</th>
+                        <th class="p-3 text-left border border-slate-700">Nómina del Estudiante</th>
+                        <th class="p-3 text-center border border-slate-700">T1</th>
+                        <th class="p-3 text-center border border-slate-700">T2</th>
+                        <th class="p-3 text-center border border-slate-700">T3</th>
+                        <th class="p-3 text-center border border-slate-700">SUPL.</th>
+                        <th class="p-3 text-center border border-slate-700 bg-emerald-700">FINAL</th>
+                        <th class="p-3 text-center border border-slate-700">ESTADO</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body" class="text-[11px] font-medium text-slate-700">
+                    <tr><td colspan="8" class="text-center py-20 text-slate-300 italic font-bold">Sin datos seleccionados</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-12">
+            <div class="chart-container text-center">
+                <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Resumen de Rendimiento Académico</p>
+                <div style="height: 250px; display: flex; justify-content: center;">
+                    <canvas id="rendimientoChart"></canvas>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-3xl">
+                    <h4 class="text-xs font-black text-indigo-900 uppercase mb-4 flex items-center">
+                        <i class="fa-solid fa-trophy mr-2 text-amber-500"></i> Cuadro de Honor (TOP 3)
+                    </h4>
+                    <div id="top-estudiantes" class="space-y-3"></div>
+                </div>
+
+                <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl">
+                    <h4 class="text-xs font-black text-rose-900 uppercase mb-4 flex items-center">
+                        <i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> Estudiantes en Peligro (< 7.00)
+                    </h4>
+                    <div id="danger-list" class="text-[10px] font-bold text-rose-600 space-y-1"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="area-firmas" class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="text-center">
+                <div class="border-t border-black pt-2 mx-4">
+                    <p id="firma-docente" class="font-black uppercase text-[11px]">---</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Docente de Materia</p>
+                </div>
+            </div>
+            <div id="col-tutor" class="text-center">
+                <div class="border-t border-black pt-2 mx-4">
+                    <p id="firma-tutor" class="font-black uppercase text-[11px]">---</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Tutor de Grado</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="border-t border-black pt-2 mx-4">
+                    <p id="firma-director" class="font-black uppercase text-[11px]">---</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Director(a) / Autoridad</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 flex justify-between items-center no-print">
+            <a href="dashboard.html" class="text-slate-400 hover:text-indigo-600 font-black text-[10px] uppercase"><i class="fa-solid fa-arrow-left mr-2"></i> Dashboard</a>
+            <button onclick="window.print()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all">
+                <i class="fa-solid fa-file-pdf mr-2"></i> Descargar Reporte
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cache = { grados: {}, materias: {}, paralelos: {}, jornadas: {}, periodo: "" };
+    let chartInstance = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString();
+            await cargarDiccionarios();
+            await cargarFiltros(user.uid);
+        } else { window.location.href = "index.html"; }
+    });
+
+    async function cargarDiccionarios() {
+        const [gS, mS, pS, jS, perS, instS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "materias")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas")),
+            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"))),
+            getDoc(doc(db, "institucion", "datos_generales"))
+        ]);
+        
+        gS.forEach(d => cache.grados[d.id] = d.data().nombre.toUpperCase());
+        mS.forEach(d => cache.materias[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cache.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cache.jornadas[d.id] = d.data().nombre.toUpperCase());
+        
+        if(!perS.empty) {
+            cache.periodo = perS.docs[0].data().nombre;
+            document.getElementById('rep-periodo').innerText = cache.periodo;
+        }
+
+        if(instS.exists()) {
+            const data = instS.data();
+            document.getElementById('inst-nombre').innerText = data.nombre.toUpperCase();
+            document.getElementById('inst-amie').innerText = data.amie.toUpperCase();
+            document.getElementById('inst-logo').src = data.logo_url;
+            document.getElementById('firma-director').innerText = data.director.toUpperCase();
+        }
+    }
+
+    async function cargarFiltros(uid) {
+        const uSnap = await getDoc(doc(db, "usuario", uid));
+        const isAdmin = uSnap.data().rol === "admin";
+        document.getElementById('firma-docente').innerText = uSnap.data().nombre.toUpperCase();
+
+        const q = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", uid));
+        const snap = await getDocs(q);
+        const select = document.getElementById('select-materia');
+        select.innerHTML = '<option value="">-- SELECCIONE CURSO/MATERIA --</option>';
+
+        snap.forEach(docSnap => {
+            const asig = docSnap.data();
+            const gNom = cache.grados[asig.grado_id] || asig.grado_id;
+            asig.materia_id.forEach(mID => {
+                const mNom = cache.materias[mID] || mID;
+                const val = JSON.stringify({g: asig.grado_id, p: asig.paralelo_id, j: asig.jornada, m: mID, d: asig.docente_id});
+                select.innerHTML += `<option value='${val}'>${mNom} - ${gNom} ${asig.paralelo_id} (${asig.jornada})</option>`;
+            });
+        });
+    }
+
+    document.getElementById('btn-generar').addEventListener('click', async () => {
+        const valRaw = document.getElementById('select-materia').value;
+        if(!valRaw) return;
+        const config = JSON.parse(valRaw);
+        const tbody = document.getElementById('tabla-body');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-20 animate-pulse font-black text-indigo-900 uppercase">Analizando expedientes académicos...</td></tr>';
+
+        // 1. Cargar Estudiantes Matriculados en esa sección
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        let alumnos = [];
+        snapE.forEach(d => {
+            const e = d.data();
+            const estP = cache.paralelos[e.paralelo] || e.paralelo;
+            const estJ = cache.jornadas[e.jornada] || e.jornada;
+            if(e.grado === config.g && estP === config.p && estJ === config.j && (e.estado === true || e.estado === "activo")) {
+                alumnos.push({id: d.id, ...e});
+            }
+        });
+        alumnos.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
+
+        // 2. Cargar Notas
+        const qN = query(collection(db, "notass"), where("periodo_id", "==", cache.periodo), where("materia_id", "==", config.m));
+        const snapN = await getDocs(qN);
+        let notasMap = {};
+        snapN.forEach(d => notasMap[d.data().estudiante_id] = d.data());
+
+        // 3. Buscar Tutor de ese curso (Para la firma)
+        const qT = query(collection(db, "asignaciones"), where("grado_id", "==", config.g), where("paralelo_id", "==", config.p), where("jornada", "==", config.j), where("tutor", "==", true));
+        const snapT = await getDocs(qT);
+        let tutorUID = "";
+        if(!snapT.empty) {
+            tutorUID = snapT.docs[0].data().docente_id;
+            const uDoc = await getDoc(doc(db, "usuario", tutorUID));
+            document.getElementById('firma-tutor').innerText = uDoc.exists() ? uDoc.data().nombre.toUpperCase() : "---";
+        }
+
+        // Lógica de Fusión de Firmas
+        if(tutorUID === config.d) {
+            document.getElementById('col-tutor').classList.add('hidden');
+            document.getElementById('firma-docente').nextElementSibling.innerText = "DOCENTE / TUTOR";
+        } else {
+            document.getElementById('col-tutor').classList.remove('hidden');
+            document.getElementById('firma-docente').nextElementSibling.innerText = "DOCENTE DE MATERIA";
+        }
+
+        // 4. Procesar Datos y Renderizar
+        tbody.innerHTML = "";
+        let dataResult = { aprobados: 0, reprobados: 0, danger: [], top: [] };
+        let num = 1;
+
+        alumnos.forEach(est => {
+            const n = notasMap[est.id] || { nota1:0, nota2:0, nota3:0, nota_supletorio:0, promedio_final:0 };
+            const isDanger = n.promedio_final < 7 && n.promedio_final > 0;
+            if(n.promedio_final >= 7) dataResult.aprobados++; else dataResult.reprobados++;
+            if(isDanger) dataResult.danger.push(`${est.apellidos} ${est.nombres} (${n.promedio_final.toFixed(2)})`);
+            dataResult.top.push({nombre: `${est.apellidos} ${est.nombres}`, promedio: n.promedio_final});
+
+            tbody.innerHTML += `
+                <tr class="border-b border-slate-50 hover:bg-slate-50">
+                    <td class="p-3 text-center border-x font-bold text-slate-300">${num++}</td>
+                    <td class="p-3 border-x font-black uppercase text-slate-800">${est.apellidos} ${est.nombres}</td>
+                    <td class="p-3 text-center border-x">${n.nota1.toFixed(2)}</td>
+                    <td class="p-3 text-center border-x">${n.nota2.toFixed(2)}</td>
+                    <td class="p-3 text-center border-x">${n.nota3.toFixed(2)}</td>
+                    <td class="p-3 text-center border-x font-bold ${n.nota_supletorio>0?'text-amber-600':''}">${n.nota_supletorio>0?n.nota_supletorio.toFixed(2):'---'}</td>
+                    <td class="p-3 text-center border-x font-black text-indigo-900 bg-slate-50/50 text-xs">${n.promedio_final.toFixed(2)}</td>
+                    <td class="p-3 text-center border-x font-black text-[9px] ${n.promedio_final>=7?'text-emerald-600':'text-rose-600'}">${n.promedio_final>=7?'APROBADO':'REPROBADO'}</td>
+                </tr>`;
+        });
+
+        // Actualizar UI
+        document.getElementById('titulo-reporte').innerText = cache.materias[config.m];
+        document.getElementById('rep-grado').innerText = cache.grados[config.g];
+        document.getElementById('rep-seccion').innerText = `${config.p} - ${config.j}`;
+
+        // Top 3
+        dataResult.top.sort((a,b) => b.promedio - a.promedio);
+        const topCont = document.getElementById('top-estudiantes');
+        topCont.innerHTML = "";
+        const icons = ['fa-medal text-amber-400', 'fa-medal text-slate-400', 'fa-medal text-orange-600'];
+        dataResult.top.slice(0,3).forEach((e, i) => {
+            if(e.promedio > 0) topCont.innerHTML += `<div class="flex justify-between font-black uppercase text-[11px]"><span class="flex items-center"><i class="fa-solid ${icons[i]} mr-2"></i> ${e.nombre}</span> <span class="text-indigo-600">${e.promedio.toFixed(2)}</span></div>`;
+        });
+
+        // Peligro
+        document.getElementById('danger-list').innerHTML = dataResult.danger.length ? dataResult.danger.join('<br>') : "NINGÚN ESTUDIANTE EN RIESGO";
+
+        // Gráfico
+        renderChart(dataResult.aprobados, dataResult.reprobados);
+    });
+
+    function renderChart(ap, rep) {
+        if(chartInstance) chartInstance.destroy();
+        const ctx = document.getElementById('rendimientoChart').getContext('2d');
+        chartInstance = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['APROBADOS', 'REPROBADOS'],
+                datasets: [{
+                    data: [ap, rep],
+                    backgroundColor: ['#10b981', '#f43f5e'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 10, weight: 'bold' } } } }
+            }
+        });
+    }
+</script>
+</body>
+</html>
