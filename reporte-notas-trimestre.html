@@ -19,6 +19,8 @@
             .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
             td, th { padding: 4px 6px !important; border: 1px solid #cbd5e1 !important; }
             .header-oficial { background: #1e293b !important; color: white !important; -webkit-print-color-adjust: exact; }
+            /* Asegurar que el hidden funcione en impresión */
+            .hidden { display: none !important; }
         }
     </style>
 </head>
@@ -76,13 +78,13 @@
             </tbody>
         </table>
 
-        <div class="mt-10 border-l-4 border-rose-500 bg-rose-50 p-6 rounded-r-2xl">
+        <div id="container-alertas" class="mt-10 border-l-4 border-rose-500 bg-rose-50 p-6 rounded-r-2xl hidden">
             <h4 class="text-xs font-black text-rose-900 uppercase mb-4 flex items-center">
-                <i class="fa-solid fa-chart-line-down mr-2 rotate-180"></i> Alertas: 5 Calificaciones más bajas (Según nota actual)
+                <i class="fa-solid fa-chart-line-down mr-2 rotate-180"></i> Alertas: Calificaciones más bajas (Igual o menor a 7.00)
             </h4>
             <div id="bottom-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
                 </div>
-            <p class="mt-4 text-[9px] font-bold text-rose-400 italic uppercase">* Estudiantes con rendimiento inferior a 7.00 en el periodo evaluado.</p>
+            <p class="mt-4 text-[9px] font-bold text-rose-400 italic uppercase">* Estudiantes que requieren seguimiento académico por rendimiento bajo.</p>
         </div>
 
         <div id="contenedor-firmas" class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -190,11 +192,12 @@
         const raw = document.getElementById('select-materia').value;
         if(!raw) return;
         const conf = JSON.parse(raw);
-        
         const tbody = document.getElementById('tabla-body');
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 animate-pulse uppercase font-black text-indigo-900">Procesando nómina...</td></tr>';
+        const alertCont = document.getElementById('container-alertas');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 animate-pulse uppercase font-black text-indigo-900">Analizando rendimiento...</td></tr>';
+        alertCont.classList.add('hidden'); // Ocultar mientras carga
 
-        // 1. Firmas
+        // Firmas
         const dSnap = await getDoc(doc(db, "usuario", conf.d));
         document.getElementById('firma-docente').innerText = dSnap.exists() ? dSnap.data().nombre : "---";
 
@@ -215,7 +218,7 @@
             document.getElementById('cargo-docente').innerText = "DOCENTE DE MATERIA";
         }
 
-        // 2. Datos
+        // Estudiantes y Notas
         const snapE = await getDocs(collection(db, "estudiantes"));
         let lista = [];
         snapE.forEach(d => {
@@ -232,16 +235,20 @@
         let notas = {}; snapN.forEach(d => notas[d.data().estudiante_id] = d.data());
 
         tbody.innerHTML = "";
-        let analisis = [];
+        let alumnosBajos = [];
         let num = 1;
 
         lista.forEach(est => {
             const n = notas[est.id] || { nota1:0, nota2:0, nota3:0 };
             let notaActual = (n.nota3 > 0) ? n.nota3 : (n.nota2 > 0) ? n.nota2 : n.nota1;
-            analisis.push({nombre: `${est.apellidos} ${est.nombres}`, nota: notaActual});
+            
+            // Si la nota es <= 7, va a la lista de alertas
+            if(notaActual <= 7 && notaActual > 0) {
+                alumnosBajos.push({nombre: `${est.apellidos} ${est.nombres}`, nota: notaActual});
+            }
 
             tbody.innerHTML += `
-                <tr class="border-b border-slate-100">
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
                     <td class="p-3 text-center border-x font-bold text-slate-300">${num++}</td>
                     <td class="p-3 border-x font-black uppercase text-indigo-950">${est.apellidos} ${est.nombres}</td>
                     <td class="p-3 border-x text-center">${n.nota1.toFixed(2)}</td>
@@ -251,17 +258,18 @@
                 </tr>`;
         });
 
-        analisis.sort((a,b) => a.nota - b.nota);
-        const botCont = document.getElementById('bottom-list');
-        botCont.innerHTML = "";
-        let alertasCont = 0;
-        analisis.forEach(e => {
-            if(e.nota < 7 && e.nota > 0 && alertasCont < 5) {
+        // LÓGICA DE VISIBILIDAD DE ALERTAS
+        if(alumnosBajos.length > 0) {
+            alertCont.classList.remove('hidden');
+            alumnosBajos.sort((a,b) => a.nota - b.nota);
+            const botCont = document.getElementById('bottom-list');
+            botCont.innerHTML = "";
+            alumnosBajos.slice(0, 5).forEach(e => {
                 botCont.innerHTML += `<div class="flex justify-between border-b border-rose-200 pb-1"><span class="uppercase font-bold text-[10px]">${e.nombre}</span><span class="font-black text-rose-700">${e.nota.toFixed(2)}</span></div>`;
-                alertasCont++;
-            }
-        });
-        if(alertasCont === 0) botCont.innerHTML = "<p class='text-emerald-600 font-black uppercase text-[10px]'>Sin alertas en este curso</p>";
+            });
+        } else {
+            alertCont.classList.add('hidden');
+        }
 
         document.getElementById('titulo-reporte').innerText = cache.materias[conf.m];
         document.getElementById('info-curso').innerText = `${cache.grados[conf.g]} | PARALELO: ${conf.p} | JORNADA: ${conf.j}`;
