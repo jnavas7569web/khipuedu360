@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Control Trimestral</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { background-color: #f1f5f9; font-family: 'Inter', sans-serif; font-size: 12px; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; }
+        
+        @media print {
+            @page { size: A4 portrait; margin: 8mm; }
+            .no-print { display: none !important; }
+            body { background: white; opacity: 1 !important; }
+            .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+            td, th { padding: 4px 6px !important; border: 1px solid #cbd5e1 !important; }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-6">
+
+<div class="max-w-5xl mx-auto glass-card overflow-hidden print-card shadow-xl">
+    <div class="bg-slate-800 text-white p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+            <img id="inst-logo" src="" class="w-16 h-16 bg-white rounded-lg p-1 object-contain" alt="Logo">
+            <div>
+                <h1 id="inst-nombre" class="text-lg font-black uppercase italic leading-none">Cargando...</h1>
+                <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1">CONTROL DE RENDIMIENTO TRIMESTRAL</p>
+            </div>
+        </div>
+        <div class="text-center md:text-right">
+            <p class="text-[10px] font-black uppercase text-indigo-300" id="rep-periodo">---</p>
+            <p class="text-[9px] font-bold opacity-50">IMPRESIÓN: <span id="fecha-actual">--/--/--</span></p>
+        </div>
+    </div>
+
+    <div class="p-4 bg-white border-b no-print flex flex-col md:flex-row gap-4 items-end">
+        <div class="flex-1">
+            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block">Seleccionar Materia y Curso</label>
+            <select id="select-materia" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-indigo-500 uppercase"></select>
+        </div>
+        <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white font-black px-6 py-3 rounded-xl text-[10px] uppercase transition-all">
+            Cargar Datos <i class="fa-solid fa-rotate ml-2"></i>
+        </button>
+    </div>
+
+    <div class="p-6 md:p-8">
+        <div class="mb-6">
+            <h2 id="titulo-reporte" class="text-base font-black uppercase text-slate-800">Resumen de Calificaciones</h2>
+            <p class="text-[10px] font-bold text-slate-400 uppercase" id="info-curso">-</p>
+        </div>
+
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-slate-100 text-slate-600 text-[9px] uppercase font-black">
+                    <th class="p-3 text-center w-10">N°</th>
+                    <th class="p-3 text-left">Nómina Estudiantil</th>
+                    <th class="p-3 text-center">Nota 1</th>
+                    <th class="p-3 text-center">Nota 2</th>
+                    <th class="p-3 text-center">Nota 3</th>
+                    <th class="p-3 text-center bg-slate-200 text-indigo-900">Promedio</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-body" class="text-[11px] font-semibold text-slate-600">
+                <tr><td colspan="6" class="text-center py-10 opacity-30 italic uppercase">Seleccione una materia</td></tr>
+            </tbody>
+        </table>
+
+        <div class="mt-10 border-l-4 border-rose-500 bg-rose-50 p-6 rounded-r-2xl">
+            <h4 class="text-xs font-black text-rose-900 uppercase mb-4 flex items-center">
+                <i class="fa-solid fa-chart-line-down mr-2 rotate-180"></i> Alertas: 5 Promedios más bajos del Trimestre
+            </h4>
+            <div id="bottom-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
+                </div>
+            <p class="mt-4 text-[9px] font-bold text-rose-400 italic">* Estos estudiantes requieren seguimiento y refuerzo académico inmediato.</p>
+        </div>
+
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="border-t border-slate-900 pt-2 mx-4">
+                    <p id="firma-docente" class="font-black uppercase text-[10px]">---</p>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase">Docente / Tutor</p>
+                </div>
+            </div>
+            <div></div> <div class="text-center">
+                <div class="border-t border-slate-900 pt-2 mx-4">
+                    <p id="firma-director" class="font-black uppercase text-[10px]">---</p>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase">Rectorado / Dirección</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-12 flex justify-end no-print">
+            <button onclick="window.print()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition-all">
+                <i class="fa-solid fa-print mr-2"></i> Imprimir Reporte Trimestral
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cache = { grados: {}, materias: {}, paralelos: {}, jornadas: {}, periodo: "" };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString();
+            await inicializar();
+        } else { window.location.href = "index.html"; }
+    });
+
+    async function inicializar() {
+        const [gS, mS, pS, jS, perS, instS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(collection(db, "materias")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas")),
+            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo"))),
+            getDoc(doc(db, "institucion", "datos_generales"))
+        ]);
+        
+        gS.forEach(d => cache.grados[d.id] = d.data().nombre.toUpperCase());
+        mS.forEach(d => cache.materias[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cache.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cache.jornadas[d.id] = d.data().nombre.toUpperCase());
+        
+        if(!perS.empty) {
+            cache.periodo = perS.docs[0].data().nombre;
+            document.getElementById('rep-periodo').innerText = "PERIODO: " + cache.periodo;
+        }
+
+        if(instS.exists()) {
+            const d = instS.data();
+            document.getElementById('inst-nombre').innerText = d.nombre;
+            document.getElementById('inst-logo').src = d.logo_url;
+            document.getElementById('firma-director').innerText = d.director;
+        }
+
+        // Cargar Filtros
+        const uSnap = await getDoc(doc(db, "usuario", auth.currentUser.uid));
+        const isAdmin = uSnap.data().rol === "admin";
+        document.getElementById('firma-docente').innerText = uSnap.data().nombre;
+
+        const q = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", auth.currentUser.uid));
+        const snapA = await getDocs(q);
+        const sel = document.getElementById('select-materia');
+        sel.innerHTML = '<option value="">-- SELECCIONAR CURSO --</option>';
+        
+        snapA.forEach(asigDoc => {
+            const a = asigDoc.data();
+            a.materia_id.forEach(mID => {
+                const val = JSON.stringify({g: a.grado_id, p: a.paralelo_id, j: a.jornada, m: mID});
+                sel.innerHTML += `<option value='${val}'>${cache.materias[mID]} - ${cache.grados[a.grado_id]} ${a.paralelo_id}</option>`;
+            });
+        });
+    }
+
+    document.getElementById('btn-generar').addEventListener('click', async () => {
+        const raw = document.getElementById('select-materia').value;
+        if(!raw) return;
+        const conf = JSON.parse(raw);
+        
+        const tbody = document.getElementById('tabla-body');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 animate-pulse uppercase font-black">Procesando...</td></tr>';
+
+        // Estudiantes
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        let lista = [];
+        snapE.forEach(d => {
+            const e = d.data();
+            const eP = cache.paralelos[e.paralelo] || e.paralelo;
+            const eJ = cache.jornadas[e.jornada] || e.jornada;
+            if(e.grado === conf.g && eP === conf.p && eJ === conf.j && (e.estado === true || e.estado === "activo")) {
+                lista.push({id: d.id, ...e});
+            }
+        });
+        lista.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
+
+        // Notas
+        const snapN = await getDocs(query(collection(db, "notass"), where("periodo_id", "==", cache.periodo), where("materia_id", "==", conf.m)));
+        let notas = {}; snapN.forEach(d => notas[d.data().estudiante_id] = d.data());
+
+        // Render y Bottom 5
+        tbody.innerHTML = "";
+        let analisis = [];
+        let num = 1;
+
+        lista.forEach(est => {
+            const n = notas[est.id] || { nota1:0, nota2:0, nota3:0 };
+            const prom = (n.nota1 + n.nota2 + n.nota3) / 3;
+            analisis.push({nombre: `${est.apellidos} ${est.nombres}`, promedio: prom});
+
+            tbody.innerHTML += `
+                <tr class="border-b border-slate-100">
+                    <td class="p-3 text-center font-bold text-slate-300">${num++}</td>
+                    <td class="p-3 font-black uppercase text-slate-700">${est.apellidos} ${est.nombres}</td>
+                    <td class="p-3 text-center">${n.nota1.toFixed(2)}</td>
+                    <td class="p-3 text-center">${n.nota2.toFixed(2)}</td>
+                    <td class="p-3 text-center">${n.nota3.toFixed(2)}</td>
+                    <td class="p-3 text-center bg-slate-50 font-black text-indigo-600">${prom.toFixed(2)}</td>
+                </tr>`;
+        });
+
+        // Bottom 5 Logic
+        analisis.sort((a,b) => a.promedio - b.promedio);
+        const botCont = document.getElementById('bottom-list');
+        botCont.innerHTML = "";
+        analisis.slice(0, 5).forEach((e, i) => {
+            botCont.innerHTML += `
+                <div class="flex justify-between border-b border-rose-200 pb-1">
+                    <span class="uppercase font-bold text-[10px]">${i+1}. ${e.nombre}</span>
+                    <span class="font-black text-rose-700">${e.promedio.toFixed(2)}</span>
+                </div>`;
+        });
+
+        document.getElementById('titulo-reporte').innerText = cache.materias[conf.m];
+        document.getElementById('info-curso').innerText = `${cache.grados[conf.g]} | PARALELO: ${conf.p} | JORNADA: ${conf.j}`;
+    });
+</script>
+</body>
+</html>
