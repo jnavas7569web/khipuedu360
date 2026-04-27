@@ -18,23 +18,24 @@
             body { background: white; opacity: 1 !important; }
             .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
             td, th { padding: 4px 6px !important; border: 1px solid #cbd5e1 !important; }
+            .header-oficial { background: #1e293b !important; color: white !important; -webkit-print-color-adjust: exact; }
         }
     </style>
 </head>
 <body class="p-2 md:p-6">
 
-<div class="max-w-5xl mx-auto glass-card overflow-hidden print-card shadow-xl">
-    <div class="bg-slate-800 text-white p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+<div class="max-w-5xl mx-auto glass-card overflow-hidden print-card shadow-xl text-slate-700">
+    <div class="bg-slate-800 text-white p-6 flex flex-col md:flex-row items-center justify-between gap-4 header-oficial">
         <div class="flex items-center gap-4">
             <img id="inst-logo" src="" class="w-16 h-16 bg-white rounded-lg p-1 object-contain" alt="Logo">
             <div>
-                <h1 id="inst-nombre" class="text-lg font-black uppercase italic leading-none">Cargando...</h1>
-                <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1">CONTROL DE RENDIMIENTO TRIMESTRAL</p>
+                <h1 id="inst-nombre" class="text-lg font-black uppercase italic leading-none">Cargando Institución...</h1>
+                <p class="text-[9px] text-slate-400 font-bold tracking-widest mt-1 uppercase">Control de Rendimiento Trimestral</p>
             </div>
         </div>
         <div class="text-center md:text-right">
             <p class="text-[10px] font-black uppercase text-indigo-300" id="rep-periodo">---</p>
-            <p class="text-[9px] font-bold opacity-50">IMPRESIÓN: <span id="fecha-actual">--/--/--</span></p>
+            <p class="text-[9px] font-bold opacity-50 uppercase">Impresión: <span id="fecha-actual">--/--/--</span></p>
         </div>
     </div>
 
@@ -50,19 +51,19 @@
 
     <div class="p-6 md:p-8">
         <div class="mb-6">
-            <h2 id="titulo-reporte" class="text-base font-black uppercase text-slate-800">Resumen de Calificaciones</h2>
+            <h2 id="titulo-reporte" class="text-base font-black uppercase text-slate-800">Resultado de Calificaciones</h2>
             <p class="text-[10px] font-bold text-slate-400 uppercase" id="info-curso">-</p>
         </div>
 
         <table class="w-full border-collapse">
             <thead>
-                <tr class="bg-slate-100 text-slate-600 text-[9px] uppercase font-black">
-                    <th class="p-3 text-center w-10">N°</th>
-                    <th class="p-3 text-left">Nómina Estudiantil</th>
-                    <th class="p-3 text-center">Nota 1</th>
-                    <th class="p-3 text-center">Nota 2</th>
-                    <th class="p-3 text-center">Nota 3</th>
-                    <th class="p-3 text-center bg-slate-200 text-indigo-900">Promedio</th>
+                <tr class="bg-slate-100 text-slate-600 text-[9px] uppercase font-black text-center">
+                    <th class="p-3 w-10 border">N°</th>
+                    <th class="p-3 text-left border">Nómina Estudiantil</th>
+                    <th class="p-3 border">Nota 1</th>
+                    <th class="p-3 border">Nota 2</th>
+                    <th class="p-3 border">Nota 3</th>
+                    <th class="p-3 bg-indigo-50 text-indigo-900 border">Actual</th>
                 </tr>
             </thead>
             <tbody id="tabla-body" class="text-[11px] font-semibold text-slate-600">
@@ -72,32 +73,32 @@
 
         <div class="mt-10 border-l-4 border-rose-500 bg-rose-50 p-6 rounded-r-2xl">
             <h4 class="text-xs font-black text-rose-900 uppercase mb-4 flex items-center">
-                <i class="fa-solid fa-chart-line-down mr-2 rotate-180"></i> Alertas: 5 Promedios más bajos del Trimestre
+                <i class="fa-solid fa-chart-line-down mr-2 rotate-180"></i> Alertas: 5 Calificaciones más bajas (Según nota actual)
             </h4>
             <div id="bottom-list" class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
                 </div>
-            <p class="mt-4 text-[9px] font-bold text-rose-400 italic">* Estos estudiantes requieren seguimiento y refuerzo académico inmediato.</p>
+            <p class="mt-4 text-[9px] font-bold text-rose-400 italic uppercase">* Estudiantes con rendimiento inferior a 7.00 en el periodo evaluado.</p>
         </div>
 
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div id="contenedor-firmas" class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="text-center">
-                <div class="border-t border-slate-900 pt-2 mx-4">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
                     <p id="firma-docente" class="font-black uppercase text-[10px]">---</p>
-                    <p class="text-[8px] text-slate-400 font-bold uppercase">Docente / Tutor</p>
+                    <p id="cargo-docente" class="text-[8px] text-slate-400 font-bold uppercase">Docente de Materia</p>
                 </div>
             </div>
-            <div></div> <div class="text-center">
-                <div class="border-t border-slate-900 pt-2 mx-4">
+            <div id="col-tutor" class="text-center">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
+                    <p id="firma-tutor" class="font-black uppercase text-[10px]">---</p>
+                    <p class="text-[8px] text-slate-400 font-bold uppercase">Tutor de Grado</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
                     <p id="firma-director" class="font-black uppercase text-[10px]">---</p>
                     <p class="text-[8px] text-slate-400 font-bold uppercase">Rectorado / Dirección</p>
                 </div>
             </div>
-        </div>
-
-        <div class="mt-12 flex justify-end no-print">
-            <button onclick="window.print()" class="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-lg hover:scale-105 transition-all">
-                <i class="fa-solid fa-print mr-2"></i> Imprimir Reporte Trimestral
-            </button>
         </div>
     </div>
 </div>
@@ -157,10 +158,8 @@
             document.getElementById('firma-director').innerText = d.director;
         }
 
-        // Cargar Filtros
         const uSnap = await getDoc(doc(db, "usuario", auth.currentUser.uid));
         const isAdmin = uSnap.data().rol === "admin";
-        document.getElementById('firma-docente').innerText = uSnap.data().nombre;
 
         const q = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", auth.currentUser.uid));
         const snapA = await getDocs(q);
@@ -170,8 +169,8 @@
         snapA.forEach(asigDoc => {
             const a = asigDoc.data();
             a.materia_id.forEach(mID => {
-                const val = JSON.stringify({g: a.grado_id, p: a.paralelo_id, j: a.jornada, m: mID});
-                sel.innerHTML += `<option value='${val}'>${cache.materias[mID]} - ${cache.grados[a.grado_id]} ${a.paralelo_id}</option>`;
+                const val = JSON.stringify({g: a.grado_id, p: a.paralelo_id, j: a.jornada, m: mID, d: a.docente_id});
+                sel.innerHTML += `<option value='${val}'>${cache.materias[mID]} - ${cache.grados[a.grado_id]} ${a.paralelo_id} (${a.jornada})</option>`;
             });
         });
     }
@@ -182,9 +181,32 @@
         const conf = JSON.parse(raw);
         
         const tbody = document.getElementById('tabla-body');
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 animate-pulse uppercase font-black">Procesando...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-10 animate-pulse uppercase font-black text-indigo-900">Cruzando registros académicos...</td></tr>';
 
-        // Estudiantes
+        // 1. Firma Docente de Materia Real
+        const dSnap = await getDoc(doc(db, "usuario", conf.d));
+        document.getElementById('firma-docente').innerText = dSnap.exists() ? dSnap.data().nombre : "DOCENTE ASIGNADO";
+
+        // 2. Firma Tutor Real
+        const qT = query(collection(db, "asignaciones"), where("grado_id", "==", conf.g), where("paralelo_id", "==", conf.p), where("jornada", "==", conf.j), where("tutor", "==", true));
+        const snapT = await getDocs(qT);
+        let tutorID = "";
+        if(!snapT.empty){
+            tutorID = snapT.docs[0].data().docente_id;
+            const tSnap = await getDoc(doc(db, "usuario", tutorID));
+            document.getElementById('firma-tutor').innerText = tSnap.exists() ? tSnap.data().nombre : "---";
+        }
+
+        // Fusión si es el mismo
+        if(tutorID === conf.d) {
+            document.getElementById('col-tutor').style.display = "none";
+            document.getElementById('cargo-docente').innerText = "DOCENTE / TUTOR";
+        } else {
+            document.getElementById('col-tutor').style.display = "block";
+            document.getElementById('cargo-docente').innerText = "DOCENTE DE MATERIA";
+        }
+
+        // 3. Estudiantes
         const snapE = await getDocs(collection(db, "estudiantes"));
         let lista = [];
         snapE.forEach(d => {
@@ -197,42 +219,54 @@
         });
         lista.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
 
-        // Notas
+        // 4. Notas
         const snapN = await getDocs(query(collection(db, "notass"), where("periodo_id", "==", cache.periodo), where("materia_id", "==", conf.m)));
         let notas = {}; snapN.forEach(d => notas[d.data().estudiante_id] = d.data());
 
-        // Render y Bottom 5
         tbody.innerHTML = "";
         let analisis = [];
         let num = 1;
 
         lista.forEach(est => {
             const n = notas[est.id] || { nota1:0, nota2:0, nota3:0 };
-            const prom = (n.nota1 + n.nota2 + n.nota3) / 3;
-            analisis.push({nombre: `${est.apellidos} ${est.nombres}`, promedio: prom});
+            
+            // LOGICA MEJORADA: Nota actual es la nota más reciente no vacía
+            let notaActual = 0;
+            if(n.nota3 > 0) notaActual = n.nota3;
+            else if(n.nota2 > 0) notaActual = n.nota2;
+            else notaActual = n.nota1;
+
+            analisis.push({nombre: `${est.apellidos} ${est.nombres}`, nota: notaActual});
 
             tbody.innerHTML += `
-                <tr class="border-b border-slate-100">
-                    <td class="p-3 text-center font-bold text-slate-300">${num++}</td>
-                    <td class="p-3 font-black uppercase text-slate-700">${est.apellidos} ${est.nombres}</td>
-                    <td class="p-3 text-center">${n.nota1.toFixed(2)}</td>
-                    <td class="p-3 text-center">${n.nota2.toFixed(2)}</td>
-                    <td class="p-3 text-center">${n.nota3.toFixed(2)}</td>
-                    <td class="p-3 text-center bg-slate-50 font-black text-indigo-600">${prom.toFixed(2)}</td>
+                <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <td class="p-3 text-center border-x font-bold text-slate-300">${num++}</td>
+                    <td class="p-3 border-x font-black uppercase text-indigo-950">${est.apellidos} ${est.nombres}</td>
+                    <td class="p-3 border-x text-center">${n.nota1.toFixed(2)}</td>
+                    <td class="p-3 border-x text-center">${n.nota2.toFixed(2)}</td>
+                    <td class="p-3 border-x text-center">${n.nota3.toFixed(2)}</td>
+                    <td class="p-3 border-x text-center bg-indigo-50 font-black text-indigo-600">${notaActual.toFixed(2)}</td>
                 </tr>`;
         });
 
-        // Bottom 5 Logic
-        analisis.sort((a,b) => a.promedio - b.promedio);
+        // Bottom 5 Logic basada en la nota real (No el promedio dividido para 3)
+        analisis.sort((a,b) => a.nota - b.nota);
         const botCont = document.getElementById('bottom-list');
         botCont.innerHTML = "";
-        analisis.slice(0, 5).forEach((e, i) => {
-            botCont.innerHTML += `
-                <div class="flex justify-between border-b border-rose-200 pb-1">
-                    <span class="uppercase font-bold text-[10px]">${i+1}. ${e.nombre}</span>
-                    <span class="font-black text-rose-700">${e.promedio.toFixed(2)}</span>
-                </div>`;
+        
+        let alertasCont = 0;
+        analisis.forEach(e => {
+            if(e.nota < 7 && e.nota > 0 && alertasCont < 5) {
+                botCont.innerHTML += `
+                    <div class="flex justify-between border-b border-rose-200 pb-1">
+                        <span class="uppercase font-bold text-[10px]"><i class="fa-solid fa-user-slash mr-2 opacity-30"></i> ${e.nombre}</span>
+                        <span class="font-black text-rose-700">${e.nota.toFixed(2)}</span>
+                    </div>`;
+                alertasCont++;
+            }
         });
+        
+        if(alertasCont === 0) botCont.innerHTML = "<p class='text-emerald-600 font-black uppercase text-[10px]'>Sin alertas. Todos los estudiantes superan el 7.00</p>";
 
         document.getElementById('titulo-reporte').innerText = cache.materias[conf.m];
         document.getElementById('info-curso').innerText = `${cache.grados[conf.g]} | PARALELO: ${conf.p} | JORNADA: ${conf.j}`;
