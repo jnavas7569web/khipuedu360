@@ -14,13 +14,13 @@
         
         /* INPUTS GIGANTES PARA AGILIDAD */
         .nota-input { 
-            width: 100px; /* Ancho duplicado */
+            width: 100px; 
             padding: 12px; 
             border-radius: 14px; 
             border: 2px solid #f1f5f9; 
             text-align: center; 
             font-weight: 800; 
-            font-size: 1.2rem; /* Texto más grande */
+            font-size: 1.2rem; 
             transition: all 0.3s; 
             outline: none; 
         }
@@ -173,7 +173,7 @@
         if(!g || !s || !m) return Swal.fire('Incompleto', 'Seleccione Grado, Sección y Materia', 'warning');
         const sec = JSON.parse(s);
         const tbody = document.getElementById('body-notas');
-        tbody.innerHTML = '<tr><td colspan="7" class="p-16 text-center animate-pulse font-black text-indigo-900 text-lg uppercase">Mapeando nómina de estudiantes...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-16 text-center animate-pulse font-black text-indigo-900 uppercase">Cargando nómina...</td></tr>';
         
         const snapE = await getDocs(collection(db, "estudiantes"));
         let alumnos = [];
@@ -250,9 +250,17 @@
                     promedio_final: promFinal, updated_at: serverTimestamp()
                 }, { merge: true });
             }
-            Swal.fire('¡Éxito!', 'Calificaciones sincronizadas.', 'success');
-        } catch (e) { console.error(e); Swal.fire('Error', 'Falla de conexión.', 'error'); }
-        btn.disabled = false; btn.innerHTML = 'Sincronizar y Guardar <i class="fa-solid fa-cloud-arrow-up ml-2"></i>';
+            Swal.fire({
+                title: '¡Éxito!',
+                text: 'Calificaciones sincronizadas correctamente.',
+                icon: 'success',
+                confirmButtonText: 'Aceptar',
+                customClass: { popup: 'rounded-[2rem]' }
+            }).then(() => location.reload()); // REFRESH FORZOSO AQUÍ
+        } catch (e) { 
+            console.error(e); Swal.fire('Error', 'Falla de conexión.', 'error'); 
+            btn.disabled = false; btn.innerHTML = 'Sincronizar y Guardar <i class="fa-solid fa-cloud-arrow-up ml-2"></i>';
+        }
     });
 </script>
 </body>
