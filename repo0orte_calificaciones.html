@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Reporte de Calificaciones</title>
+    <title>Khipu Edu 360 - Reporte Maestro de Calificaciones</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -20,29 +20,31 @@
             .no-print { display: none !important; }
             body { background: white; opacity: 1 !important; }
             .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
-            .header-oficial { background: white !important; color: black !important; border-bottom: 3px solid black !important; padding: 0 !important; }
-            .logo-img { border: 1px solid #ddd !important; }
+            .header-oficial { background: white !important; color: black !important; border-bottom: 3px solid black !important; padding: 0 !important; display: flex !important; flex-direction: row !important; }
+            .logo-img { border: 1px solid #ddd !important; display: block !important; }
             td, th { padding: 4px 8px !important; font-size: 10px !important; border: 1px solid #e2e8f0 !important; }
             .chart-container { max-width: 300px !important; margin: 0 auto; }
+            .header-oficial h1 { color: #1e1b4b !important; }
+            .header-oficial p { color: #475569 !important; }
         }
     </style>
 </head>
-<body class="p-2 md:p-6">
+<body class="p-2 md:p-6 text-slate-700">
 
 <div class="max-w-6xl mx-auto glass-card overflow-hidden print-card">
     <div class="header-oficial p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-6 text-center md:text-left">
             <img id="inst-logo" src="" class="logo-img shadow-lg" alt="Logo">
             <div>
-                <h1 id="inst-nombre" class="text-xl md:text-2xl font-black tracking-tighter uppercase italic">Cargando Institución...</h1>
-                <p class="text-indigo-200 text-[10px] font-bold tracking-[0.3em] uppercase">AMIE: <span id="inst-amie">---</span></p>
-                <p class="text-white text-[11px] font-black mt-1">REPORTE OFICIAL DE CALIFICACIONES</p>
+                <h1 id="inst-nombre" class="text-xl md:text-2xl font-black tracking-tighter uppercase italic leading-none">Cargando Institución...</h1>
+                <p class="text-indigo-200 text-[10px] font-bold tracking-[0.3em] uppercase mt-2">AMIE: <span id="inst-amie">---</span></p>
+                <p class="text-white text-[11px] font-black mt-1 uppercase">Reporte Maestro de Calificaciones</p>
             </div>
         </div>
         <div class="text-center md:text-right">
             <div class="bg-white/10 px-4 py-2 rounded-xl mb-2">
                 <p class="text-[10px] font-bold text-indigo-100 uppercase">Periodo Lectivo</p>
-                <h3 id="rep-periodo" class="font-black italic">2026-2027</h3>
+                <h3 id="rep-periodo" class="font-black italic">---</h3>
             </div>
             <p class="text-[9px] text-white/50 font-bold uppercase">Impreso: <span id="fecha-actual">--/--/----</span></p>
         </div>
@@ -50,48 +52,48 @@
 
     <div class="p-6 bg-slate-50 border-b no-print">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Materia / Curso:</label>
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 mb-1 uppercase tracking-widest">Seleccionar Materia / Curso:</label>
                 <select id="select-materia" class="w-full p-3 bg-white border-2 border-slate-200 rounded-xl font-black text-xs outline-none focus:border-indigo-500 uppercase"></select>
             </div>
-            <div class="md:col-span-2"></div>
+            <div></div>
             <button id="btn-generar" class="bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-xl text-[10px] uppercase shadow-lg transition-all active:scale-95">
-                Generar Análisis<i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
+                Generar Análisis Maestro <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
             </button>
         </div>
     </div>
 
     <div class="p-4 md:p-10">
         <div class="text-center mb-8">
-            <h2 id="titulo-reporte" class="text-xl font-black uppercase text-slate-800">Seleccione los parámetros para procesar</h2>
+            <h2 id="titulo-reporte" class="text-xl font-black uppercase text-slate-800 italic">Esperando selección...</h2>
             <div class="flex justify-center gap-4 mt-2 text-[10px] font-black text-slate-400 uppercase">
-                <span id="rep-grado">-</span> | <span id="rep-seccion">-</span>
+                <span id="rep-grado">GRADO</span> | <span id="rep-seccion">SECCIÓN</span>
             </div>
         </div>
 
         <div class="overflow-x-auto mb-10">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest">
-                        <th class="p-3 text-center border border-slate-700">N°</th>
+                    <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest text-center">
+                        <th class="p-3 w-10 border border-slate-700 text-center">N°</th>
                         <th class="p-3 text-left border border-slate-700">Nómina del Estudiante</th>
-                        <th class="p-3 text-center border border-slate-700">T1</th>
-                        <th class="p-3 text-center border border-slate-700">T2</th>
-                        <th class="p-3 text-center border border-slate-700">T3</th>
-                        <th class="p-3 text-center border border-slate-700">SUPL.</th>
-                        <th class="p-3 text-center border border-slate-700 bg-emerald-700">FINAL</th>
-                        <th class="p-3 text-center border border-slate-700">ESTADO</th>
+                        <th class="p-3 border border-slate-700">T1</th>
+                        <th class="p-3 border border-slate-700">T2</th>
+                        <th class="p-3 border border-slate-700">T3</th>
+                        <th class="p-3 border border-slate-700">SUPL.</th>
+                        <th class="p-3 border border-slate-700 bg-emerald-700">FINAL</th>
+                        <th class="p-3 border border-slate-700">ESTADO</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-body" class="text-[11px] font-medium text-slate-700">
-                    <tr><td colspan="8" class="text-center py-20 text-slate-300 italic font-bold">Sin datos seleccionados</td></tr>
+                    <tr><td colspan="8" class="text-center py-20 text-slate-300 italic font-bold uppercase">Configure los parámetros superiores para procesar la información</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start mt-12">
             <div class="chart-container text-center">
-                <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Resumen de Rendimiento Académico</p>
+                <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Estadística de Rendimiento</p>
                 <div style="height: 250px; display: flex; justify-content: center;">
                     <canvas id="rendimientoChart"></canvas>
                 </div>
@@ -107,38 +109,38 @@
 
                 <div class="bg-rose-50 border border-rose-100 p-6 rounded-3xl">
                     <h4 class="text-xs font-black text-rose-900 uppercase mb-4 flex items-center">
-                        <i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> Estudiantes en Peligro (< 7.00)
+                        <i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> Estudiantes en Riesgo (< 7.00)
                     </h4>
-                    <div id="danger-list" class="text-[10px] font-bold text-rose-600 space-y-1"></div>
+                    <div id="danger-list" class="text-[10px] font-bold text-rose-600 space-y-1 uppercase"></div>
                 </div>
             </div>
         </div>
 
-        <div id="area-firmas" class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div id="area-firmas" class="mt-24 grid grid-cols-1 md:grid-cols-3 gap-10">
             <div class="text-center">
-                <div class="border-t border-black pt-2 mx-4">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
                     <p id="firma-docente" class="font-black uppercase text-[11px]">---</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Docente de Materia</p>
+                    <p id="cargo-docente" class="text-[9px] text-slate-400 font-bold uppercase">Docente de Materia</p>
                 </div>
             </div>
             <div id="col-tutor" class="text-center">
-                <div class="border-t border-black pt-2 mx-4">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
                     <p id="firma-tutor" class="font-black uppercase text-[11px]">---</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Tutor de Grado</p>
                 </div>
             </div>
             <div class="text-center">
-                <div class="border-t border-black pt-2 mx-4">
+                <div class="border-t-2 border-slate-900 pt-2 mx-4">
                     <p id="firma-director" class="font-black uppercase text-[11px]">---</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Director(a) / Autoridad</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Rectorado / Dirección</p>
                 </div>
             </div>
         </div>
 
         <div class="mt-12 flex justify-between items-center no-print">
-            <a href="dashboard.html" class="text-slate-400 hover:text-indigo-600 font-black text-[10px] uppercase"><i class="fa-solid fa-arrow-left mr-2"></i> Dashboard</a>
-            <button onclick="window.print()" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all">
-                <i class="fa-solid fa-file-pdf mr-2"></i> Descargar Reporte
+            <a href="dashboard.html" class="text-slate-400 hover:text-indigo-600 font-black text-[10px] uppercase tracking-widest"><i class="fa-solid fa-house mr-2"></i> Dashboard</a>
+            <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-emerald-600 transition-all">
+                <i class="fa-solid fa-file-pdf mr-2 text-lg"></i> Imprimir Reporte Oficial
             </button>
         </div>
     </div>
@@ -206,7 +208,6 @@
     async function cargarFiltros(uid) {
         const uSnap = await getDoc(doc(db, "usuario", uid));
         const isAdmin = uSnap.data().rol === "admin";
-        document.getElementById('firma-docente').innerText = uSnap.data().nombre.toUpperCase();
 
         const q = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", uid));
         const snap = await getDocs(q);
@@ -218,6 +219,7 @@
             const gNom = cache.grados[asig.grado_id] || asig.grado_id;
             asig.materia_id.forEach(mID => {
                 const mNom = cache.materias[mID] || mID;
+                // Guardamos el objeto completo para tener el docente_id real de la materia
                 const val = JSON.stringify({g: asig.grado_id, p: asig.paralelo_id, j: asig.jornada, m: mID, d: asig.docente_id});
                 select.innerHTML += `<option value='${val}'>${mNom} - ${gNom} ${asig.paralelo_id} (${asig.jornada})</option>`;
             });
@@ -231,7 +233,29 @@
         const tbody = document.getElementById('tabla-body');
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-20 animate-pulse font-black text-indigo-900 uppercase">Analizando expedientes académicos...</td></tr>';
 
-        // 1. Cargar Estudiantes Matriculados en esa sección
+        // 1. Firmas Reales (Docente de materia y Tutor)
+        const dSnap = await getDoc(doc(db, "usuario", config.d));
+        document.getElementById('firma-docente').innerText = dSnap.exists() ? dSnap.data().nombre.toUpperCase() : "---";
+
+        const qT = query(collection(db, "asignaciones"), where("grado_id", "==", config.g), where("paralelo_id", "==", config.p), where("jornada", "==", config.j), where("tutor", "==", true));
+        const snapT = await getDocs(qT);
+        let tutorID = "";
+        if(!snapT.empty){
+            tutorID = snapT.docs[0].data().docente_id;
+            const tSnap = await getDoc(doc(db, "usuario", tutorID));
+            document.getElementById('firma-tutor').innerText = tSnap.exists() ? tSnap.data().nombre.toUpperCase() : "---";
+        }
+
+        // Fusión si coinciden
+        if(tutorID === config.d) {
+            document.getElementById('col-tutor').style.display = "none";
+            document.getElementById('cargo-docente').innerText = "DOCENTE / TUTOR";
+        } else {
+            document.getElementById('col-tutor').style.display = "block";
+            document.getElementById('cargo-docente').innerText = "DOCENTE DE MATERIA";
+        }
+
+        // 2. Estudiantes y Notas
         const snapE = await getDocs(collection(db, "estudiantes"));
         let alumnos = [];
         snapE.forEach(d => {
@@ -244,75 +268,52 @@
         });
         alumnos.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
 
-        // 2. Cargar Notas
         const qN = query(collection(db, "notass"), where("periodo_id", "==", cache.periodo), where("materia_id", "==", config.m));
         const snapN = await getDocs(qN);
         let notasMap = {};
         snapN.forEach(d => notasMap[d.data().estudiante_id] = d.data());
 
-        // 3. Buscar Tutor de ese curso (Para la firma)
-        const qT = query(collection(db, "asignaciones"), where("grado_id", "==", config.g), where("paralelo_id", "==", config.p), where("jornada", "==", config.j), where("tutor", "==", true));
-        const snapT = await getDocs(qT);
-        let tutorUID = "";
-        if(!snapT.empty) {
-            tutorUID = snapT.docs[0].data().docente_id;
-            const uDoc = await getDoc(doc(db, "usuario", tutorUID));
-            document.getElementById('firma-tutor').innerText = uDoc.exists() ? uDoc.data().nombre.toUpperCase() : "---";
-        }
-
-        // Lógica de Fusión de Firmas
-        if(tutorUID === config.d) {
-            document.getElementById('col-tutor').classList.add('hidden');
-            document.getElementById('firma-docente').nextElementSibling.innerText = "DOCENTE / TUTOR";
-        } else {
-            document.getElementById('col-tutor').classList.remove('hidden');
-            document.getElementById('firma-docente').nextElementSibling.innerText = "DOCENTE DE MATERIA";
-        }
-
-        // 4. Procesar Datos y Renderizar
+        // 3. Renderizado y Estadísticas
         tbody.innerHTML = "";
-        let dataResult = { aprobados: 0, reprobados: 0, danger: [], top: [] };
+        let stats = { ap: 0, rep: 0, danger: [], top: [] };
         let num = 1;
 
         alumnos.forEach(est => {
             const n = notasMap[est.id] || { nota1:0, nota2:0, nota3:0, nota_supletorio:0, promedio_final:0 };
             const isDanger = n.promedio_final < 7 && n.promedio_final > 0;
-            if(n.promedio_final >= 7) dataResult.aprobados++; else dataResult.reprobados++;
-            if(isDanger) dataResult.danger.push(`${est.apellidos} ${est.nombres} (${n.promedio_final.toFixed(2)})`);
-            dataResult.top.push({nombre: `${est.apellidos} ${est.nombres}`, promedio: n.promedio_final});
+            if(n.promedio_final >= 7) stats.ap++; else stats.rep++;
+            if(isDanger) stats.danger.push(`${est.apellidos} ${est.nombres} (${n.promedio_final.toFixed(2)})`);
+            stats.top.push({nombre: `${est.apellidos} ${est.nombres}`, promedio: n.promedio_final});
 
             tbody.innerHTML += `
-                <tr class="border-b border-slate-50 hover:bg-slate-50">
-                    <td class="p-3 text-center border-x font-bold text-slate-300">${num++}</td>
-                    <td class="p-3 border-x font-black uppercase text-slate-800">${est.apellidos} ${est.nombres}</td>
-                    <td class="p-3 text-center border-x">${n.nota1.toFixed(2)}</td>
-                    <td class="p-3 text-center border-x">${n.nota2.toFixed(2)}</td>
-                    <td class="p-3 text-center border-x">${n.nota3.toFixed(2)}</td>
-                    <td class="p-3 text-center border-x font-bold ${n.nota_supletorio>0?'text-amber-600':''}">${n.nota_supletorio>0?n.nota_supletorio.toFixed(2):'---'}</td>
-                    <td class="p-3 text-center border-x font-black text-indigo-900 bg-slate-50/50 text-xs">${n.promedio_final.toFixed(2)}</td>
-                    <td class="p-3 text-center border-x font-black text-[9px] ${n.promedio_final>=7?'text-emerald-600':'text-rose-600'}">${n.promedio_final>=7?'APROBADO':'REPROBADO'}</td>
+                <tr class="border-b border-slate-100 hover:bg-slate-50 text-center">
+                    <td class="p-3 border-x font-bold text-slate-300">${num++}</td>
+                    <td class="p-3 border-x font-black uppercase text-left text-indigo-950">${est.apellidos} ${est.nombres}</td>
+                    <td class="p-3 border-x">${n.nota1.toFixed(2)}</td>
+                    <td class="p-3 border-x">${n.nota2.toFixed(2)}</td>
+                    <td class="p-3 border-x">${n.nota3.toFixed(2)}</td>
+                    <td class="p-3 border-x font-bold ${n.nota_supletorio>0?'text-amber-600':''}">${n.nota_supletorio>0?n.nota_supletorio.toFixed(2):'---'}</td>
+                    <td class="p-3 border-x font-black text-indigo-900 bg-slate-50/50">${n.promedio_final.toFixed(2)}</td>
+                    <td class="p-3 border-x font-black text-[9px] ${n.promedio_final>=7?'text-emerald-600':'text-rose-600'}">${n.promedio_final>=7?'APROBADO':'REPROBADO'}</td>
                 </tr>`;
         });
 
-        // Actualizar UI
+        // UI Final
         document.getElementById('titulo-reporte').innerText = cache.materias[config.m];
         document.getElementById('rep-grado').innerText = cache.grados[config.g];
         document.getElementById('rep-seccion').innerText = `${config.p} - ${config.j}`;
 
         // Top 3
-        dataResult.top.sort((a,b) => b.promedio - a.promedio);
+        stats.top.sort((a,b) => b.promedio - a.promedio);
         const topCont = document.getElementById('top-estudiantes');
         topCont.innerHTML = "";
         const icons = ['fa-medal text-amber-400', 'fa-medal text-slate-400', 'fa-medal text-orange-600'];
-        dataResult.top.slice(0,3).forEach((e, i) => {
-            if(e.promedio > 0) topCont.innerHTML += `<div class="flex justify-between font-black uppercase text-[11px]"><span class="flex items-center"><i class="fa-solid ${icons[i]} mr-2"></i> ${e.nombre}</span> <span class="text-indigo-600">${e.promedio.toFixed(2)}</span></div>`;
+        stats.top.slice(0,3).forEach((e, i) => {
+            if(e.promedio > 0) topCont.innerHTML += `<div class="flex justify-between font-black uppercase text-[11px]"><span><i class="fa-solid ${icons[i]} mr-2"></i> ${e.nombre}</span> <span class="text-indigo-600">${e.promedio.toFixed(2)}</span></div>`;
         });
 
-        // Peligro
-        document.getElementById('danger-list').innerHTML = dataResult.danger.length ? dataResult.danger.join('<br>') : "NINGÚN ESTUDIANTE EN RIESGO";
-
-        // Gráfico
-        renderChart(dataResult.aprobados, dataResult.reprobados);
+        document.getElementById('danger-list').innerHTML = stats.danger.length ? stats.danger.join('<br>') : "SIN ESTUDIANTES EN RIESGO";
+        renderChart(stats.ap, stats.rep);
     });
 
     function renderChart(ap, rep) {
@@ -322,11 +323,7 @@
             type: 'pie',
             data: {
                 labels: ['APROBADOS', 'REPROBADOS'],
-                datasets: [{
-                    data: [ap, rep],
-                    backgroundColor: ['#10b981', '#f43f5e'],
-                    borderWidth: 0
-                }]
+                datasets: [{ data: [ap, rep], backgroundColor: ['#10b981', '#f43f5e'], borderWidth: 0 }]
             },
             options: {
                 responsive: true,
