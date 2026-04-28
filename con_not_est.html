@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Consulta Familiar</title>
+    <title>Khipu Edu 360 - Portal De Consultas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -127,19 +127,31 @@
         const ced = document.getElementById('cedula_input').value.trim();
         if(ced.length !== 10) return Swal.fire('Aviso', 'Ingrese los 10 dígitos.', 'warning');
 
-        Swal.fire({ title: 'Cargando Datos...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Sincronizando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         try {
             // 1. ESTUDIANTE
             const eSnap = await getDoc(doc(db, "estudiantes", ced));
             if (!eSnap.exists()) {
                 Swal.close();
-                return Swal.fire('No encontrado', 'Estudiante no registrado.', 'warning');
+                return Swal.fire('No encontrado', 'Cédula no registrada.', 'warning');
             }
             const est = eSnap.data();
 
+            // VINCULACIÓN GRADO Y PARALELO
+            let nombreGrado = "---";
+            let nombreParalelo = "---";
+            if(est.grado_id) {
+                const gSnap = await getDoc(doc(db, "grados", est.grado_id));
+                if(gSnap.exists()) nombreGrado = gSnap.data().nombre;
+            }
+            if(est.paralelo_id) {
+                const pSnap = await getDoc(doc(db, "paralelos", est.paralelo_id));
+                if(pSnap.exists()) nombreParalelo = pSnap.data().nombre;
+            }
+
             document.getElementById('res_nombre').innerText = `${est.nombres} ${est.apellidos}`;
-            document.getElementById('res_curso').innerText = `${est.grado || 'S/G'} - ${est.paralelo || 'S/P'}`;
+            document.getElementById('res_curso').innerText = `${nombreGrado} - ${nombreParalelo}`;
 
             // 2. ASISTENCIA
             const asisSnap = await getDoc(doc(db, "asistencias", `${ced}_${HOY}`));
@@ -153,45 +165,52 @@
                 badge.className = "px-3 py-1 rounded-lg font-black text-[10px] bg-slate-100 text-slate-400";
             }
 
-            // 3. NOTAS (Colección notass)
+            // 3. NOTAS CON VINCULACIÓN DE MATERIA
             const qN = query(collection(db, "notass"), where("estudiante_id", "==", ced));
             const snapN = await getDocs(qN);
             const bodyN = document.getElementById('lista-notas');
             bodyN.innerHTML = "";
             if(snapN.empty) {
-                bodyN.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-300 italic">No hay calificaciones publicadas.</td></tr>';
+                bodyN.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-300 italic">No hay notas publicadas.</td></tr>';
             } else {
-                snapN.forEach(docN => {
+                const notasHTML = await Promise.all(snapN.docs.map(async (docN) => {
                     const n = docN.data();
+                    let nomMat = n.materia_id;
+                    const mSnap = await getDoc(doc(db, "materias", n.materia_id));
+                    if(mSnap.exists()) nomMat = mSnap.data().nombre;
                     const p = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
-                    bodyN.innerHTML += `<tr><td class="p-5 uppercase font-black text-indigo-950">${n.materia_id || 'Materia'}</td><td class="p-5 text-center">${n.nota1||'0.00'}</td><td class="p-5 text-center">${n.nota2||'0.00'}</td><td class="p-5 text-center">${n.nota3||'0.00'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
-                });
+                    return `<tr><td class="p-5 uppercase font-black text-indigo-950">${nomMat}</td><td class="p-5 text-center">${n.nota1||'0.00'}</td><td class="p-5 text-center">${n.nota2||'0.00'}</td><td class="p-5 text-center">${n.nota3||'0.00'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
+                }));
+                bodyN.innerHTML = notasHTML.join("");
             }
 
-            // 4. TAREAS (Con blindaje de error)
+            // 4. TAREAS
             const listaT = document.getElementById('lista-tareas');
             listaT.innerHTML = "";
             try {
-                if (est.grado && est.paralelo) {
-                    const qT = query(collection(db, "tareas"), where("grado", "==", est.grado), where("paralelo", "==", est.paralelo));
+                if (est.grado_id && est.paralelo_id) {
+                    const qT = query(collection(db, "tareas"), where("grado_id", "==", est.grado_id), where("paralelo_id", "==", est.paralelo_id));
                     const snapT = await getDocs(qT);
                     let vigentes = [];
                     snapT.forEach(dt => { if(dt.data().fecha_entrega >= HOY) vigentes.push(dt.data()); });
-                    
                     if(vigentes.length > 0) {
-                        vigentes.forEach(t => {
-                            listaT.innerHTML += `<div class="glass-card p-6 border-l-8 border-emerald-500 flex justify-between items-center gap-4 mb-4">
-                                <div><p class="text-[9px] font-black text-indigo-500 uppercase">${t.materia}</p>
+                        const tareasHTML = await Promise.all(vigentes.map(async (t) => {
+                            let matT = t.materia_id;
+                            const mtSnap = await getDoc(doc(db, "materias", t.materia_id));
+                            if(mtSnap.exists()) matT = mtSnap.data().nombre;
+                            return `<div class="glass-card p-6 border-l-8 border-emerald-500 flex justify-between items-center gap-4 mb-4">
+                                <div><p class="text-[9px] font-black text-indigo-500 uppercase">${matT}</p>
                                 <h4 class="font-black text-slate-800 uppercase text-sm">${t.titulo}</h4></div>
                                 <div class="bg-rose-50 px-4 py-2 rounded-xl text-rose-600 font-black text-xs">${t.fecha_entrega}</div>
                             </div>`;
-                        });
+                        }));
+                        listaT.innerHTML = tareasHTML.join("");
                     } else {
                         listaT.innerHTML = '<div class="p-10 text-center text-slate-300 font-black uppercase text-[10px]">No hay tareas pendientes</div>';
                     }
                 }
-            } catch (errTareas) {
-                listaT.innerHTML = '<div class="p-10 text-center text-amber-500 font-black uppercase text-[10px] bg-amber-50 rounded-3xl">Módulo de tareas en construcción 🛠️</div>';
+            } catch (err) {
+                listaT.innerHTML = '<div class="p-10 text-center text-amber-500 font-black uppercase text-[10px]">Módulo de tareas en construcción 🛠️</div>';
             }
 
             document.getElementById('seccion-busqueda').classList.add('hidden');
@@ -202,7 +221,7 @@
 
         } catch (e) {
             console.error(e);
-            Swal.fire('Error', 'Falla de conexión. Verifica las reglas de Firebase.', 'error');
+            Swal.fire('Error', 'Falla de conexión. Revisa las reglas de Firebase.', 'error');
         }
     };
 
