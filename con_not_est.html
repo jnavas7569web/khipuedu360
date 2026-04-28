@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Portal De Consultas</title>
+    <title>Khipu Edu 360 - Consulta Familiar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -89,18 +89,14 @@
                 <div id="lista-tareas" class="space-y-4"></div>
             </div>
         </div>
-
-        <div id="placeholder" class="py-20 text-center opacity-10">
-            <i class="fa-solid fa-fingerprint text-8xl"></i>
-        </div>
     </main>
 
     <footer class="mt-10 py-10 text-center">
-        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 tracking-widest">
             © 2026 Escuela Gran Colombia • Sistema Khipu
         </p>
-        <div class="inline-block px-5 py-2 rounded-full bg-indigo-50 border border-indigo-100">
-            <p class="text-[10px] font-bold text-indigo-900 tracking-wide">
+        <div class="inline-block px-5 py-2 rounded-full bg-indigo-50 border border-indigo-100 shadow-sm">
+            <p class="text-[10px] font-bold text-indigo-900">
                 Diseño y desarrollo by. Ing. Jury Navas 🤓
             </p>
         </div>
@@ -138,20 +134,25 @@
             }
             const est = eSnap.data();
 
-            // VINCULACIÓN GRADO Y PARALELO
-            let nombreGrado = "---";
-            let nombreParalelo = "---";
-            if(est.grado_id) {
-                const gSnap = await getDoc(doc(db, "grados", est.grado_id));
-                if(gSnap.exists()) nombreGrado = gSnap.data().nombre;
-            }
-            if(est.paralelo_id) {
-                const pSnap = await getDoc(doc(db, "paralelos", est.paralelo_id));
-                if(pSnap.exists()) nombreParalelo = pSnap.data().nombre;
-            }
+            // TRADUCCIÓN DE IDS (A prueba de fallos)
+            let nGrado = "---", nParalelo = "---", nJornada = "---";
+            try {
+                if(est.grado) {
+                    const gS = await getDoc(doc(db, "grados", est.grado));
+                    if(gS.exists()) nGrado = gS.data().nombre;
+                }
+                if(est.paralelo) {
+                    const pS = await getDoc(doc(db, "paralelos", est.paralelo));
+                    if(pS.exists()) nParalelo = pS.data().nombre;
+                }
+                if(est.jornada) {
+                    const jS = await getDoc(doc(db, "jornadas", est.jornada));
+                    if(jS.exists()) nJornada = jS.data().nombre;
+                }
+            } catch(e) { console.warn("Error traduciendo cabecera"); }
 
             document.getElementById('res_nombre').innerText = `${est.nombres} ${est.apellidos}`;
-            document.getElementById('res_curso').innerText = `${nombreGrado} - ${nombreParalelo}`;
+            document.getElementById('res_curso').innerText = `${nGrado} - ${nParalelo} - ${nJornada}`;
 
             // 2. ASISTENCIA
             const asisSnap = await getDoc(doc(db, "asistencias", `${ced}_${HOY}`));
@@ -165,7 +166,7 @@
                 badge.className = "px-3 py-1 rounded-lg font-black text-[10px] bg-slate-100 text-slate-400";
             }
 
-            // 3. NOTAS CON VINCULACIÓN DE MATERIA
+            // 3. NOTAS (Colección notass - Usando estudiante_id como dice tu foto)
             const qN = query(collection(db, "notass"), where("estudiante_id", "==", ced));
             const snapN = await getDocs(qN);
             const bodyN = document.getElementById('lista-notas');
@@ -173,55 +174,60 @@
             if(snapN.empty) {
                 bodyN.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-300 italic">No hay notas publicadas.</td></tr>';
             } else {
-                const notasHTML = await Promise.all(snapN.docs.map(async (docN) => {
+                const promesasNotas = snapN.docs.map(async (docN) => {
                     const n = docN.data();
-                    let nomMat = n.materia_id;
-                    const mSnap = await getDoc(doc(db, "materias", n.materia_id));
-                    if(mSnap.exists()) nomMat = mSnap.data().nombre;
+                    let nomMat = "Materia";
+                    try {
+                        const mSnap = await getDoc(doc(db, "materias", n.materia_id));
+                        if(mSnap.exists()) nomMat = mSnap.data().nombre;
+                    } catch(e) {}
                     const p = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
                     return `<tr><td class="p-5 uppercase font-black text-indigo-950">${nomMat}</td><td class="p-5 text-center">${n.nota1||'0.00'}</td><td class="p-5 text-center">${n.nota2||'0.00'}</td><td class="p-5 text-center">${n.nota3||'0.00'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
-                }));
-                bodyN.innerHTML = notasHTML.join("");
+                });
+                const htmlNotas = await Promise.all(promesasNotas);
+                bodyN.innerHTML = htmlNotas.join("");
             }
 
-            // 4. TAREAS
+            // 4. TAREAS (Con blindaje de error si la colección no existe aún)
             const listaT = document.getElementById('lista-tareas');
             listaT.innerHTML = "";
             try {
-                if (est.grado_id && est.paralelo_id) {
-                    const qT = query(collection(db, "tareas"), where("grado_id", "==", est.grado_id), where("paralelo_id", "==", est.paralelo_id));
+                if (est.grado && est.paralelo) {
+                    const qT = query(collection(db, "tareas"), where("grado", "==", est.grado), where("paralelo", "==", est.paralelo));
                     const snapT = await getDocs(qT);
                     let vigentes = [];
                     snapT.forEach(dt => { if(dt.data().fecha_entrega >= HOY) vigentes.push(dt.data()); });
                     if(vigentes.length > 0) {
-                        const tareasHTML = await Promise.all(vigentes.map(async (t) => {
-                            let matT = t.materia_id;
-                            const mtSnap = await getDoc(doc(db, "materias", t.materia_id));
-                            if(mtSnap.exists()) matT = mtSnap.data().nombre;
+                        const promesasTareas = vigentes.map(async (t) => {
+                            let matT = "Materia";
+                            try {
+                                const mtSnap = await getDoc(doc(db, "materias", t.materia_id));
+                                if(mtSnap.exists()) matT = mtSnap.data().nombre;
+                            } catch(e) {}
                             return `<div class="glass-card p-6 border-l-8 border-emerald-500 flex justify-between items-center gap-4 mb-4">
                                 <div><p class="text-[9px] font-black text-indigo-500 uppercase">${matT}</p>
                                 <h4 class="font-black text-slate-800 uppercase text-sm">${t.titulo}</h4></div>
                                 <div class="bg-rose-50 px-4 py-2 rounded-xl text-rose-600 font-black text-xs">${t.fecha_entrega}</div>
                             </div>`;
-                        }));
-                        listaT.innerHTML = tareasHTML.join("");
+                        });
+                        const htmlTareas = await Promise.all(promesasTareas);
+                        listaT.innerHTML = htmlTareas.join("");
                     } else {
                         listaT.innerHTML = '<div class="p-10 text-center text-slate-300 font-black uppercase text-[10px]">No hay tareas pendientes</div>';
                     }
                 }
             } catch (err) {
-                listaT.innerHTML = '<div class="p-10 text-center text-amber-500 font-black uppercase text-[10px]">Módulo de tareas en construcción 🛠️</div>';
+                listaT.innerHTML = '<div class="p-10 text-center text-amber-500 font-black uppercase text-[10px] bg-amber-50 rounded-3xl">Módulo de tareas en construcción 🛠️</div>';
             }
 
             document.getElementById('seccion-busqueda').classList.add('hidden');
             document.getElementById('portal-estudiante').classList.remove('hidden');
-            document.getElementById('placeholder').classList.add('hidden');
             window.cambiarTab('notas');
             Swal.close();
 
         } catch (e) {
             console.error(e);
-            Swal.fire('Error', 'Falla de conexión. Revisa las reglas de Firebase.', 'error');
+            Swal.fire('Falla de conexión', 'Revisa las reglas de Firebase y refresca.', 'error');
         }
     };
 
