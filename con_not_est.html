@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Consulta de Calificaciones</title>
+    <title>Khipu Edu 360 - Portal del Representante</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -13,68 +13,102 @@
         .glass-card { background: white; border-radius: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05); }
         .input-huge { background: #f8fafc; border: 2px solid #e2e8f0; transition: all 0.3s ease; }
         .input-huge:focus { border-color: #6366f1; background: white; box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.1); }
-        .row-materia { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
-        .row-materia:hover { background: #f8fafc; }
+        .btn-menu { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-menu:hover { transform: translateY(-5px); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-10 min-h-screen flex flex-col items-center">
 
     <div class="text-center mb-10">
-        <h1 class="text-2xl font-black text-indigo-900 tracking-tighter italic italic uppercase">Khipu Edu 360</h1>
-        <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.4em]">Plataforma de Consulta Académica</p>
+        <h1 class="text-2xl font-black text-indigo-900 tracking-tighter italic uppercase">Khipu Edu 360</h1>
+        <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.4em]">Portal de Consulta Familiar</p>
     </div>
 
-    <main class="max-w-3xl w-full">
-        <section class="glass-card p-8 md:p-12 mb-8 text-center">
-            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase italic">Consultar Notas de Estudiante</h2>
-            
+    <main class="max-w-4xl w-full">
+        <section id="seccion-busqueda" class="glass-card p-8 md:p-12 mb-8 text-center">
+            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase italic">Identificación del Estudiante</h2>
             <div class="relative max-w-md mx-auto">
                 <input type="text" id="cedula_input" maxlength="10" 
                     class="w-full p-5 rounded-3xl input-huge text-center font-black text-xl tracking-widest text-slate-700 outline-none" 
-                    placeholder="INGRESE CÉDULA">
-                <button onclick="consultarNotas()" class="mt-6 w-full bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-2xl uppercase text-[11px] tracking-widest transition-all shadow-xl active:scale-95">
-                    Ver Calificaciones <i class="fa-solid fa-magnifying-glass ml-2"></i>
+                    placeholder="NÚMERO DE CÉDULA">
+                <button onclick="consultarEstudiante()" class="mt-6 w-full bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-2xl uppercase text-[11px] tracking-widest transition-all shadow-xl active:scale-95">
+                    Ingresar al Portal <i class="fa-solid fa-right-to-bracket ml-2"></i>
                 </button>
             </div>
         </section>
 
-        <div id="panel-resultados" class="hidden animate-fade-in">
-            <div class="glass-card p-8 mb-6 border-l-8 border-indigo-500">
-                <div class="flex justify-between items-start">
+        <div id="panel-estudiante" class="hidden">
+            <div class="glass-card p-6 mb-6 border-l-8 border-indigo-500 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-2xl">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
                     <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estudiante Encontrado:</p>
-                        <h3 id="res_nombre" class="text-2xl font-black text-slate-800 uppercase italic">---</h3>
-                        <div class="flex gap-2 mt-2">
+                        <h3 id="res_nombre" class="text-xl font-black text-slate-800 uppercase italic">---</h3>
+                        <div class="flex gap-2">
                             <span id="res_curso" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-black text-[10px] uppercase">---</span>
+                            <span id="res_asistencia" class="px-3 py-1 rounded-lg font-black text-[10px] uppercase bg-slate-100 text-slate-500">Sin registro de hoy</span>
                         </div>
                     </div>
-                    <button onclick="limpiar()" class="text-slate-300 hover:text-red-500 transition-all">
-                        <i class="fa-solid fa-circle-xmark text-2xl"></i>
-                    </button>
                 </div>
+                <button onclick="limpiarTodo()" class="bg-slate-100 hover:bg-rose-500 hover:text-white text-slate-500 px-6 py-3 rounded-2xl font-black text-[10px] uppercase transition-all">
+                    Salir y Limpiar <i class="fa-solid fa-circle-xmark ml-1"></i>
+                </button>
             </div>
 
-            <div class="glass-card overflow-hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <button onclick="cambiarVista('notas')" class="btn-menu glass-card p-6 flex items-center gap-4 hover:bg-indigo-600 hover:text-white group">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-white/20 group-hover:text-white">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-black uppercase text-sm">Calificaciones</p>
+                        <p class="text-[10px] opacity-60">Notas trimestrales y promedios</p>
+                    </div>
+                </button>
+                <button onclick="cambiarVista('tareas')" class="btn-menu glass-card p-6 flex items-center gap-4 hover:bg-emerald-600 hover:text-white group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-white/20 group-hover:text-white">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-black uppercase text-sm">Tareas Pendientes</p>
+                        <p class="text-[10px] opacity-60">Actividades asignadas por docentes</p>
+                    </div>
+                </button>
+            </div>
+
+            <section id="vista-notas" class="tab-content glass-card overflow-hidden">
+                <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
+                    <h4 class="font-black uppercase italic text-indigo-900">Cuadro de Calificaciones</h4>
+                    <i class="fa-solid fa-file-invoice text-indigo-200 text-2xl"></i>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-                            <tr class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
                                 <th class="p-5">Asignatura</th>
-                                <th class="p-5 text-center">Nota 1</th>
-                                <th class="p-5 text-center">Nota 2</th>
-                                <th class="p-5 text-center">Nota 3</th>
-                                <th class="p-5 text-center bg-indigo-50 text-indigo-600">Promedio</th>
+                                <th class="p-5 text-center">T1</th>
+                                <th class="p-5 text-center">T2</th>
+                                <th class="p-5 text-center">T3</th>
+                                <th class="p-5 text-center bg-indigo-50 text-indigo-600">Prom</th>
                             </tr>
                         </thead>
-                        <tbody id="tabla-notas" class="text-sm font-bold text-slate-600">
-                            </tbody>
+                        <tbody id="tabla-notas" class="text-sm font-bold text-slate-600 divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
-            </div>
+            </section>
+
+            <section id="vista-tareas" class="tab-content">
+                <div class="grid grid-cols-1 gap-4" id="contenedor-tareas">
+                    </div>
+            </section>
         </div>
 
         <div id="placeholder-vacio" class="text-center py-20 opacity-20">
-            <i class="fa-solid fa-file-invoice text-7xl"></i>
+            <i class="fa-solid fa-fingerprint text-7xl"></i>
         </div>
     </main>
 
@@ -84,7 +118,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
@@ -98,73 +132,145 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    window.consultarNotas = async () => {
-        const ced = document.getElementById('cedula_input').value.trim();
-        
-        if(ced.length !== 10) {
-            return Swal.fire('Error', 'La cédula debe tener 10 dígitos.', 'error');
-        }
+    // Variables de sesión local
+    let studentData = null;
+    const HOY = "2026-04-27"; // Fecha fijada por el sistema
 
-        // Mostrar cargando
-        Swal.fire({ title: 'Buscando...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+    window.consultarEstudiante = async () => {
+        const ced = document.getElementById('cedula_input').value.trim();
+        if(ced.length !== 10) return Swal.fire('Atención', 'Ingrese una cédula válida.', 'warning');
+
+        Swal.fire({ title: 'Validando...', didOpen: () => Swal.showLoading() });
 
         try {
-            // 1. Buscar Estudiante
-            const estuRef = doc(db, "estudiantes", ced);
-            const estuSnap = await getDoc(estuRef);
+            const docRef = doc(db, "estudiantes", ced);
+            const docSnap = await getDoc(docRef);
 
-            if (!estuSnap.exists()) {
+            if (!docSnap.exists()) {
                 Swal.close();
-                return Swal.fire('No encontrado', 'No existe un estudiante registrado con esa cédula.', 'warning');
+                return Swal.fire('No encontrado', 'Cédula no registrada.', 'error');
             }
 
-            const alumno = estuSnap.data();
-            document.getElementById('res_nombre').innerText = `${alumno.nombres} ${alumno.apellidos}`;
-            document.getElementById('res_curso').innerText = `${alumno.grado} "${alumno.paralelo}"`;
-
-            // 2. Buscar Notas
-            const qNotas = query(collection(db, "notas"), where("cedula_estudiante", "==", ced));
-            const snapNotas = await getDocs(qNotas);
+            studentData = { id: docSnap.id, ...docSnap.data() };
             
-            const tbody = document.getElementById('tabla-notas');
-            tbody.innerHTML = "";
+            // Cargar Interfaz
+            document.getElementById('res_nombre').innerText = `${studentData.nombres} ${studentData.apellidos}`;
+            document.getElementById('res_curso').innerText = `${studentData.grado} "${studentData.paralelo}"`;
+            
+            await verificarAsistencia(ced);
+            await cargarNotas(ced);
+            await cargarTareas(studentData.grado, studentData.paralelo);
 
-            if(snapNotas.empty) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400">No hay notas registradas para este periodo.</td></tr>`;
-            } else {
-                snapNotas.forEach(docN => {
-                    const n = docN.data();
-                    const promedio = ((parseFloat(n.nota1 || 0) + parseFloat(n.nota2 || 0) + parseFloat(n.nota3 || 0)) / 3).toFixed(2);
-                    
-                    const tr = document.createElement('tr');
-                    tr.className = "row-materia";
-                    tr.innerHTML = `
-                        <td class="p-5 uppercase font-black text-indigo-950">${n.nombre_materia || n.id_materia}</td>
-                        <td class="p-5 text-center">${n.nota1 || '0.00'}</td>
-                        <td class="p-5 text-center">${n.nota2 || '0.00'}</td>
-                        <td class="p-5 text-center">${n.nota3 || '0.00'}</td>
-                        <td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${promedio}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-
-            Swal.close();
-            document.getElementById('panel-resultados').classList.remove('hidden');
+            document.getElementById('seccion-busqueda').classList.add('hidden');
+            document.getElementById('panel-estudiante').classList.remove('hidden');
             document.getElementById('placeholder-vacio').classList.add('hidden');
-
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Hubo un problema al conectar con el servidor.', 'error');
+            cambiarVista('notas'); // Vista por defecto
+            
+            Swal.close();
+        } catch (e) {
+            Swal.fire('Error', 'Falla de conexión.', 'error');
         }
     };
 
-    window.limpiar = () => {
-        document.getElementById('cedula_input').value = "";
-        document.getElementById('panel-resultados').classList.add('hidden');
-        document.getElementById('placeholder-vacio').classList.remove('hidden');
+    async function verificarAsistencia(ced) {
+        // Formato ID asistencia: FECHA_CEDULA (Ej: 2026-04-27_1312345678)
+        const asisId = `${HOY}_${ced}`;
+        const asisSnap = await getDoc(doc(db, "asistencia", asisId));
+        const badge = document.getElementById('res_asistencia');
+
+        if(asisSnap.exists()) {
+            const estado = asisSnap.data().estado; // PRESENTE / AUSENTE / JUSTIFICADO
+            badge.innerText = `HOY: ${estado}`;
+            badge.className = `px-3 py-1 rounded-lg font-black text-[10px] uppercase ${estado === 'PRESENTE' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`;
+        } else {
+            badge.innerText = "Grado no listado hoy";
+            badge.className = "px-3 py-1 rounded-lg font-black text-[10px] uppercase bg-slate-100 text-slate-400";
+        }
+    }
+
+    async function cargarNotas(ced) {
+        const q = query(collection(db, "notas"), where("cedula_estudiante", "==", ced));
+        const snap = await getDocs(q);
+        const tbody = document.getElementById('tabla-notas');
+        tbody.innerHTML = "";
+
+        if(snap.empty) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-slate-400 italic">No hay registros para este periodo.</td></tr>`;
+            return;
+        }
+
+        snap.forEach(docN => {
+            const n = docN.data();
+            const prom = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
+            tbody.innerHTML += `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-5 font-black text-indigo-900 uppercase">${n.nombre_materia}</td>
+                    <td class="p-5 text-center">${n.nota1 || '-'}</td>
+                    <td class="p-5 text-center">${n.nota2 || '-'}</td>
+                    <td class="p-5 text-center">${n.nota3 || '-'}</td>
+                    <td class="p-5 text-center font-black bg-indigo-50/30 text-indigo-600">${prom}</td>
+                </tr>
+            `;
+        });
+    }
+
+    async function cargarTareas(grado, paralelo) {
+        const cont = document.getElementById('contenedor-tareas');
+        cont.innerHTML = "";
+        
+        // Consultar tareas del grado/paralelo ordenadas por fecha de entrega
+        const q = query(
+            collection(db, "tareas"), 
+            where("grado", "==", grado),
+            where("paralelo", "==", paralelo),
+            where("fecha_entrega", ">=", HOY),
+            orderBy("fecha_entrega", "asc")
+        );
+
+        const snap = await getDocs(q);
+
+        if(snap.empty) {
+            cont.innerHTML = `
+                <div class="glass-card p-10 text-center opacity-40">
+                    <i class="fa-solid fa-mug-hot text-4xl mb-3"></i>
+                    <p class="font-black uppercase text-xs">No hay tareas pendientes</p>
+                </div>`;
+            return;
+        }
+
+        snap.forEach(docT => {
+            const t = docT.data();
+            cont.innerHTML += `
+                <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-l-4 border-emerald-500">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase">${t.materia}</span>
+                            <span class="text-slate-400 text-[10px] font-bold">Docente: ${t.nombre_docente}</span>
+                        </div>
+                        <h5 class="font-black text-slate-800 uppercase">${t.titulo}</h5>
+                        <p class="text-sm text-slate-500">${t.descripcion}</p>
+                    </div>
+                    <div class="text-center min-w-[120px] bg-slate-50 p-3 rounded-2xl">
+                        <p class="text-[9px] font-black text-slate-400 uppercase">Entrega</p>
+                        <p class="font-black text-rose-600">${t.fecha_entrega}</p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.cambiarVista = (vista) => {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(`vista-${vista}`).classList.add('active');
     };
 
+    window.limpiarTodo = () => {
+        studentData = null;
+        document.getElementById('cedula_input').value = "";
+        document.getElementById('seccion-busqueda').classList.remove('hidden');
+        document.getElementById('panel-estudiante').classList.add('hidden');
+        document.getElementById('placeholder-vacio').classList.remove('hidden');
+    };
 </script>
 </body>
 </html>
