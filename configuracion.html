@@ -59,7 +59,7 @@
 
 <script type="module">
     ////// AITO DESLOGIGIGNGN
-    import "./security-control.js";
+import { activarVigilante } from "./security-control.js";
     ///////////////////AUTO DESLOOGGGGG
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -75,7 +75,9 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
+//////
+activarVigilante(auth);
+/////
     // Verificar que el usuario esté logueado
     onAuthStateChanged(auth, (user) => {
         if (!user) window.location.href = "index.html";
