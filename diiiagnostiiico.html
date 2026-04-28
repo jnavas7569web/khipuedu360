@@ -24,49 +24,16 @@
             @page { size: A4 portrait; margin: 15mm; }
             .no-print { display: none !important; }
             body { background: white !important; opacity: 1 !important; padding: 0 !important; font-size: 11px !important; }
-            
-            #membrete-impresion { 
-                display: flex !important; flex-direction: row; align-items: center; gap: 20px; 
-                border-bottom: 2.5px solid #000; padding-bottom: 10px; margin-bottom: 30px; 
-                -webkit-print-color-adjust: exact; 
-            }
+            #membrete-impresion { display: flex !important; flex-direction: row; align-items: center; gap: 20px; border-bottom: 2.5px solid #000; padding-bottom: 10px; margin-bottom: 30px; -webkit-print-color-adjust: exact; }
             .print-logo { width: 65px; height: 65px; object-fit: contain; }
-            
-            /* TABLA CENTRADA Y TAMAÑO NORMAL */
-            #col-tabla-print { 
-                width: 85% !important; 
-                margin: 0 auto 30px auto !important; 
-                display: block !important; 
-            }
-            
-            /* ALERTAS: DESAPARECER SI ESTÁN OCULTAS */
+            #col-tabla-print { width: 90% !important; margin: 0 auto 20px auto !important; display: block !important; }
             #alert-refuerzo-box.hidden { display: none !important; }
-            #alert-refuerzo-box { 
-                width: 85% !important; 
-                margin: 0 auto 30px auto !important;
-                background: #fff1f2 !important; 
-                border: 1.5px solid #fda4af !important; 
-                padding: 15px !important; 
-                border-radius: 1rem !important;
-                -webkit-print-color-adjust: exact; 
-            }
-
-            /* GRÁFICO ABAJO */
-            #col-stats-print { 
-                width: 85% !important; 
-                margin: 0 auto !important;
-                display: block !important;
-            }
-
-            #seccion-firma-print { 
-                display: block !important; 
-                margin-top: 50px !important; 
-                text-align: center !important; 
-            }
+            #alert-refuerzo-box { width: 90% !important; margin: 0 auto 20px auto !important; background: #fff1f2 !important; border: 1.5px solid #fda4af !important; padding: 15px !important; border-radius: 1rem !important; -webkit-print-color-adjust: exact; }
+            #col-stats-print { width: 90% !important; margin: 0 auto !important; display: block !important; }
+            #seccion-firma-print { display: block !important; margin-top: 50px !important; text-align: center !important; }
             .linea-firma { border-top: 1.5px solid black; width: 250px; margin: 0 auto; padding-top: 5px; font-weight: 900; text-transform: uppercase; }
-            
             td, th { border: 1px solid #e2e8f0 !important; padding: 8px !important; }
-            canvas { max-width: 100% !important; height: 250px !important; }
+            canvas { max-width: 100% !important; height: 230px !important; }
         }
     </style>
 </head>
@@ -84,9 +51,7 @@
 
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 no-print shadow-sm">
             <div class="flex items-center gap-4">
-                <div class="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                    <i class="fa-solid fa-clipboard-check text-xl"></i>
-                </div>
+                <div class="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-clipboard-check text-xl"></i></div>
                 <div>
                     <h1 class="text-2xl font-black text-indigo-950 italic uppercase tracking-tighter">Test Diagnóstico</h1>
                     <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.3em]">Khipu Edu 360</p>
@@ -112,7 +77,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest text-center">
-                                <th class="p-5 w-10">N°</th><th class="p-5 text-left">Nómina del Estudiante</th><th>Matemáticas</th><th>Lengua</th><th>Sociales</th><th>Ciencias</th><th class="p-5 bg-indigo-800">Promedio</th>
+                                <th class="p-5 w-10">N°</th><th class="p-5 text-left">Nómina Estudiante</th><th>Matemáticas</th><th>Lengua</th><th>Sociales</th><th>Ciencias</th><th class="p-5 bg-indigo-800">Promedio</th>
                             </tr>
                         </thead>
                         <tbody id="body-ingreso" class="text-[12px] font-bold text-slate-700 divide-y divide-slate-100"></tbody>
@@ -131,16 +96,14 @@
             </div>
 
             <div id="reporte-final" class="hidden">
-                <div class="text-center mb-8">
-                    <h3 id="rep-materia-titulo" class="text-3xl font-black uppercase italic border-b-4 border-indigo-600 pb-1 inline-block">---</h3>
+                <div class="text-center mb-10 no-print"> <h3 id="rep-materia-titulo" class="text-3xl font-black uppercase italic border-b-4 border-indigo-600 pb-1 inline-block">---</h3>
                     <p id="rep-subtitulo-print" class="text-[11px] font-black text-slate-500 uppercase mt-2 tracking-widest">---</p>
                 </div>
 
-                <div id="col-tabla-print">
-                    <div class="glass-card border overflow-hidden">
+                <div id="col-tabla-print" class="mb-10"> <div class="glass-card border overflow-hidden">
                         <table class="w-full border-collapse">
                             <thead>
-                                <tr class="text-[10px] uppercase text-slate-600 border-b bg-slate-50 font-black">
+                                <tr class="text-[10px] uppercase text-slate-600 border-b bg-slate-100 font-black">
                                     <th class="py-3 px-3 text-left">N°</th><th class="py-3 px-3 text-left">Estudiante</th><th class="py-3 px-3 text-center">Nota</th>
                                 </tr>
                             </thead>
@@ -149,24 +112,22 @@
                     </div>
                 </div>
                 
-                <div id="alert-refuerzo-box" class="hidden">
-                    <h4 class="text-rose-900 font-black uppercase text-[11px] mb-2 flex items-center">
+                <div id="alert-refuerzo-box" class="hidden mb-10"> <h4 class="text-rose-900 font-black uppercase text-[11px] mb-2 flex items-center">
                         <i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> Alumnos en Proceso de Refuerzo (< 7.00)
                     </h4>
                     <div id="lista-refuerzo" class="text-[10px] font-bold text-rose-600 space-y-1 uppercase leading-tight"></div>
                 </div>
 
-                <div id="col-stats-print">
-                    <div class="glass-card p-6 border-t-4 border-indigo-500">
-                        <p class="text-[9px] font-black uppercase text-slate-400 mb-4 text-center tracking-tighter">Estadística de Rendimiento Diagnóstico</p>
-                        <div style="height: 250px;"><canvas id="chartDiagnostico"></canvas></div>
+                <div id="col-stats-print" class="mb-12"> <div class="glass-card p-8 border-t-4 border-indigo-500">
+                        <p class="text-[9px] font-black uppercase text-slate-400 mb-6 text-center tracking-widest">Estadística de Rendimiento Diagnóstico</p>
+                        <div style="height: 280px;"><canvas id="chartDiagnostico"></canvas></div>
                     </div>
                 </div>
 
                 <div id="seccion-firma-print">
                     <div class="linea-firma">
                         <span id="nombre-tutor-firma">---</span><br>
-                        <span class="text-[9px] font-black text-slate-400 uppercase">Docente Tutor</span>
+                        <span class="text-[9px] font-black text-slate-400 uppercase">Docente Tutor / Responsable</span>
                     </div>
                 </div>
 
@@ -208,8 +169,8 @@
         jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
         if(!perS.empty) { periodoActivo = perS.docs[0].data().nombre; document.getElementById('print-periodo').innerText = periodoActivo; }
         if(instS.exists()) {
-            const d = instS.data(); document.getElementById('print-inst-nombre').innerText = d.nombre;
-            document.getElementById('print-inst-amie').innerText = d.amie; document.getElementById('print-logo-img').src = d.logo_url;
+            const data = instS.data(); document.getElementById('print-inst-nombre').innerText = data.nombre;
+            document.getElementById('print-inst-amie').innerText = data.amie; document.getElementById('print-logo-img').src = data.logo_url;
         }
         await cargarFiltros(auth.currentUser.uid, 'sel-grado', 'sel-seccion');
         await cargarFiltros(auth.currentUser.uid, 'rep-sel-grado', 'rep-sel-seccion');
@@ -311,12 +272,8 @@
         }).join('');
         
         const alertBox = document.getElementById('alert-refuerzo-box');
-        if(stats.refuerzo.length > 0) { 
-            alertBox.classList.remove('hidden'); 
-            document.getElementById('lista-refuerzo').innerHTML = stats.refuerzo.join('<br>'); 
-        } else { 
-            alertBox.classList.add('hidden'); 
-        }
+        if(stats.refuerzo.length > 0) { alertBox.classList.remove('hidden'); document.getElementById('lista-refuerzo').innerHTML = stats.refuerzo.join('<br>'); } 
+        else { alertBox.classList.add('hidden'); }
 
         renderChart(stats);
         document.getElementById('reporte-final').classList.remove('hidden');
@@ -330,28 +287,15 @@
             type: 'bar',
             data: {
                 labels: ['DOMINA (9-10)', 'ALCANZA (7-8.9)', 'NO ALCANZA (<7)'],
-                datasets: [{ 
-                    data: [s.verde, s.amar, s.rojo], 
-                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                    borderRadius: 8,
-                    barThickness: 25
-                }]
+                datasets: [{ data: [s.verde, s.amar, s.rojo], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderRadius: 8, barThickness: 35 }]
             },
             options: {
-                indexAxis: 'y',
-                animation: false,
-                responsive: true, maintainAspectRatio: false,
+                indexAxis: 'y', animation: false, responsive: true, maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    datalabels: {
-                        color: '#fff', font: { weight: '900', size: 11 },
-                        formatter: (val) => val > 0 ? ((val * 100 / total).toFixed(1) + "%") : ''
-                    }
+                    datalabels: { color: '#fff', font: { weight: '900', size: 12 }, formatter: (val) => val > 0 ? ((val * 100 / total).toFixed(1) + "%") : '' }
                 },
-                scales: { 
-                    x: { display: false }, 
-                    y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 10 } } } 
-                }
+                scales: { x: { display: false }, y: { grid: { display: false }, ticks: { font: { weight: 'bold', size: 11 } } } }
             }
         });
     }
