@@ -16,7 +16,7 @@ export function activarVigilante(auth) {
                     window.location.href = "index.html?reason=timeout";
                 }).catch(err => console.error("Error al cerrar sesión:", err));
             }
-        }, 10000); 
+        }, 300000); 
     };
 
     // Lista de eventos que resetean el tiempo
