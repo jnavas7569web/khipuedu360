@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Consultas</title>
+    <title>Khipu Edu 360 - Consulta Familiar</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,6 +14,8 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: slideUp 0.4s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-nav { transition: all 0.3s ease; border: 2px solid transparent; cursor: pointer; }
+        .btn-nav:hover { transform: translateY(-3px); border-color: #6366f1; }
     </style>
 </head>
 <body class="p-4 md:p-10 flex flex-col items-center">
@@ -56,11 +58,11 @@
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <button onclick="cambiarTab('notas')" class="glass-card p-6 flex items-center gap-4 hover:border-indigo-500 transition-all">
+                <button onclick="cambiarTab('notas')" class="btn-nav glass-card p-6 flex items-center gap-4">
                     <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 text-xl"><i class="fa-solid fa-star"></i></div>
-                    <p class="font-black text-slate-800 uppercase text-xs">Notas</p>
+                    <p class="font-black text-slate-800 uppercase text-xs">Calificaciones</p>
                 </button>
-                <button onclick="cambiarTab('tareas')" class="glass-card p-6 flex items-center gap-4 hover:border-emerald-500 transition-all">
+                <button onclick="cambiarTab('tareas')" class="btn-nav glass-card p-6 flex items-center gap-4">
                     <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-book"></i></div>
                     <p class="font-black text-slate-800 uppercase text-xs">Tareas</p>
                 </button>
@@ -72,9 +74,9 @@
                         <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-400 border-b">
                             <tr>
                                 <th class="p-5">Materia</th>
-                                <th class="p-5 text-center">Trim 1</th>
-                                <th class="p-5 text-center">Trim 2</th>
-                                <th class="p-5 text-center">Trim 3</th>
+                                <th class="p-5 text-center">T1</th>
+                                <th class="p-5 text-center">T2</th>
+                                <th class="p-5 text-center">T3</th>
                                 <th class="p-5 text-center bg-indigo-50/50 text-indigo-600">Prom</th>
                             </tr>
                         </thead>
@@ -93,6 +95,20 @@
         </div>
     </main>
 
+    <footer class="mt-auto py-10 text-center">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">© 2026 Escuela Gran Colombia • Sistema Khipu</p>
+    </footer>
+
+    <footer class="mt-auto py-10 text-center">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2">
+            © 2026 Escuela Gran Colombia • Sistema Khipu
+        </p>
+        <div class="inline-block px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100">
+            <p class="text-[10px] font-bold text-indigo-900 tracking-wide">
+                Diseño y desarrollo by. Ing. Jury Navas 🤓
+            </p>
+        </div>
+    </footer>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, getDocs, collection, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -108,13 +124,13 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const HOY = "2026-04-27"; // Fecha del sistema
+    const HOY = "2026-04-27"; 
 
     window.consultarPortal = async () => {
         const ced = document.getElementById('cedula_input').value.trim();
         if(ced.length !== 10) return Swal.fire('Aviso', 'Ingrese los 10 dígitos.', 'warning');
 
-        Swal.fire({ title: 'Buscando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Buscando Estudiante...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         try {
             // 1. Datos del Estudiante
@@ -122,10 +138,24 @@
             const eSnap = await getDoc(estRef);
 
             if (!eSnap.exists()) {
-                return Swal.fire('No encontrado', 'Estudiante no registrado.', 'error');
+                return Swal.fire('No encontrado', 'Cédula no registrada.', 'error');
             }
 
             const est = eSnap.data();
+
+            // --- TRADUCCIÓN DE IDS A NOMBRES ---
+            let nombreGrado = est.grado; 
+            let nombreJornada = est.jornada;
+
+            const gradoSnap = await getDoc(doc(db, "grados", est.grado));
+            if(gradoSnap.exists()) nombreGrado = gradoSnap.data().nombre;
+
+            const jornadaSnap = await getDoc(doc(db, "jornadas", est.jornada));
+            if(jornadaSnap.exists()) nombreJornada = jornadaSnap.data().nombre;
+            // -----------------------------------
+
+            document.getElementById('res_nombre').innerText = `${est.nombres} ${est.apellidos}`;
+            document.getElementById('res_curso').innerText = `${nombreGrado} - ${est.paralelo} - ${nombreJornada}`;
 
             // 2. Asistencia (Formato: CEDULA_FECHA)
             const idAsis = `${ced}_${HOY}`;
@@ -140,18 +170,23 @@
                 badge.className = "px-3 py-1 rounded-lg font-black text-[10px] bg-slate-100 text-slate-400";
             }
 
-            // 3. Calificaciones (Importante: tabla 'notass')
+            // 3. Calificaciones (Colección: notass)
             const qN = query(collection(db, "notass"), where("cedula_estudiante", "==", ced));
             const snapN = await getDocs(qN);
             const bodyN = document.getElementById('lista-notas');
             bodyN.innerHTML = "";
-            snapN.forEach(docN => {
-                const n = docN.data();
-                const p = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
-                bodyN.innerHTML += `<tr><td class="p-5 uppercase font-black text-indigo-950">${n.nombre_materia}</td><td class="p-5 text-center">${n.nota1||'-'}</td><td class="p-5 text-center">${n.nota2||'-'}</td><td class="p-5 text-center">${n.nota3||'-'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
-            });
+            
+            if(snapN.empty) {
+                bodyN.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-300 italic">No hay notas publicadas.</td></tr>';
+            } else {
+                snapN.forEach(docN => {
+                    const n = docN.data();
+                    const p = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
+                    bodyN.innerHTML += `<tr><td class="p-5 uppercase font-black text-indigo-950">${n.nombre_materia}</td><td class="p-5 text-center">${n.nota1||'-'}</td><td class="p-5 text-center">${n.nota2||'-'}</td><td class="p-5 text-center">${n.nota3||'-'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
+                });
+            }
 
-            // 4. Tareas (Vigentes y por Grado)
+            // 4. Tareas (Filtro por Curso + Fecha en JS)
             const qT = query(collection(db, "tareas"), where("grado_id", "==", est.grado), where("paralelo_id", "==", est.paralelo));
             const snapT = await getDocs(qT);
             const listaT = document.getElementById('lista-tareas');
@@ -165,13 +200,13 @@
             vigentes.sort((a,b) => a.fecha_entrega.localeCompare(b.fecha_entrega));
 
             if(vigentes.length === 0) {
-                listaT.innerHTML = '<div class="glass-card p-10 text-center text-slate-300 font-black uppercase text-xs">No hay tareas pendientes</div>';
+                listaT.innerHTML = '<div class="glass-card p-10 text-center text-slate-300 font-black uppercase text-[10px]">No hay tareas pendientes</div>';
             } else {
                 vigentes.forEach(t => {
                     listaT.innerHTML += `
                     <div class="glass-card p-6 border-l-8 border-emerald-500 flex justify-between items-center gap-4">
                         <div>
-                            <p class="text-[9px] font-black text-indigo-500 uppercase">${t.materia} | PROF: ${t.nombre_docente}</p>
+                            <p class="text-[9px] font-black text-indigo-500 uppercase mb-1">${t.materia} | PROF: ${t.nombre_docente}</p>
                             <h4 class="font-black text-slate-800 uppercase text-sm">${t.titulo}</h4>
                             <p class="text-slate-500 text-xs mt-1 leading-relaxed">${t.descripcion}</p>
                         </div>
@@ -183,18 +218,15 @@
                 });
             }
 
-            // Actualizar Interfaz
-            document.getElementById('res_nombre').innerText = `${est.nombres} ${est.apellidos}`;
-            document.getElementById('res_curso').innerText = `${est.grado} - ${est.paralelo}`;
             document.getElementById('seccion-busqueda').classList.add('hidden');
             document.getElementById('portal-estudiante').classList.remove('hidden');
             document.getElementById('placeholder').classList.add('hidden');
-            cambiarTab('notas');
+            window.cambiarTab('notas');
             Swal.close();
 
         } catch (e) {
             console.error(e);
-            Swal.fire('Error de Conexión', 'Verifica que hayas publicado las Reglas de Firebase.', 'error');
+            Swal.fire('Error', 'Falla al conectar con el servidor.', 'error');
         }
     };
 
