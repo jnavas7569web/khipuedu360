@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khipu Edu 360 - Evaluación Diagnóstica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2.5rem; border: 1px solid #e2e8f0; }
+        .tab-btn { transition: 0.3s; border-radius: 1rem; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .tab-active { background: #4f46e5 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+        .nota-input { width: 70px; padding: 8px; border-radius: 10px; border: 2px solid #f1f5f9; text-align: center; font-weight: 800; outline: none; transition: 0.3s; }
+        .nota-input:focus { border-color: #4f46e5; background: #eef2ff; }
+        .nota-input:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; border-color: transparent; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; opacity: 1 !important; }
+            .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
+            td, th { border: 1px solid #e2e8f0 !important; padding: 4px !important; font-size: 10px !important; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
+            <div>
+                <h1 class="text-3xl font-black text-indigo-950 italic uppercase tracking-tighter">Evaluación Diagnóstica</h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em]">Registro Inicial y Análisis de Saberes</p>
+            </div>
+            <div class="flex gap-3 no-print">
+                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex gap-4 mb-8 no-print">
+            <button id="tab-ingreso-btn" onclick="cambiarTab('ingreso')" class="tab-btn tab-active px-8 py-4 bg-white text-slate-400 shadow-sm flex items-center gap-3">
+                <i class="fa-solid fa-pen-nib"></i> Ingreso de Notas
+            </button>
+            <button id="tab-reporte-btn" onclick="cambiarTab('reporte')" class="tab-btn px-8 py-4 bg-white text-slate-400 shadow-sm flex items-center gap-3">
+                <i class="fa-solid fa-chart-pie"></i> Reporte y Gráficos
+            </button>
+        </div>
+
+        <div id="tab-ingreso" class="tab-content">
+            <div class="glass-card p-8 mb-8 no-print">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Seleccionar Curso</label>
+                        <select id="sel-curso-ingreso" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500"></select>
+                    </div>
+                    <button id="btn-cargar-ingreso" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] shadow-xl transition-all">
+                        Cargar Nómina Colectiva <i class="fa-solid fa-users-viewfinder ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="container-tabla-ingreso" class="hidden">
+                <div class="glass-card overflow-hidden">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest">
+                                <th class="p-5">N°</th>
+                                <th class="p-5">Nómina del Estudiante</th>
+                                <th class="p-5 text-center">Matemáticas</th>
+                                <th class="p-5 text-center">Lengua</th>
+                                <th class="p-5 text-center">Sociales</th>
+                                <th class="p-5 text-center">Ciencias</th>
+                                <th class="p-5 text-center bg-indigo-800">Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-ingreso" class="text-[11px] font-bold text-slate-600 divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="mt-8 flex justify-end">
+                    <button id="btn-guardar-diag" class="bg-emerald-500 hover:bg-black text-white px-12 py-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-2xl transition-all">
+                        Guardar Diagnósticos <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-reporte" class="tab-content hidden">
+            <div class="glass-card p-8 mb-8 no-print">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Curso y Materia a Reportar</label>
+                        <select id="sel-reporte-diag" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500"></select>
+                    </div>
+                    <button id="btn-generar-rep" class="bg-violet-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] shadow-xl transition-all">
+                        Generar Análisis <i class="fa-solid fa-magnifying-glass-chart ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="reporte-final" class="hidden print-card">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div class="glass-card p-8">
+                        <h3 id="rep-materia-titulo" class="text-xl font-black uppercase italic mb-6 border-b pb-4">---</h3>
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-[9px] uppercase text-slate-400 border-b">
+                                    <th class="py-3 text-left">N°</th>
+                                    <th class="py-3 text-left">Estudiante</th>
+                                    <th class="py-3 text-center">Nota</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-reporte-lista" class="text-[10px] font-bold uppercase divide-y"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="glass-card p-8 text-center">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-6">Distribución de Niveles</p>
+                            <div style="height: 250px;"><canvas id="chartDiagnostico"></canvas></div>
+                        </div>
+                        <div id="refuerzo-card" class="bg-rose-50 border border-rose-100 p-8 rounded-[2.5rem]">
+                            <h4 class="text-rose-900 font-black uppercase text-xs mb-4 flex items-center">
+                                <i class="fa-solid fa-person-chalkboard mr-2"></i> Estudiantes para Refuerzo
+                            </h4>
+                            <div id="lista-refuerzo" class="text-[10px] font-bold text-rose-600 space-y-1 uppercase"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 flex justify-end no-print">
+                    <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all">
+                        <i class="fa-solid fa-print mr-2"></i> Imprimir Análisis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
+        authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360",
+        storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196",
+        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const cache = { grados: {}, periodo: "", asignaciones: [] };
+    let chartDiag = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            await inicializar();
+        } else { window.location.href = "index.html"; }
+    });
+
+    async function inicializar() {
+        const [gS, perS] = await Promise.all([
+            getDocs(collection(db, "grados")),
+            getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo")))
+        ]);
+        gS.forEach(d => cache.grados[d.id] = d.data().nombre.toUpperCase());
+        if(!perS.empty) cache.periodo = perS.docs[0].data().nombre;
+
+        const uSnap = await getDoc(doc(db, "usuario", auth.currentUser.uid));
+        const isAdmin = uSnap.data().rol === "admin";
+        
+        const qAsig = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", auth.currentUser.uid));
+        const snapA = await getDocs(qAsig);
+        
+        const selI = document.getElementById('sel-curso-ingreso');
+        const selR = document.getElementById('sel-reporte-diag');
+        selI.innerHTML = '<option value="">ELEGIR CURSO</option>';
+        selR.innerHTML = '<option value="">ELEGIR REPORTE</option>';
+
+        snapA.forEach(d => {
+            const a = d.data();
+            cache.asignaciones.push({id: d.id, ...a});
+            const cursoTxt = `${cache.grados[a.grado_id]} "${a.paralelo_id}" (${a.jornada})`;
+            
+            // Filtro Ingreso (Solo cursos donde tengo carga)
+            selI.innerHTML += `<option value='${JSON.stringify(a)}'>${cursoTxt}</option>`;
+            
+            // Filtro Reporte (Curso + Materias Básicas)
+            const basicas = { 'ciencias': 'CIENCIAS NATURALES', 'sociales': 'ESTUDIOS SOCIALES', 'matematicas': 'MATEMÁTICAS', 'lengua': 'LENGUA Y LITERATURA' };
+            Object.keys(basicas).forEach(key => {
+                selR.innerHTML += `<option value='${JSON.stringify({...a, materia_key: key})}'>${basicas[key]} - ${cursoTxt}</option>`;
+            });
+        });
+    }
+
+    // PESTAÑA 1: INGRESO
+    document.getElementById('btn-cargar-ingreso').addEventListener('click', async () => {
+        const asig = JSON.parse(document.getElementById('sel-curso-ingreso').value);
+        const tbody = document.getElementById('body-ingreso');
+        tbody.innerHTML = '<tr><td colspan="7" class="p-10 text-center animate-pulse">CARGANDO LISTADO...</td></tr>';
+
+        // Estudiantes
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        let alumnos = [];
+        snapE.forEach(d => {
+            const e = d.data();
+            if(e.grado === asig.grado_id && e.paralelo === asig.paralelo_id && e.jornada === asig.jornada) alumnos.push({id: d.id, ...e});
+        });
+        alumnos.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
+
+        // Notas actuales
+        const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", cache.periodo)));
+        let notasG = {}; snapD.forEach(d => notasG[d.data().estudiante_id] = d.data().notas);
+
+        tbody.innerHTML = "";
+        alumnos.forEach((est, idx) => {
+            const n = notasG[est.id] || { matematicas:0, lengua:0, sociales:0, ciencias:0 };
+            
+            // Lógica de Bloqueo: Solo habilito si soy Tutor O doy esa materia específica
+            const canMat = asig.tutor || asig.materia_id.includes('matematicas_id_ejemplo'); // Cambiar por tus IDs reales
+            const canLen = asig.tutor || asig.materia_id.includes('lengua_id_ejemplo');
+            const canSoc = asig.tutor || asig.materia_id.includes('sociales_id_ejemplo');
+            const canCie = asig.tutor || asig.materia_id.includes('ciencias_id_ejemplo');
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-5 text-slate-300 font-black">${idx+1}</td>
+                <td class="p-5 uppercase">${est.apellidos} ${est.nombres}</td>
+                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-mat" data-id="${est.id}" value="${n.matematicas || ''}" ${asig.tutor?'':'disabled'}></td>
+                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-len" data-id="${est.id}" value="${n.lengua || ''}" ${asig.tutor?'':'disabled'}></td>
+                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-soc" data-id="${est.id}" value="${n.sociales || ''}" ${asig.tutor?'':'disabled'}></td>
+                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-cie" data-id="${est.id}" value="${n.ciencias || ''}" ${asig.tutor?'':'disabled'}></td>
+                <td class="p-5 text-center font-black text-indigo-600 bg-slate-50 text-base prom">0.00</td>
+            `;
+            tbody.appendChild(tr);
+            actualizarPromedio(tr);
+        });
+        document.getElementById('container-tabla-ingreso').classList.remove('hidden');
+    });
+
+    function actualizarPromedio(tr) {
+        const m = parseFloat(tr.querySelector('.n-mat').value) || 0;
+        const l = parseFloat(tr.querySelector('.n-len').value) || 0;
+        const s = parseFloat(tr.querySelector('.n-soc').value) || 0;
+        const c = parseFloat(tr.querySelector('.n-cie').value) || 0;
+        const p = (m + l + s + c) / 4;
+        tr.querySelector('.prom').innerText = p.toFixed(2);
+    }
+
+    document.addEventListener('input', e => {
+        if(e.target.classList.contains('nota-input')) {
+            if(e.target.value > 10) e.target.value = 10;
+            actualizarPromedio(e.target.closest('tr'));
+        }
+    });
+
+    document.getElementById('btn-guardar-diag').addEventListener('click', async () => {
+        const rows = document.querySelectorAll('#body-ingreso tr');
+        try {
+            for(let tr of rows) {
+                const eid = tr.querySelector('.n-mat').dataset.id;
+                await setDoc(doc(db, "diagnosticos", `${cache.periodo}_${eid}`), {
+                    estudiante_id: eid, periodo_id: cache.periodo,
+                    notas: {
+                        matematicas: parseFloat(tr.querySelector('.n-mat').value) || 0,
+                        lengua: parseFloat(tr.querySelector('.n-len').value) || 0,
+                        sociales: parseFloat(tr.querySelector('.n-soc').value) || 0,
+                        ciencias: parseFloat(tr.querySelector('.n-cie').value) || 0
+                    },
+                    updated_at: serverTimestamp()
+                }, { merge: true });
+            }
+            Swal.fire('Guardado', 'Evaluación registrada.', 'success').then(() => location.reload());
+        } catch(e) { Swal.fire('Error', 'Falla de red', 'error'); }
+    });
+
+    // PESTAÑA 2: REPORTE
+    document.getElementById('btn-generar-rep').addEventListener('click', async () => {
+        const conf = JSON.parse(document.getElementById('sel-reporte-diag').value);
+        const basicas = { 'matematicas': 'MATEMÁTICAS', 'lengua': 'LENGUA Y LITERATURA', 'sociales': 'ESTUDIOS SOCIALES', 'ciencias': 'CIENCIAS NATURALES' };
+        
+        const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", cache.periodo)));
+        const snapE = await getDocs(collection(db, "estudiantes"));
+        
+        let estMap = {}; snapE.forEach(d => estMap[d.id] = d.data());
+        let dataRep = { verde: 0, amarillo: 0, rojo: 0, lista: [], refuerzo: [] };
+
+        snapD.forEach(docD => {
+            const diag = docD.data();
+            const est = estMap[diag.estudiante_id];
+            if(est && est.grado === conf.g && est.paralelo === conf.p && est.jornada === conf.j) {
+                const nota = diag.notas[conf.materia_key] || 0;
+                dataRep.lista.push({ nombre: `${est.apellidos} ${est.nombres}`, nota });
+                if(nota >= 9) dataRep.verde++;
+                else if(nota >= 7) dataRep.amarillo++;
+                else { dataRep.rojo++; dataRep.refuerzo.push(est.apellidos + ' ' + est.nombres); }
+            }
+        });
+
+        dataRep.lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
+        
+        // Render
+        document.getElementById('rep-materia-titulo').innerText = basicas[conf.materia_key];
+        const tbodyR = document.getElementById('body-reporte-lista');
+        tbodyR.innerHTML = dataRep.lista.map((e,i) => `<tr><td class="py-2">${i+1}</td><td class="py-2">${e.nombre}</td><td class="py-2 text-center font-black ${e.nota<7?'text-red-500':''}">${e.nota.toFixed(2)}</td></tr>`).join('');
+        
+        document.getElementById('lista-refuerzo').innerHTML = dataRep.refuerzo.length ? dataRep.refuerzo.join('<br>') : "NINGUNO";
+        renderChartDiag(dataRep);
+        document.getElementById('reporte-final').classList.remove('hidden');
+    });
+
+    function renderChartDiag(d) {
+        if(chartDiag) chartDiag.destroy();
+        chartDiag = new Chart(document.getElementById('chartDiagnostico'), {
+            type: 'pie',
+            data: {
+                labels: ['9-10 DOMINA', '7-8.99 ALCANZA', '<7 NO ALCANZA'],
+                datasets: [{ data: [d.verde, d.amarillo, d.rojo], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    window.cambiarTab = (tab) => {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        document.getElementById(`tab-${tab}-btn`).classList.add('tab-active');
+    }
+</script>
+</body>
+</html>
