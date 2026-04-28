@@ -16,7 +16,7 @@ const reiniciarTemporizador = () => {
                 window.location.href = "index.html?reason=timeout";
             });
         }
-    }, 100000); 
+    }, 10000); 
 };
 
 // Escuchar cuando el estado de autenticación cambia para activar el vigilante
