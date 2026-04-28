@@ -14,7 +14,7 @@ export function activarVigilante(auth) {
                     window.location.href = "index.html?reason=timeout";
                 });
             }
-        }, 300000); 
+        }, 100000); 
     };
 
     const eventos = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
