@@ -14,51 +14,64 @@
         
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; font-size: 13px; color: #334155; }
         .glass-card { background: white; border-radius: 2rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-        .tab-btn { transition: 0.3s; border-radius: 1.2rem; font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; color: #64748b; border: 1px solid transparent; }
+        .tab-btn { transition: 0.3s; border-radius: 1.2rem; font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; color: #64748b; }
         .tab-active { background: #4f46e5 !important; color: white !important; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
-        .nota-input { width: 80px; padding: 8px; border-radius: 12px; border: 2px solid #f1f5f9; text-align: center; font-weight: 800; font-size: 1.1rem; outline: none; }
+        .nota-input { width: 80px; padding: 10px; border-radius: 12px; border: 2px solid #f1f5f9; text-align: center; font-weight: 800; font-size: 1.1rem; outline: none; transition: 0.3s; }
+        .nota-input:focus { border-color: #4f46e5; background: #eef2ff; }
         
         #membrete-impresion, #seccion-firma-print { display: none; }
 
         @media print {
-            @page { size: A4 portrait; margin: 10mm; }
+            @page { size: A4 portrait; margin: 12mm; }
             .no-print { display: none !important; }
-            body { background: white; opacity: 1 !important; padding: 0; font-size: 11px; }
+            body { background: white !important; opacity: 1 !important; padding: 0 !important; font-size: 11px !important; }
             .glass-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; }
-            #membrete-impresion { display: flex !important; flex-direction: row; align-items: center; gap: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px; -webkit-print-color-adjust: exact; }
+            
+            #membrete-impresion { 
+                display: flex !important; flex-direction: row; align-items: center; gap: 20px; 
+                border-bottom: 2.5px solid #000; padding-bottom: 10px; margin-bottom: 20px; 
+                -webkit-print-color-adjust: exact; 
+            }
             .print-logo { width: 70px; height: 70px; object-fit: contain; }
             .print-titulo-escuela { font-weight: 900; font-size: 18px; text-transform: uppercase; }
             
-            /* ESTRUCTURA PDF: TABLA ANCHA -> GRÁFICO (IZQ) | ALERTA (DER) */
-            #col-tabla-print { width: 100% !important; margin-bottom: 30px; }
+            #col-tabla-print { width: 100% !important; display: block !important; margin-bottom: 30px !important; }
+            
+            /* LÓGICA ANTI-SOLAPAMIENTO PARA PDF */
             .resumen-footer-print { 
-                display: flex !important; 
-                flex-direction: row !important; 
-                gap: 20px !important; 
-                align-items: stretch !important; 
-                width: 100% !important; 
+                display: block !important; 
+                width: 100% !important;
+                clear: both !important;
             }
-            
-            /* GRÁFICO A LA IZQUIERDA (45%) */
+
             #col-stats-print { 
-                width: 45% !important; 
-                display: block !important; 
+                float: left !important;
+                width: 42% !important; 
+                margin-right: 3% !important;
+                display: block !important;
             }
-            
-            /* ALERTA A LA DERECHA (50%) */
+
             #alert-refuerzo-box { 
-                width: 50% !important; 
-                display: block !important; 
+                float: left !important;
+                width: 55% !important; 
                 background: #fff1f2 !important; 
-                border: 1px solid #fda4af !important; 
+                border: 1.5px solid #fda4af !important; 
                 padding: 15px !important; 
                 border-radius: 1.5rem !important;
+                display: block !important;
                 -webkit-print-color-adjust: exact; 
             }
 
-            #seccion-firma-print { display: flex !important; justify-content: center; margin-top: 50px; text-align: center; width: 100%; }
-            .linea-firma { border-top: 1.5px solid black; width: 280px; padding-top: 8px; font-weight: 900; text-transform: uppercase; font-size: 11px; }
+            #seccion-firma-print { 
+                clear: both !important; 
+                display: block !important; 
+                padding-top: 60px !important; 
+                text-align: center !important; 
+                width: 100% !important; 
+            }
+            .linea-firma { border-top: 1.5px solid black; width: 280px; margin: 0 auto; padding-top: 5px; font-weight: 900; text-transform: uppercase; font-size: 11px; }
             td, th { border: 1px solid #cbd5e1 !important; padding: 6px !important; font-size: 11px !important; }
+            canvas { max-width: 100% !important; height: 220px !important; }
         }
     </style>
 </head>
@@ -76,7 +89,7 @@
 
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl border border-slate-100 no-print shadow-sm">
             <div class="flex items-center gap-4">
-                <div class="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                <div class="bg-indigo-600 w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg">
                     <i class="fa-solid fa-clipboard-list text-xl"></i>
                 </div>
                 <div>
@@ -84,9 +97,7 @@
                     <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.3em]">Gestión de Saberes Iniciales</p>
                 </div>
             </div>
-            <button onclick="window.location.href='dashboard.html'" class="no-print bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
-                <i class="fa-solid fa-house"></i>
-            </button>
+            <button onclick="window.location.href='dashboard.html'" class="no-print bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center"><i class="fa-solid fa-house"></i></button>
         </header>
 
         <div class="flex gap-3 mb-8 no-print bg-white p-2 rounded-3xl w-fit shadow-sm border">
@@ -106,7 +117,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest text-center">
-                                <th class="p-5 w-10">N°</th><th class="p-5 text-left">Nómina Estudiante</th><th>Matemáticas</th><th>Lengua</th><th>Sociales</th><th>Ciencias</th><th class="p-5 bg-indigo-800">Promedio</th>
+                                <th class="p-5 w-10">N°</th><th class="p-5 text-left">Nómina del Estudiante</th><th>Matemáticas</th><th>Lengua</th><th>Sociales</th><th>Ciencias</th><th class="p-5 bg-indigo-800">Promedio</th>
                             </tr>
                         </thead>
                         <tbody id="body-ingreso" class="text-[12px] font-bold text-slate-700 divide-y divide-slate-100"></tbody>
@@ -125,51 +136,52 @@
             </div>
 
             <div id="reporte-final" class="hidden">
-                <div class="mb-6">
-                    <h3 id="rep-materia-titulo" class="text-3xl font-black uppercase italic border-b-8 border-indigo-600 pb-2 inline-block">---</h3>
-                    <p id="rep-subtitulo-print" class="text-[12px] font-black text-slate-500 uppercase mt-2 tracking-widest">---</p>
+                <div class="mb-4">
+                    <h3 id="rep-materia-titulo" class="text-3xl font-black uppercase italic border-b-8 border-indigo-600 pb-1 inline-block leading-tight">---</h3>
+                    <p id="rep-subtitulo-print" class="text-[12px] font-black text-slate-500 uppercase mt-1 tracking-widest">---</p>
                 </div>
 
                 <div id="reporte-contenedor-flex">
-                    <div id="col-tabla-print" class="w-full">
-                        <div class="glass-card p-4 border">
+                    <div id="col-tabla-print">
+                        <div class="glass-card border overflow-hidden">
                             <table class="w-full border-collapse">
                                 <thead>
-                                    <tr class="text-[10px] uppercase text-slate-500 border-b bg-slate-50 font-black">
-                                        <th class="py-4 px-3 text-left">N°</th><th class="py-4 px-3 text-left">Estudiante</th><th class="py-4 px-3 text-center">Nota</th>
+                                    <tr class="text-[11px] uppercase text-slate-600 border-b bg-slate-100 font-black">
+                                        <th class="py-3 px-3 text-left">N°</th><th class="py-3 px-3 text-left">Nómina del Alumno</th><th class="py-3 px-3 text-center">Nota Diagnóstico</th>
                                     </tr>
                                 </thead>
-                                <tbody id="body-reporte-lista" class="text-[13px] font-black uppercase divide-y divide-slate-100"></tbody>
+                                <tbody id="body-reporte-lista" class="text-[13px] font-black uppercase divide-y divide-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
                     
-                    <div class="resumen-footer-print flex flex-col md:flex-row gap-6 items-start mt-6">
-                        <div id="col-stats-print" class="w-full md:w-1/3">
-                            <div class="glass-card p-6 text-center border-b-8 border-indigo-500 shadow-xl">
-                                <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-widest">Distribución de Niveles (%)</p>
-                                <div style="height: 250px;"><canvas id="chartDiagnostico"></canvas></div>
+                    <div class="resumen-footer-print mt-6">
+                        <div id="col-stats-print">
+                            <div class="glass-card p-6 text-center border-b-8 border-indigo-500 shadow-lg">
+                                <p class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-tighter">Distribución de Niveles (%)</p>
+                                <div style="height: 220px;"><canvas id="chartDiagnostico"></canvas></div>
                             </div>
                         </div>
 
-                        <div id="alert-refuerzo-box" class="bg-rose-50 border border-rose-100 p-8 rounded-3xl flex-1 hidden">
+                        <div id="alert-refuerzo-box" class="bg-rose-50 border border-rose-200 p-6 rounded-3xl hidden">
                             <h4 class="text-rose-900 font-black uppercase text-[12px] mb-3 flex items-center">
-                                <i class="fa-solid fa-triangle-exclamation mr-3 text-rose-500 text-lg"></i> REFUERZO REQUERIDO (< 7.00)
+                                <i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> REFUERZO REQUERIDO (< 7.00)
                             </h4>
-                            <div id="lista-refuerzo" class="text-[11px] font-black text-rose-600 space-y-2 uppercase"></div>
+                            <div id="lista-refuerzo" class="text-[11px] font-black text-rose-600 space-y-1 uppercase leading-tight"></div>
                         </div>
+                        <div style="clear: both;"></div>
                     </div>
                 </div>
 
                 <div id="seccion-firma-print">
                     <div class="linea-firma">
                         <span id="nombre-tutor-firma">---</span><br>
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Docente Tutor / Responsable</span>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Docente Tutor / Responsable</span>
                     </div>
                 </div>
 
                 <div class="mt-12 flex justify-end no-print">
-                    <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all"><i class="fa-solid fa-file-pdf mr-2 text-lg"></i> Imprimir Reporte Oficial</button>
+                    <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all"><i class="fa-solid fa-file-pdf mr-2 text-lg"></i> Imprimir Reporte PDF</button>
                 </div>
             </div>
         </div>
@@ -181,12 +193,9 @@
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk",
-        authDomain: "khipu-edu360.firebaseapp.com",
-        projectId: "khipu-edu360",
-        storageBucket: "khipu-edu360.firebasestorage.app",
-        messagingSenderId: "505046535196",
-        appId: "1:505046535196:web:5e260f2839bacdc35263d9"
+        apiKey: "AIzaSyD7pl5NiJtX1qlwLVng2Frt9MOeT6x9aNk", authDomain: "khipu-edu360.firebaseapp.com",
+        projectId: "khipu-edu360", storageBucket: "khipu-edu360.firebasestorage.app",
+        messagingSenderId: "505046535196", appId: "1:505046535196:web:5e260f2839bacdc35263d9"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -197,10 +206,7 @@
     let periodoActivo = "";
     let chartDiag = null;
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) { document.body.style.opacity = "1"; await inicializar(); }
-        else { window.location.href = "index.html"; }
-    });
+    onAuthStateChanged(auth, async (user) => { if (user) { document.body.style.opacity = "1"; await inicializar(); } else { window.location.href = "index.html"; } });
 
     async function inicializar() {
         const [gS, pS, jS, perS, instS] = await Promise.all([
@@ -212,10 +218,8 @@
         jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
         if(!perS.empty) { periodoActivo = perS.docs[0].data().nombre; document.getElementById('print-periodo').innerText = periodoActivo; }
         if(instS.exists()) {
-            const data = instS.data();
-            document.getElementById('print-inst-nombre').innerText = data.nombre;
-            document.getElementById('print-inst-amie').innerText = data.amie;
-            document.getElementById('print-logo-img').src = data.logo_url;
+            const d = instS.data(); document.getElementById('print-inst-nombre').innerText = d.nombre;
+            document.getElementById('print-inst-amie').innerText = d.amie; document.getElementById('print-logo-img').src = d.logo_url;
         }
         await cargarFiltros(auth.currentUser.uid, 'sel-grado', 'sel-seccion');
         await cargarFiltros(auth.currentUser.uid, 'rep-sel-grado', 'rep-sel-seccion');
@@ -229,17 +233,11 @@
         const selG = document.getElementById(idG);
         selG.innerHTML = '<option value="">-- GRADO --</option>';
         let vistos = new Set();
-        snap.forEach(d => {
-            const a = d.data();
-            if(!vistos.has(a.grado_id)) { vistos.add(a.grado_id); selG.innerHTML += `<option value="${a.grado_id}">${cacheMaps.grados[a.grado_id] || a.grado_id}</option>`; }
-        });
+        snap.forEach(d => { const a = d.data(); if(!vistos.has(a.grado_id)) { vistos.add(a.grado_id); selG.innerHTML += `<option value="${a.grado_id}">${cacheMaps.grados[a.grado_id] || a.grado_id}</option>`; } });
         selG.addEventListener('change', (e) => {
             const selS = document.getElementById(idS);
             selS.innerHTML = '<option value="">-- SECCIÓN --</option>';
-            snap.forEach(d => {
-                const a = d.data();
-                if(a.grado_id === e.target.value) { selS.innerHTML += `<option value='${JSON.stringify({p: a.paralelo_id, j: a.jornada})}'>${a.paralelo_id} - ${a.jornada}</option>`; }
-            });
+            snap.forEach(d => { const a = d.data(); if(a.grado_id === e.target.value) { selS.innerHTML += `<option value='${JSON.stringify({p: a.paralelo_id, j: a.jornada})}'>${a.paralelo_id} - ${a.jornada}</option>`; } });
         });
     }
 
@@ -254,9 +252,7 @@
         let alumnos = [];
         snapE.forEach(d => {
             const e = d.data();
-            const eP = cacheMaps.paralelos[e.paralelo] || e.paralelo;
-            const eJ = cacheMaps.jornadas[e.jornada] || e.jornada;
-            if(e.grado === g && eP === sec.p && eJ === sec.j && (e.estado === true || e.estado === "activo")) alumnos.push({id: d.id, ...e});
+            if(e.grado === g && (cacheMaps.paralelos[e.paralelo] || e.paralelo) === sec.p && (cacheMaps.jornadas[e.jornada] || e.jornada) === sec.j && (e.estado === true || e.estado === "activo")) alumnos.push({id: d.id, ...e});
         });
         alumnos.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
         const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", periodoActivo)));
@@ -272,12 +268,7 @@
         document.getElementById('container-tabla-ingreso').classList.remove('hidden');
     });
 
-    function actualizarPromedio(tr) {
-        const val = (cl) => parseFloat(tr.querySelector(cl).value) || 0;
-        const p = (val('.n-mat') + val('.n-len') + val('.n-soc') + val('.n-cie')) / 4;
-        tr.querySelector('.prom').innerText = p.toFixed(2);
-    }
-
+    function actualizarPromedio(tr) { const val = (cl) => parseFloat(tr.querySelector(cl).value) || 0; const p = (val('.n-mat') + val('.n-len') + val('.n-soc') + val('.n-cie')) / 4; tr.querySelector('.prom').innerText = p.toFixed(2); }
     document.addEventListener('input', e => { if(e.target.classList.contains('nota-input')) { if(e.target.value > 10) e.target.value = 10; actualizarPromedio(e.target.closest('tr')); } });
 
     document.getElementById('btn-guardar-diag').addEventListener('click', async () => {
@@ -303,8 +294,8 @@
         const qT = query(collection(db, "asignaciones"), where("grado_id", "==", g), where("paralelo_id", "==", sec.p), where("jornada", "==", sec.j), where("tutor", "==", true));
         const snapT = await getDocs(qT);
         if(!snapT.empty) {
-            const tutorUID = snapT.docs[0].data().docente_id;
-            const uT = await getDoc(doc(db, "usuario", tutorUID));
+            const tUID = snapT.docs[0].data().docente_id;
+            const uT = await getDoc(doc(db, "usuario", tUID));
             document.getElementById('nombre-tutor-firma').innerText = uT.exists() ? uT.data().nombre : "---";
         }
 
@@ -350,7 +341,7 @@
                 datasets: [{ data: [s.verde, s.amar, s.rojo], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWeight: 0 }]
             },
             options: {
-                animation: false, // DESACTIVADO PARA QUE EL PDF LO CAPTURE SIEMPRE
+                animation: false,
                 responsive: true, maintainAspectRatio: false,
                 plugins: {
                     legend: { position: 'bottom', labels: { font: { size: 10, weight: '800' } } },
