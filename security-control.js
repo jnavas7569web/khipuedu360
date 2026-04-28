@@ -1,28 +1,34 @@
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// security-control.js - Versión Blindada
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// Variable para el temporizador
 let timeout;
+const auth = getAuth();
 
 const reiniciarTemporizador = () => {
-    const auth = getAuth();
     clearTimeout(timeout);
     
     // 300000 ms = 5 minutos
     timeout = setTimeout(() => {
+        // Solo cerramos si hay alguien logueado
         if (auth.currentUser) {
+            console.log("⏰ Tiempo agotado. Cerrando sesión...");
             signOut(auth).then(() => {
                 window.location.href = "index.html?reason=timeout";
             });
         }
-    }, 300000); 
+    }, 100000); 
 };
 
-// Eventos para detectar que el usuario sigue ahí
-window.onload = reiniciarTemporizador;
-document.onmousemove = reiniciarTemporizador;
-document.onkeypress = reiniciarTemporizador;
-document.onclick = reiniciarTemporizador;
-document.onwheel = reiniciarTemporizador;
-document.ontouchstart = reiniciarTemporizador;
-
-console.log("🛡️ Seguridad Khipu: Auto-logout activo (5 min)");
+// Escuchar cuando el estado de autenticación cambia para activar el vigilante
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("🛡️ Vigilante de sesión activado para:", user.email);
+        reiniciarTemporizador();
+        
+        // Eventos para detectar actividad humana
+        const eventos = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        eventos.forEach(evt => {
+            document.addEventListener(evt, reiniciarTemporizador, true);
+        });
+    }
+});
