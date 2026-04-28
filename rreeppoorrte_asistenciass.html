@@ -118,6 +118,9 @@
 </div>
 
 <script type="module">
+  /////////////////////AUTO DESLOOGGG
+    import { activarVigilante } from "./security-control.js";
+    /////////////////////AUTO DESLOOGGG
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, getDocs, collection, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -134,7 +137,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
+//////
+activarVigilante(auth);
+/////
     const cacheMaps = { grados: {}, paralelos: {}, jornadas: {} };
 
     onAuthStateChanged(auth, async (user) => {
