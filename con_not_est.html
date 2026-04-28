@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khipu Edu 360 - Consulta Familiar</title>
+    <title>Khipu Edu 360 - Consultas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,11 +12,8 @@
         body { font-family: 'Inter', sans-serif; background: #f8fafc; }
         .glass-card { background: white; border-radius: 2rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .btn-nav { transition: all 0.3s ease; border: 2px solid transparent; }
-        .btn-nav:hover { transform: translateY(-3px); border-color: #6366f1; }
-        .badge-asis { padding: 4px 12px; border-radius: 8px; font-weight: 900; font-size: 10px; text-transform: uppercase; }
+        .tab-content.active { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 md:p-10 flex flex-col items-center">
@@ -28,13 +25,13 @@
 
     <main class="max-w-4xl w-full">
         <section id="seccion-busqueda" class="glass-card p-8 md:p-12 text-center mb-8">
-            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase italic">Identificación del Estudiante</h2>
+            <h2 class="text-xl font-black text-slate-800 mb-6 uppercase italic tracking-tight">Consultar Expediente</h2>
             <div class="max-w-sm mx-auto">
                 <input type="text" id="cedula_input" maxlength="10" 
-                    class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-slate-200 text-center font-black text-xl outline-none focus:border-indigo-500 focus:bg-white transition-all" 
-                    placeholder="N° DE CÉDULA">
+                    class="w-full p-5 rounded-3xl bg-slate-50 border-2 border-slate-200 text-center font-black text-xl outline-none focus:border-indigo-500 transition-all" 
+                    placeholder="CÉDULA DEL ALUMNO">
                 <button onclick="consultarPortal()" class="mt-6 w-full bg-indigo-600 hover:bg-black text-white font-black py-4 rounded-2xl uppercase text-[11px] tracking-widest transition-all shadow-xl active:scale-95">
-                    Entrar al Sistema <i class="fa-solid fa-right-to-bracket ml-2"></i>
+                    Ver Información <i class="fa-solid fa-magnifying-glass ml-2"></i>
                 </button>
             </div>
         </section>
@@ -48,53 +45,41 @@
                     <div>
                         <h3 id="res_nombre" class="text-xl font-black text-slate-800 uppercase italic">---</h3>
                         <div class="flex flex-wrap gap-2 mt-1">
-                            <span id="res_curso" class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-black text-[10px] border border-indigo-100">---</span>
-                            <span id="res_asistencia" class="badge-asis">---</span>
+                            <span id="res_curso" class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg font-black text-[10px] border border-indigo-100 uppercase">---</span>
+                            <span id="res_asistencia" class="px-3 py-1 rounded-lg font-black text-[10px] uppercase">---</span>
                         </div>
                     </div>
                 </div>
                 <button onclick="location.reload()" class="bg-slate-100 hover:bg-rose-500 hover:text-white text-slate-500 px-6 py-3 rounded-2xl font-black text-[10px] uppercase transition-all">
-                    Cerrar Consulta <i class="fa-solid fa-rotate-left ml-2"></i>
+                    Nueva Consulta <i class="fa-solid fa-rotate-left ml-2"></i>
                 </button>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-8">
-                <button onclick="cambiarTab('notas')" class="btn-nav glass-card p-6 flex items-center gap-4">
+                <button onclick="cambiarTab('notas')" class="glass-card p-6 flex items-center gap-4 hover:border-indigo-500 transition-all">
                     <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 text-xl"><i class="fa-solid fa-star"></i></div>
-                    <div class="text-left">
-                        <p class="font-black text-slate-800 uppercase text-xs">Notas</p>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Calificaciones</p>
-                    </div>
+                    <p class="font-black text-slate-800 uppercase text-xs">Notas</p>
                 </button>
-                <button onclick="cambiarTab('tareas')" class="btn-nav glass-card p-6 flex items-center gap-4">
+                <button onclick="cambiarTab('tareas')" class="glass-card p-6 flex items-center gap-4 hover:border-emerald-500 transition-all">
                     <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500 text-xl"><i class="fa-solid fa-book"></i></div>
-                    <div class="text-left">
-                        <p class="font-black text-slate-800 uppercase text-xs">Tareas</p>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase">Pendientes</p>
-                    </div>
+                    <p class="font-black text-slate-800 uppercase text-xs">Tareas</p>
                 </button>
             </div>
 
             <div id="tab-notas" class="tab-content active">
                 <div class="glass-card overflow-hidden">
-                    <div class="p-6 bg-slate-50 border-b flex justify-between items-center">
-                        <span class="font-black text-[10px] uppercase text-slate-500 tracking-widest">Reporte de Calificaciones Actual</span>
-                        <i class="fa-solid fa-chart-line text-indigo-300"></i>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-[9px] font-black text-slate-400 uppercase tracking-widest border-b">
-                                    <th class="p-5">Asignatura</th>
-                                    <th class="p-5 text-center">T1</th>
-                                    <th class="p-5 text-center">T2</th>
-                                    <th class="p-5 text-center">T3</th>
-                                    <th class="p-5 text-center bg-indigo-50/50 text-indigo-600">Promedio</th>
-                                </tr>
-                            </thead>
-                            <tbody id="lista-notas" class="text-[12px] font-bold text-slate-700 divide-y divide-slate-50"></tbody>
-                        </table>
-                    </div>
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 text-[9px] font-black uppercase text-slate-400 border-b">
+                            <tr>
+                                <th class="p-5">Materia</th>
+                                <th class="p-5 text-center">Trim 1</th>
+                                <th class="p-5 text-center">Trim 2</th>
+                                <th class="p-5 text-center">Trim 3</th>
+                                <th class="p-5 text-center bg-indigo-50/50 text-indigo-600">Prom</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-notas" class="text-[12px] font-bold text-slate-700 divide-y divide-slate-50"></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -104,7 +89,7 @@
         </div>
 
         <div id="placeholder" class="py-20 text-center opacity-10">
-            <i class="fa-solid fa-fingerprint text-8xl"></i>
+            <i class="fa-solid fa-shield-halved text-8xl"></i>
         </div>
     </main>
 
@@ -123,20 +108,23 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const HOY = "2026-04-27"; // Fecha actual del sistema
+    const HOY = "2026-04-27"; // Fecha del sistema
 
     window.consultarPortal = async () => {
         const ced = document.getElementById('cedula_input').value.trim();
-        if(ced.length !== 10) return Swal.fire('Error', 'Ingrese 10 dígitos.', 'error');
+        if(ced.length !== 10) return Swal.fire('Aviso', 'Ingrese los 10 dígitos.', 'warning');
 
-        Swal.fire({ title: 'Buscando...', didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Buscando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
         try {
-            // 1. Datos Estudiante
-            const eSnap = await getDoc(doc(db, "estudiantes", ced));
+            // 1. Datos del Estudiante
+            const estRef = doc(db, "estudiantes", ced);
+            const eSnap = await getDoc(estRef);
+
             if (!eSnap.exists()) {
-                return Swal.fire('No encontrado', 'Cédula no registrada.', 'warning');
+                return Swal.fire('No encontrado', 'Estudiante no registrado.', 'error');
             }
+
             const est = eSnap.data();
 
             // 2. Asistencia (Formato: CEDULA_FECHA)
@@ -146,13 +134,13 @@
             if(asisSnap.exists()) {
                 const s = asisSnap.data().estado.toUpperCase();
                 badge.innerText = `HOY: ${s}`;
-                badge.className = `badge-asis ${s==='PRESENTE'?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}`;
+                badge.className = `px-3 py-1 rounded-lg font-black text-[10px] uppercase ${s==='PRESENTE'?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}`;
             } else {
                 badge.innerText = "SIN REGISTRO HOY";
-                badge.className = "badge-asis bg-slate-100 text-slate-400";
+                badge.className = "px-3 py-1 rounded-lg font-black text-[10px] bg-slate-100 text-slate-400";
             }
 
-            // 3. Calificaciones (Colección: notass)
+            // 3. Calificaciones (Importante: tabla 'notass')
             const qN = query(collection(db, "notass"), where("cedula_estudiante", "==", ced));
             const snapN = await getDocs(qN);
             const bodyN = document.getElementById('lista-notas');
@@ -160,16 +148,11 @@
             snapN.forEach(docN => {
                 const n = docN.data();
                 const p = ((parseFloat(n.nota1||0)+parseFloat(n.nota2||0)+parseFloat(n.nota3||0))/3).toFixed(2);
-                bodyN.innerHTML += `<tr><td class="p-5 uppercase font-black">${n.nombre_materia}</td><td class="p-5 text-center">${n.nota1||'-'}</td><td class="p-5 text-center">${n.nota2||'-'}</td><td class="p-5 text-center">${n.nota3||'-'}</td><td class="p-5 text-center bg-indigo-50/30 text-indigo-600">${p}</td></tr>`;
+                bodyN.innerHTML += `<tr><td class="p-5 uppercase font-black text-indigo-950">${n.nombre_materia}</td><td class="p-5 text-center">${n.nota1||'-'}</td><td class="p-5 text-center">${n.nota2||'-'}</td><td class="p-5 text-center">${n.nota3||'-'}</td><td class="p-5 text-center bg-indigo-50/50 text-indigo-700 font-black">${p}</td></tr>`;
             });
 
-            // 4. Tareas (Filtro por Curso + Filtro Fecha en JS)
-            const qT = query(
-                collection(db, "tareas"), 
-                where("grado_id", "==", est.grado), 
-                where("paralelo_id", "==", est.paralelo),
-                where("jornada", "==", est.jornada)
-            );
+            // 4. Tareas (Vigentes y por Grado)
+            const qT = query(collection(db, "tareas"), where("grado_id", "==", est.grado), where("paralelo_id", "==", est.paralelo));
             const snapT = await getDocs(qT);
             const listaT = document.getElementById('lista-tareas');
             listaT.innerHTML = "";
@@ -182,17 +165,17 @@
             vigentes.sort((a,b) => a.fecha_entrega.localeCompare(b.fecha_entrega));
 
             if(vigentes.length === 0) {
-                listaT.innerHTML = '<div class="glass-card p-10 text-center text-slate-400 font-black uppercase text-xs">Sin tareas pendientes</div>';
+                listaT.innerHTML = '<div class="glass-card p-10 text-center text-slate-300 font-black uppercase text-xs">No hay tareas pendientes</div>';
             } else {
                 vigentes.forEach(t => {
                     listaT.innerHTML += `
-                    <div class="glass-card p-6 border-l-8 border-emerald-500 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex-1">
-                            <p class="text-[9px] font-black text-indigo-500 uppercase mb-1">${t.materia} | PROF: ${t.nombre_docente}</p>
+                    <div class="glass-card p-6 border-l-8 border-emerald-500 flex justify-between items-center gap-4">
+                        <div>
+                            <p class="text-[9px] font-black text-indigo-500 uppercase">${t.materia} | PROF: ${t.nombre_docente}</p>
                             <h4 class="font-black text-slate-800 uppercase text-sm">${t.titulo}</h4>
                             <p class="text-slate-500 text-xs mt-1 leading-relaxed">${t.descripcion}</p>
                         </div>
-                        <div class="bg-rose-50 px-5 py-3 rounded-2xl text-center min-w-[110px]">
+                        <div class="bg-rose-50 px-5 py-3 rounded-2xl text-center min-w-[100px]">
                             <p class="text-[8px] font-black text-rose-400 uppercase">Entrega</p>
                             <p class="font-black text-rose-600 text-sm">${t.fecha_entrega}</p>
                         </div>
@@ -200,9 +183,9 @@
                 });
             }
 
-            // Mostrar interfaz
+            // Actualizar Interfaz
             document.getElementById('res_nombre').innerText = `${est.nombres} ${est.apellidos}`;
-            document.getElementById('res_curso').innerText = `${est.periodo_actual} | ${est.grado}`;
+            document.getElementById('res_curso').innerText = `${est.grado} - ${est.paralelo}`;
             document.getElementById('seccion-busqueda').classList.add('hidden');
             document.getElementById('portal-estudiante').classList.remove('hidden');
             document.getElementById('placeholder').classList.add('hidden');
@@ -211,7 +194,7 @@
 
         } catch (e) {
             console.error(e);
-            Swal.fire('Error', 'Falla de conexión con el servidor.', 'error');
+            Swal.fire('Error de Conexión', 'Verifica que hayas publicado las Reglas de Firebase.', 'error');
         }
     };
 
