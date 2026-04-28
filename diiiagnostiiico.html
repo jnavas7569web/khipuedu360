@@ -10,130 +10,128 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; opacity: 0; transition: opacity 0.5s ease; }
-        .glass-card { background: white; border-radius: 2.5rem; border: 1px solid #e2e8f0; }
-        .tab-btn { transition: 0.3s; border-radius: 1rem; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        .tab-active { background: #4f46e5 !important; color: white !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
-        .nota-input { width: 70px; padding: 8px; border-radius: 10px; border: 2px solid #f1f5f9; text-align: center; font-weight: 800; outline: none; transition: 0.3s; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; opacity: 0; transition: opacity 0.5s ease; }
+        .glass-card { background: white; border-radius: 2.5rem; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .tab-btn { transition: 0.3s; border-radius: 1.2rem; font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 1px; color: #64748b; }
+        .tab-active { background: #4f46e5 !important; color: white !important; box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4); }
+        .nota-input { width: 85px; padding: 10px; border-radius: 12px; border: 2px solid #f1f5f9; text-align: center; font-weight: 800; font-size: 1.1rem; outline: none; transition: 0.3s; }
         .nota-input:focus { border-color: #4f46e5; background: #eef2ff; }
-        .nota-input:disabled { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; border-color: transparent; }
         
         @media print {
             .no-print { display: none !important; }
             body { background: white; opacity: 1 !important; }
             .print-card { border: none !important; box-shadow: none !important; border-radius: 0 !important; }
-            td, th { border: 1px solid #e2e8f0 !important; padding: 4px !important; font-size: 10px !important; }
+            td, th { border: 1px solid #e2e8f0 !important; padding: 5px !important; font-size: 10px !important; }
+            .hidden { display: none !important; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-2 md:p-8">
 
     <div class="max-w-7xl mx-auto">
         <header class="flex justify-between items-center mb-8 bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
             <div>
-                <h1 class="text-3xl font-black text-indigo-950 italic uppercase tracking-tighter">Evaluación Diagnóstica</h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em]">Registro Inicial y Análisis de Saberes</p>
+                <h1 class="text-2xl font-black text-indigo-950 italic uppercase tracking-tighter">Evaluación Diagnóstica</h1>
+                <p class="text-slate-400 text-[9px] font-bold uppercase tracking-[0.3em]">Registro Inicial de Saberes</p>
             </div>
-            <div class="flex gap-3 no-print">
-                <button onclick="window.location.href='dashboard.html'" class="bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
-                    <i class="fa-solid fa-house"></i>
-                </button>
-            </div>
+            <button onclick="window.location.href='dashboard.html'" class="no-print bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-500 w-12 h-12 rounded-2xl transition-all flex items-center justify-center">
+                <i class="fa-solid fa-house"></i>
+            </button>
         </header>
 
-        <div class="flex gap-4 mb-8 no-print">
-            <button id="tab-ingreso-btn" onclick="cambiarTab('ingreso')" class="tab-btn tab-active px-8 py-4 bg-white text-slate-400 shadow-sm flex items-center gap-3">
-                <i class="fa-solid fa-pen-nib"></i> Ingreso de Notas
+        <div class="flex gap-3 mb-8 no-print bg-white p-2 rounded-3xl w-fit shadow-sm border">
+            <button id="tab-ingreso-btn" onclick="cambiarTab('ingreso')" class="tab-btn tab-active px-8 py-4 flex items-center gap-2">
+                <i class="fa-solid fa-keyboard"></i> Ingreso
             </button>
-            <button id="tab-reporte-btn" onclick="cambiarTab('reporte')" class="tab-btn px-8 py-4 bg-white text-slate-400 shadow-sm flex items-center gap-3">
-                <i class="fa-solid fa-chart-pie"></i> Reporte y Gráficos
+            <button id="tab-reporte-btn" onclick="cambiarTab('reporte')" class="tab-btn px-8 py-4 flex items-center gap-2">
+                <i class="fa-solid fa-chart-column"></i> Reporte
             </button>
         </div>
 
         <div id="tab-ingreso" class="tab-content">
-            <div class="glass-card p-8 mb-8 no-print">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Seleccionar Curso</label>
-                        <select id="sel-curso-ingreso" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500"></select>
-                    </div>
-                    <button id="btn-cargar-ingreso" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] shadow-xl transition-all">
-                        Cargar Nómina Colectiva <i class="fa-solid fa-users-viewfinder ml-2"></i>
-                    </button>
+            <div class="glass-card p-8 mb-8 no-print grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Grado / Curso</label>
+                    <select id="sel-grado" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500 appearance-none"></select>
                 </div>
+                <div>
+                    <label class="text-[10px] font-black text-slate-400 uppercase mb-2 block">Sección (P | J)</label>
+                    <select id="sel-seccion" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none appearance-none"></select>
+                </div>
+                <div class="md:col-span-1"></div>
+                <button id="btn-cargar-ingreso" class="bg-indigo-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[10px] shadow-xl transition-all active:scale-95">
+                    Cargar Nómina Colectiva <i class="fa-solid fa-magnifying-glass ml-2"></i>
+                </button>
             </div>
 
             <div id="container-tabla-ingreso" class="hidden">
-                <div class="glass-card overflow-hidden">
+                <div class="glass-card overflow-hidden border-b-8 border-indigo-600">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest">
-                                <th class="p-5">N°</th>
-                                <th class="p-5">Nómina del Estudiante</th>
-                                <th class="p-5 text-center">Matemáticas</th>
-                                <th class="p-5 text-center">Lengua</th>
-                                <th class="p-5 text-center">Sociales</th>
-                                <th class="p-5 text-center">Ciencias</th>
-                                <th class="p-5 text-center bg-indigo-800">Promedio</th>
+                            <tr class="bg-slate-900 text-white text-[9px] uppercase tracking-widest text-center">
+                                <th class="p-5 w-10">N°</th>
+                                <th class="p-5 text-left">Nómina del Estudiante</th>
+                                <th class="p-5">Matemáticas</th>
+                                <th class="p-5">Lengua</th>
+                                <th class="p-5">Sociales</th>
+                                <th class="p-5">Ciencias</th>
+                                <th class="p-5 bg-indigo-800">Promedio</th>
                             </tr>
                         </thead>
-                        <tbody id="body-ingreso" class="text-[11px] font-bold text-slate-600 divide-y divide-slate-100"></tbody>
+                        <tbody id="body-ingreso" class="text-[11px] font-bold text-slate-700 divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
                 <div class="mt-8 flex justify-end">
-                    <button id="btn-guardar-diag" class="bg-emerald-500 hover:bg-black text-white px-12 py-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-2xl transition-all">
-                        Guardar Diagnósticos <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
+                    <button id="btn-guardar-diag" class="bg-emerald-500 hover:bg-black text-white px-12 py-5 rounded-[2.5rem] font-black uppercase text-xs tracking-widest shadow-2xl transition-all active:scale-95">
+                        Sincronizar Diagnósticos <i class="fa-solid fa-cloud-arrow-up ml-2"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <div id="tab-reporte" class="tab-content hidden">
-            <div class="glass-card p-8 mb-8 no-print">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Curso y Materia a Reportar</label>
-                        <select id="sel-reporte-diag" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none focus:border-indigo-500"></select>
-                    </div>
-                    <button id="btn-generar-rep" class="bg-violet-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[11px] shadow-xl transition-all">
-                        Generar Análisis <i class="fa-solid fa-magnifying-glass-chart ml-2"></i>
-                    </button>
+            <div class="glass-card p-8 mb-8 no-print grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                <div><select id="rep-sel-grado" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none"></select></div>
+                <div><select id="rep-sel-seccion" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none"></select></div>
+                <div>
+                    <select id="rep-sel-materia" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl font-black text-xs uppercase outline-none">
+                        <option value="">-- MATERIA --</option>
+                        <option value="matematicas">MATEMÁTICAS</option>
+                        <option value="lengua">LENGUA Y LITERATURA</option>
+                        <option value="sociales">ESTUDIOS SOCIALES</option>
+                        <option value="ciencias">CIENCIAS NATURALES</option>
+                    </select>
                 </div>
+                <button id="btn-generar-rep" class="bg-violet-600 hover:bg-black text-white p-4 rounded-2xl font-black uppercase text-[10px] shadow-xl transition-all">
+                    Generar Análisis <i class="fa-solid fa-wand-magic-sparkles ml-2"></i>
+                </button>
             </div>
 
-            <div id="reporte-final" class="hidden print-card">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                    <div class="glass-card p-8">
-                        <h3 id="rep-materia-titulo" class="text-xl font-black uppercase italic mb-6 border-b pb-4">---</h3>
+            <div id="reporte-final" class="hidden">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="glass-card p-8 flex-1">
+                        <h3 id="rep-materia-titulo" class="text-xl font-black uppercase italic mb-6 border-b-4 border-indigo-600 pb-2 inline-block">---</h3>
                         <table class="w-full">
                             <thead>
                                 <tr class="text-[9px] uppercase text-slate-400 border-b">
                                     <th class="py-3 text-left">N°</th>
-                                    <th class="py-3 text-left">Estudiante</th>
+                                    <th class="py-3 text-left">Nómina</th>
                                     <th class="py-3 text-center">Nota</th>
                                 </tr>
                             </thead>
                             <tbody id="body-reporte-lista" class="text-[10px] font-bold uppercase divide-y"></tbody>
                         </table>
                     </div>
-
-                    <div class="space-y-8">
-                        <div class="glass-card p-8 text-center">
-                            <p class="text-[10px] font-black uppercase text-slate-400 mb-6">Distribución de Niveles</p>
-                            <div style="height: 250px;"><canvas id="chartDiagnostico"></canvas></div>
+                    <div class="w-full md:w-1/3 space-y-6">
+                        <div class="glass-card p-8 text-center border-b-8 border-indigo-500">
+                            <p class="text-[9px] font-black uppercase text-slate-400 mb-4">Rendimiento por Niveles</p>
+                            <div style="height: 220px;"><canvas id="chartDiagnostico"></canvas></div>
                         </div>
-                        <div id="refuerzo-card" class="bg-rose-50 border border-rose-100 p-8 rounded-[2.5rem]">
-                            <h4 class="text-rose-900 font-black uppercase text-xs mb-4 flex items-center">
-                                <i class="fa-solid fa-person-chalkboard mr-2"></i> Estudiantes para Refuerzo
-                            </h4>
-                            <div id="lista-refuerzo" class="text-[10px] font-bold text-rose-600 space-y-1 uppercase"></div>
+                        <div id="alert-refuerzo-box" class="bg-rose-50 border border-rose-100 p-6 rounded-[2rem] hidden">
+                            <h4 class="text-rose-900 font-black uppercase text-[10px] mb-4 flex items-center"><i class="fa-solid fa-triangle-exclamation mr-2 text-rose-500"></i> Alerta: Requieren Refuerzo</h4>
+                            <div id="lista-refuerzo" class="text-[9px] font-bold text-rose-600 space-y-1 uppercase leading-tight"></div>
                         </div>
                     </div>
-                </div>
-                <div class="mt-12 flex justify-end no-print">
-                    <button onclick="window.print()" class="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl hover:bg-indigo-600 transition-all">
-                        <i class="fa-solid fa-print mr-2"></i> Imprimir Análisis
-                    </button>
                 </div>
             </div>
         </div>
@@ -157,89 +155,100 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const cache = { grados: {}, periodo: "", asignaciones: [] };
+    const cacheMaps = { grados: {}, paralelos: {}, jornadas: {} };
+    let misAsignaciones = [];
+    let periodoActivo = "";
     let chartDiag = null;
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            document.body.style.opacity = "1";
-            await inicializar();
-        } else { window.location.href = "index.html"; }
+        if (user) { document.body.style.opacity = "1"; await inicializar(); }
+        else { window.location.href = "index.html"; }
     });
 
     async function inicializar() {
-        const [gS, perS] = await Promise.all([
+        const [gS, pS, jS, perS] = await Promise.all([
             getDocs(collection(db, "grados")),
+            getDocs(collection(db, "paralelos")),
+            getDocs(collection(db, "jornadas")),
             getDocs(query(collection(db, "periodos_lectivos"), where("estado", "==", "activo")))
         ]);
-        gS.forEach(d => cache.grados[d.id] = d.data().nombre.toUpperCase());
-        if(!perS.empty) cache.periodo = perS.docs[0].data().nombre;
+        
+        gS.forEach(d => cacheMaps.grados[d.id] = d.data().nombre.toUpperCase());
+        pS.forEach(d => cacheMaps.paralelos[d.id] = d.data().nombre.toUpperCase());
+        jS.forEach(d => cacheMaps.jornadas[d.id] = d.data().nombre.toUpperCase());
+        if(!perS.empty) periodoActivo = perS.docs[0].data().nombre;
 
-        const uSnap = await getDoc(doc(db, "usuario", auth.currentUser.uid));
+        await cargarFiltros(auth.currentUser.uid, 'sel-grado', 'sel-seccion');
+        await cargarFiltros(auth.currentUser.uid, 'rep-sel-grado', 'rep-sel-seccion');
+    }
+
+    async function cargarFiltros(uid, idGrado, idSeccion) {
+        const uSnap = await getDoc(doc(db, "usuario", uid));
         const isAdmin = uSnap.data().rol === "admin";
+        const qAsig = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", uid));
+        const snap = await getDocs(qAsig);
         
-        const qAsig = isAdmin ? query(collection(db, "asignaciones")) : query(collection(db, "asignaciones"), where("docente_id", "==", auth.currentUser.uid));
-        const snapA = await getDocs(qAsig);
+        const selG = document.getElementById(idGrado);
+        selG.innerHTML = '<option value="">ELEGIR GRADO</option>';
+        let vistos = new Set();
         
-        const selI = document.getElementById('sel-curso-ingreso');
-        const selR = document.getElementById('sel-reporte-diag');
-        selI.innerHTML = '<option value="">ELEGIR CURSO</option>';
-        selR.innerHTML = '<option value="">ELEGIR REPORTE</option>';
+        snap.forEach(d => {
+            const a = d.data(); if(idGrado === 'sel-grado') misAsignaciones.push({id: d.id, ...a});
+            if(!vistos.has(a.grado_id)) {
+                vistos.add(a.grado_id);
+                selG.innerHTML += `<option value="${a.grado_id}">${cacheMaps.grados[a.grado_id] || a.grado_id}</option>`;
+            }
+        });
 
-        snapA.forEach(d => {
-            const a = d.data();
-            cache.asignaciones.push({id: d.id, ...a});
-            const cursoTxt = `${cache.grados[a.grado_id]} "${a.paralelo_id}" (${a.jornada})`;
-            
-            // Filtro Ingreso (Solo cursos donde tengo carga)
-            selI.innerHTML += `<option value='${JSON.stringify(a)}'>${cursoTxt}</option>`;
-            
-            // Filtro Reporte (Curso + Materias Básicas)
-            const basicas = { 'ciencias': 'CIENCIAS NATURALES', 'sociales': 'ESTUDIOS SOCIALES', 'matematicas': 'MATEMÁTICAS', 'lengua': 'LENGUA Y LITERATURA' };
-            Object.keys(basicas).forEach(key => {
-                selR.innerHTML += `<option value='${JSON.stringify({...a, materia_key: key})}'>${basicas[key]} - ${cursoTxt}</option>`;
+        selG.addEventListener('change', (e) => {
+            const selS = document.getElementById(idSeccion);
+            selS.innerHTML = '<option value="">ELEGIR SECCIÓN</option>';
+            // Filtrar asignaciones por el grado seleccionado
+            snap.forEach(d => {
+                const a = d.data();
+                if(a.grado_id === e.target.value) {
+                    selS.innerHTML += `<option value='${JSON.stringify({p: a.paralelo_id, j: a.jornada})}'>${a.paralelo_id} - ${a.jornada}</option>`;
+                }
             });
         });
     }
 
-    // PESTAÑA 1: INGRESO
+    // PESTAÑA INGRESO
     document.getElementById('btn-cargar-ingreso').addEventListener('click', async () => {
-        const asig = JSON.parse(document.getElementById('sel-curso-ingreso').value);
+        const g = document.getElementById('sel-grado').value;
+        const s = document.getElementById('sel-seccion').value;
+        if(!g || !s) return Swal.fire('Atención', 'Seleccione Grado y Sección', 'warning');
+        
+        const sec = JSON.parse(s);
         const tbody = document.getElementById('body-ingreso');
-        tbody.innerHTML = '<tr><td colspan="7" class="p-10 text-center animate-pulse">CARGANDO LISTADO...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-16 text-center animate-pulse font-black text-indigo-900">Sincronizando nómina...</td></tr>';
 
-        // Estudiantes
         const snapE = await getDocs(collection(db, "estudiantes"));
         let alumnos = [];
         snapE.forEach(d => {
             const e = d.data();
-            if(e.grado === asig.grado_id && e.paralelo === asig.paralelo_id && e.jornada === asig.jornada) alumnos.push({id: d.id, ...e});
+            const eP = cacheMaps.paralelos[e.paralelo] || e.paralelo;
+            const eJ = cacheMaps.jornadas[e.jornada] || e.jornada;
+            if(e.grado === g && eP === sec.p && eJ === sec.j && (e.estado === true || e.estado === "activo")) alumnos.push({id: d.id, ...e});
         });
         alumnos.sort((a,b) => a.apellidos.localeCompare(b.apellidos));
 
-        // Notas actuales
-        const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", cache.periodo)));
+        const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", periodoActivo)));
         let notasG = {}; snapD.forEach(d => notasG[d.data().estudiante_id] = d.data().notas);
 
         tbody.innerHTML = "";
         alumnos.forEach((est, idx) => {
             const n = notasG[est.id] || { matematicas:0, lengua:0, sociales:0, ciencias:0 };
-            
-            // Lógica de Bloqueo: Solo habilito si soy Tutor O doy esa materia específica
-            const canMat = asig.tutor || asig.materia_id.includes('matematicas_id_ejemplo'); // Cambiar por tus IDs reales
-            const canLen = asig.tutor || asig.materia_id.includes('lengua_id_ejemplo');
-            const canSoc = asig.tutor || asig.materia_id.includes('sociales_id_ejemplo');
-            const canCie = asig.tutor || asig.materia_id.includes('ciencias_id_ejemplo');
-
             const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50 text-center";
             tr.innerHTML = `
-                <td class="p-5 text-slate-300 font-black">${idx+1}</td>
-                <td class="p-5 uppercase">${est.apellidos} ${est.nombres}</td>
-                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-mat" data-id="${est.id}" value="${n.matematicas || ''}" ${asig.tutor?'':'disabled'}></td>
-                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-len" data-id="${est.id}" value="${n.lengua || ''}" ${asig.tutor?'':'disabled'}></td>
-                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-soc" data-id="${est.id}" value="${n.sociales || ''}" ${asig.tutor?'':'disabled'}></td>
-                <td class="p-5 text-center"><input type="number" step="0.01" class="nota-input n-cie" data-id="${est.id}" value="${n.ciencias || ''}" ${asig.tutor?'':'disabled'}></td>
-                <td class="p-5 text-center font-black text-indigo-600 bg-slate-50 text-base prom">0.00</td>
+                <td class="p-5 text-slate-300 font-black border-r">${idx+1}</td>
+                <td class="p-5 text-left uppercase text-indigo-950 border-r">${est.apellidos} ${est.nombres}</td>
+                <td class="p-5 border-r"><input type="number" step="0.01" class="nota-input n-mat" data-id="${est.id}" value="${n.matematicas || ''}"></td>
+                <td class="p-5 border-r"><input type="number" step="0.01" class="nota-input n-len" data-id="${est.id}" value="${n.lengua || ''}"></td>
+                <td class="p-5 border-r"><input type="number" step="0.01" class="nota-input n-soc" data-id="${est.id}" value="${n.sociales || ''}"></td>
+                <td class="p-5 border-r"><input type="number" step="0.01" class="nota-input n-cie" data-id="${est.id}" value="${n.ciencias || ''}"></td>
+                <td class="p-5 font-black text-indigo-600 bg-slate-50/50 text-lg prom">0.00</td>
             `;
             tbody.appendChild(tr);
             actualizarPromedio(tr);
@@ -248,11 +257,8 @@
     });
 
     function actualizarPromedio(tr) {
-        const m = parseFloat(tr.querySelector('.n-mat').value) || 0;
-        const l = parseFloat(tr.querySelector('.n-len').value) || 0;
-        const s = parseFloat(tr.querySelector('.n-soc').value) || 0;
-        const c = parseFloat(tr.querySelector('.n-cie').value) || 0;
-        const p = (m + l + s + c) / 4;
+        const val = (cl) => parseFloat(tr.querySelector(cl).value) || 0;
+        const p = (val('.n-mat') + val('.n-len') + val('.n-soc') + val('.n-cie')) / 4;
         tr.querySelector('.prom').innerText = p.toFixed(2);
     }
 
@@ -265,11 +271,12 @@
 
     document.getElementById('btn-guardar-diag').addEventListener('click', async () => {
         const rows = document.querySelectorAll('#body-ingreso tr');
+        Swal.fire({ title: 'Guardando...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         try {
             for(let tr of rows) {
                 const eid = tr.querySelector('.n-mat').dataset.id;
-                await setDoc(doc(db, "diagnosticos", `${cache.periodo}_${eid}`), {
-                    estudiante_id: eid, periodo_id: cache.periodo,
+                await setDoc(doc(db, "diagnosticos", `${periodoActivo}_${eid}`.replace(/\s+/g, '')), {
+                    estudiante_id: eid, periodo_id: periodoActivo,
                     notas: {
                         matematicas: parseFloat(tr.querySelector('.n-mat').value) || 0,
                         lengua: parseFloat(tr.querySelector('.n-len').value) || 0,
@@ -279,62 +286,72 @@
                     updated_at: serverTimestamp()
                 }, { merge: true });
             }
-            Swal.fire('Guardado', 'Evaluación registrada.', 'success').then(() => location.reload());
-        } catch(e) { Swal.fire('Error', 'Falla de red', 'error'); }
+            Swal.fire('¡Éxito!', 'Diagnósticos sincronizados.', 'success').then(() => location.reload());
+        } catch(e) { Swal.fire('Error', 'Falla de conexión.', 'error'); }
     });
 
-    // PESTAÑA 2: REPORTE
+    // REPORTE LOGIC
     document.getElementById('btn-generar-rep').addEventListener('click', async () => {
-        const conf = JSON.parse(document.getElementById('sel-reporte-diag').value);
-        const basicas = { 'matematicas': 'MATEMÁTICAS', 'lengua': 'LENGUA Y LITERATURA', 'sociales': 'ESTUDIOS SOCIALES', 'ciencias': 'CIENCIAS NATURALES' };
+        const g = document.getElementById('rep-sel-grado').value;
+        const s = document.getElementById('rep-sel-seccion').value;
+        const m = document.getElementById('rep-sel-materia').value;
+        if(!g || !s || !m) return;
+        const sec = JSON.parse(s);
         
-        const snapD = await getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", cache.periodo)));
-        const snapE = await getDocs(collection(db, "estudiantes"));
+        const [snapD, snapE] = await Promise.all([
+            getDocs(query(collection(db, "diagnosticos"), where("periodo_id", "==", periodoActivo))),
+            getDocs(collection(db, "estudiantes"))
+        ]);
         
         let estMap = {}; snapE.forEach(d => estMap[d.id] = d.data());
-        let dataRep = { verde: 0, amarillo: 0, rojo: 0, lista: [], refuerzo: [] };
+        let stats = { verde: 0, amar: 0, rojo: 0, lista: [], refuerzo: [] };
 
         snapD.forEach(docD => {
-            const diag = docD.data();
-            const est = estMap[diag.estudiante_id];
-            if(est && est.grado === conf.g && est.paralelo === conf.p && est.jornada === conf.j) {
-                const nota = diag.notas[conf.materia_key] || 0;
-                dataRep.lista.push({ nombre: `${est.apellidos} ${est.nombres}`, nota });
-                if(nota >= 9) dataRep.verde++;
-                else if(nota >= 7) dataRep.amarillo++;
-                else { dataRep.rojo++; dataRep.refuerzo.push(est.apellidos + ' ' + est.nombres); }
+            const d = docD.data();
+            const e = estMap[d.estudiante_id];
+            const eP = cacheMaps.paralelos[e?.paralelo] || e?.paralelo;
+            const eJ = cacheMaps.jornadas[e?.jornada] || e?.jornada;
+
+            if(e && e.grado === g && eP === sec.p && eJ === sec.j) {
+                const nota = d.notas[m] || 0;
+                stats.lista.push({ nombre: `${e.apellidos} ${e.nombres}`, nota });
+                if(nota >= 9) stats.verde++;
+                else if(nota >= 7) stats.amar++;
+                else { stats.rojo++; stats.refuerzo.push(`${e.apellidos} ${e.nombres}`); }
             }
         });
 
-        dataRep.lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
+        stats.lista.sort((a,b) => a.nombre.localeCompare(b.nombre));
+        document.getElementById('rep-materia-titulo').innerText = m.toUpperCase();
+        document.getElementById('body-reporte-lista').innerHTML = stats.lista.map((e,i) => `<tr><td class="py-3">${i+1}</td><td class="py-3 uppercase font-black">${e.nombre}</td><td class="py-3 text-center font-black ${e.nota<7?'text-rose-600':'text-indigo-600'}">${e.nota.toFixed(2)}</td></tr>`).join('');
         
-        // Render
-        document.getElementById('rep-materia-titulo').innerText = basicas[conf.materia_key];
-        const tbodyR = document.getElementById('body-reporte-lista');
-        tbodyR.innerHTML = dataRep.lista.map((e,i) => `<tr><td class="py-2">${i+1}</td><td class="py-2">${e.nombre}</td><td class="py-2 text-center font-black ${e.nota<7?'text-red-500':''}">${e.nota.toFixed(2)}</td></tr>`).join('');
-        
-        document.getElementById('lista-refuerzo').innerHTML = dataRep.refuerzo.length ? dataRep.refuerzo.join('<br>') : "NINGUNO";
-        renderChartDiag(dataRep);
+        const alertBox = document.getElementById('alert-refuerzo-box');
+        if(stats.refuerzo.length > 0) {
+            alertBox.classList.remove('hidden');
+            document.getElementById('lista-refuerzo').innerHTML = stats.refuerzo.join('<br>');
+        } else { alertBox.classList.add('hidden'); }
+
+        renderChart(stats);
         document.getElementById('reporte-final').classList.remove('hidden');
     });
 
-    function renderChartDiag(d) {
+    function renderChart(s) {
         if(chartDiag) chartDiag.destroy();
         chartDiag = new Chart(document.getElementById('chartDiagnostico'), {
-            type: 'pie',
+            type: 'doughnut',
             data: {
-                labels: ['9-10 DOMINA', '7-8.99 ALCANZA', '<7 NO ALCANZA'],
-                datasets: [{ data: [d.verde, d.amarillo, d.rojo], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }]
+                labels: ['9-10', '7-8.99', '<7'],
+                datasets: [{ data: [s.verde, s.amar, s.rojo], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWeight: 0 }]
             },
             options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
-    window.cambiarTab = (tab) => {
+    window.cambiarTab = (t) => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.getElementById(`tab-${tab}-btn`).classList.add('tab-active');
+        document.getElementById(`tab-${t}`).classList.remove('hidden');
+        document.getElementById(`tab-${t}-btn`).classList.add('tab-active');
     }
 </script>
 </body>
