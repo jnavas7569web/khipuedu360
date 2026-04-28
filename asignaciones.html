@@ -132,7 +132,7 @@
 <script type="module">
 
     /////
-    import "./security-control.js"; // El vigilante entra primero
+   import { activarVigilante } from "./security-control.js";
     ///
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc, serverTimestamp, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -150,6 +150,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    //////
+activarVigilante(auth);
+/////
 
     let materiasSel = [];
     const maps = { docente: {}, grado: {}, materia: {} };
